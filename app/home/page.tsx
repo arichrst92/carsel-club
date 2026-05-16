@@ -47,13 +47,32 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <div className="rounded-2xl bg-bg-card border border-border-light p-5 text-center">
-          <p className="text-sm text-text-600 font-semibold">
-            🚧 Foundation auth + session siap.
-          </p>
-          <p className="text-xs text-text-500 mt-1">
-            Coding fitur Sessions/Match dimulai berikutnya.
-          </p>
+        {/* Sessions CTA */}
+        <div className="grid grid-cols-2 gap-3">
+          <a
+            href="/sessions/new"
+            className="rounded-2xl bg-primary-500 text-white p-4 shadow-fab hover:bg-primary-600 active:scale-[0.98] transition flex flex-col gap-2"
+          >
+            <div className="text-2xl">➕</div>
+            <div className="font-display font-bold text-sm leading-tight">
+              Buat Session
+            </div>
+            <div className="text-[11px] opacity-90 font-semibold">
+              Mulai event padel
+            </div>
+          </a>
+          <a
+            href="/sessions"
+            className="rounded-2xl bg-bg-card border border-border-light p-4 hover:border-primary-200 hover:shadow-card active:scale-[0.98] transition flex flex-col gap-2"
+          >
+            <div className="text-2xl">🎾</div>
+            <div className="font-display font-bold text-sm text-text-900 leading-tight">
+              My Sessions
+            </div>
+            <div className="text-[11px] text-text-500 font-semibold">
+              Lihat session aktif
+            </div>
+          </a>
         </div>
 
         <details className="rounded-xl bg-bg-soft border border-border-light p-4 text-xs">
