@@ -1,0 +1,331 @@
+/**
+ * Drizzle schema — mirror schema.sql.
+ * Source of truth untuk type generation + migrations.
+ *
+ * Generate migration: npx drizzle-kit generate
+ * Apply migration:    npx drizzle-kit migrate
+ */
+
+import { sql } from "drizzle-orm";
+import {
+  boolean,
+  check,
+  index,
+  integer,
+  pgEnum,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  unique,
+  uuid,
+} from "drizzle-orm/pg-core";
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+export const sessionFormatEnum = pgEnum("session_format", [
+  "americano",
+  "mexicano",
+  "tournament",
+]);
+export const sessionPlayTypeEnum = pgEnum("session_play_type", [
+  "freeplay",
+  "tournament",
+]);
+export const sessionVisibilityEnum = pgEnum("session_visibility", [
+  "public",
+  "private",
+]);
+export const sessionStatusEnum = pgEnum("session_status", [
+  "upcoming",
+  "live",
+  "completed",
+  "cancelled",
+]);
+export const participantRoleEnum = pgEnum("participant_role", [
+  "host",
+  "co_host",
+  "player",
+  "guest",
+]);
+export const roundStatusEnum = pgEnum("round_status", [
+  "pending",
+  "in_progress",
+  "completed",
+]);
+export const matchStatusEnum = pgEnum("match_status", [
+  "pending",
+  "live",
+  "completed",
+]);
+export const generationMethodEnum = pgEnum("generation_method", [
+  "auto_random",
+  "auto_mexicano",
+  "manual_drag",
+]);
+
+// ============================================================
+// TIER DEFINITIONS
+// ============================================================
+
+export const tierDefinitions = pgTable("tier_definitions", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  minPoints: integer("min_points").notNull().default(0),
+  minMatches: integer("min_matches").notNull().default(0),
+  icon: text("icon"),
+  color: text("color"),
+  displayOrder: integer("display_order").notNull().unique(),
+});
+
+// ============================================================
+// USERS
+// ============================================================
+
+export const users = pgTable(
+  "users",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    whatsappNumber: text("whatsapp_number").notNull().unique(),
+    displayName: text("display_name").notNull(),
+    avatarUrl: text("avatar_url"),
+    city: text("city"),
+    totalPoints: integer("total_points").notNull().default(0),
+    totalMatches: integer("total_matches").notNull().default(0),
+    totalWins: integer("total_wins").notNull().default(0),
+    totalLosses: integer("total_losses").notNull().default(0),
+    totalDraws: integer("total_draws").notNull().default(0),
+    currentTierId: integer("current_tier_id").references(
+      () => tierDefinitions.id
+    ).default(1),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("idx_users_whatsapp").on(t.whatsappNumber),
+    index("idx_users_lb_points").on(t.totalPoints.desc()),
+    index("idx_users_lb_matches").on(t.totalMatches.desc()),
+    check(
+      "total_stats_consistent",
+      sql`${t.totalWins} + ${t.totalLosses} + ${t.totalDraws} = ${t.totalMatches}`
+    ),
+  ]
+);
+
+// ============================================================
+// OTP VERIFICATIONS
+// ============================================================
+
+export const otpVerifications = pgTable(
+  "otp_verifications",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    whatsappNumber: text("whatsapp_number").notNull(),
+    codeHash: text("code_hash").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    attempts: integer("attempts").notNull().default(0),
+    verifiedAt: timestamp("verified_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index("idx_otp_phone_created").on(t.whatsappNumber, t.createdAt)]
+);
+
+// ============================================================
+// REFERRALS
+// ============================================================
+
+export const referrals = pgTable(
+  "referrals",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    code: text("code").notNull().unique(),
+    referrerUserId: uuid("referrer_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    referredUserId: uuid("referred_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    claimedAt: timestamp("claimed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("idx_referrals_code").on(t.code),
+    index("idx_referrals_referrer").on(t.referrerUserId),
+  ]
+);
+
+// ============================================================
+// SESSIONS
+// ============================================================
+
+export const sessions = pgTable(
+  "sessions",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    title: text("title").notNull(),
+    hostId: uuid("host_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    venueName: text("venue_name"),
+    scheduledAt: timestamp("scheduled_at", { withTimezone: true }).notNull(),
+    format: sessionFormatEnum("format").notNull().default("americano"),
+    playType: sessionPlayTypeEnum("play_type").notNull().default("freeplay"),
+    visibility: sessionVisibilityEnum("visibility").notNull().default("private"),
+    numCourts: integer("num_courts").notNull().default(1),
+    status: sessionStatusEnum("status").notNull().default("upcoming"),
+    fixPartners: boolean("fix_partners").notNull().default(false),
+    coverPhotoUrl: text("cover_photo_url"),
+    description: text("description"),
+    endedAt: timestamp("ended_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("idx_sessions_host").on(t.hostId),
+    index("idx_sessions_scheduled").on(t.scheduledAt.desc()),
+    check("num_courts_positive", sql`${t.numCourts} > 0 AND ${t.numCourts} <= 20`),
+  ]
+);
+
+// ============================================================
+// SESSION PARTICIPANTS
+// ============================================================
+
+export const sessionParticipants = pgTable(
+  "session_participants",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    sessionId: uuid("session_id")
+      .notNull()
+      .references(() => sessions.id, { onDelete: "cascade" }),
+    userId: uuid("user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    guestName: text("guest_name"),
+    role: participantRoleEnum("role").notNull().default("player"),
+    isPlaying: boolean("is_playing").notNull().default(true),
+    sessionPoints: integer("session_points").notNull().default(0),
+    sessionMatches: integer("session_matches").notNull().default(0),
+    sessionWins: integer("session_wins").notNull().default(0),
+    sessionLosses: integer("session_losses").notNull().default(0),
+    sessionDraws: integer("session_draws").notNull().default(0),
+    joinedAt: timestamp("joined_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("idx_sp_session").on(t.sessionId),
+    index("idx_sp_user").on(t.userId),
+    unique("uq_session_member").on(t.sessionId, t.userId),
+    check(
+      "cohost_non_guest",
+      sql`
+        (${t.role} IN ('host', 'co_host', 'player') AND ${t.userId} IS NOT NULL AND ${t.guestName} IS NULL)
+        OR
+        (${t.role} = 'guest' AND ${t.userId} IS NULL AND ${t.guestName} IS NOT NULL)
+      `
+    ),
+    check(
+      "session_stats_consistent",
+      sql`${t.sessionWins} + ${t.sessionLosses} + ${t.sessionDraws} = ${t.sessionMatches}`
+    ),
+  ]
+);
+
+// ============================================================
+// MATCH ROUND SETS
+// ============================================================
+
+export const matchRoundSets = pgTable(
+  "match_round_sets",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    sessionId: uuid("session_id")
+      .notNull()
+      .references(() => sessions.id, { onDelete: "cascade" }),
+    roundNumber: integer("round_number").notNull(),
+    generationMethod: generationMethodEnum("generation_method")
+      .notNull()
+      .default("auto_random"),
+    generatedBy: uuid("generated_by")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    status: roundStatusEnum("status").notNull().default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("idx_mrs_session").on(t.sessionId, t.roundNumber),
+    unique("uq_mrs_session_round").on(t.sessionId, t.roundNumber),
+    check("round_number_positive", sql`${t.roundNumber} > 0`),
+  ]
+);
+
+// ============================================================
+// MATCHES
+// ============================================================
+
+export const matches = pgTable(
+  "matches",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    matchRoundSetId: uuid("match_round_set_id")
+      .notNull()
+      .references(() => matchRoundSets.id, { onDelete: "cascade" }),
+    courtNumber: integer("court_number").notNull(),
+    matchPosition: integer("match_position").notNull(),
+    team1P1Id: uuid("team1_p1_id")
+      .notNull()
+      .references(() => sessionParticipants.id, { onDelete: "restrict" }),
+    team1P2Id: uuid("team1_p2_id")
+      .notNull()
+      .references(() => sessionParticipants.id, { onDelete: "restrict" }),
+    team2P1Id: uuid("team2_p1_id")
+      .notNull()
+      .references(() => sessionParticipants.id, { onDelete: "restrict" }),
+    team2P2Id: uuid("team2_p2_id")
+      .notNull()
+      .references(() => sessionParticipants.id, { onDelete: "restrict" }),
+    team1Score: integer("team1_score").notNull().default(0),
+    team2Score: integer("team2_score").notNull().default(0),
+    status: matchStatusEnum("status").notNull().default("pending"),
+    startedAt: timestamp("started_at", { withTimezone: true }),
+    endedAt: timestamp("ended_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("idx_matches_round").on(t.matchRoundSetId, t.matchPosition),
+    check(
+      "distinct_players",
+      sql`
+        ${t.team1P1Id} != ${t.team1P2Id} AND
+        ${t.team1P1Id} != ${t.team2P1Id} AND
+        ${t.team1P1Id} != ${t.team2P2Id} AND
+        ${t.team1P2Id} != ${t.team2P1Id} AND
+        ${t.team1P2Id} != ${t.team2P2Id} AND
+        ${t.team2P1Id} != ${t.team2P2Id}
+      `
+    ),
+    check(
+      "scores_non_negative",
+      sql`${t.team1Score} >= 0 AND ${t.team2Score} >= 0`
+    ),
+  ]
+);
