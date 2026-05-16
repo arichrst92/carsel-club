@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Session } from "@/lib/db/types";
-import { formatDate, formatTime } from "@/lib/utils";
+import { formatDate, formatTimeRange } from "@/lib/utils";
 
 const STATUS_STYLES: Record<
   Session["status"],
@@ -38,9 +38,9 @@ export function SessionCard({ session }: { session: Session }) {
         </span>
       </div>
 
-      <div className="flex items-center gap-3 text-xs text-text-700 font-semibold">
+      <div className="flex items-center gap-3 text-xs text-text-700 font-semibold flex-wrap">
         <span>📅 {formatDate(session.scheduledAt)}</span>
-        <span>⏰ {formatTime(session.scheduledAt)}</span>
+        <span>⏰ {formatTimeRange(session.scheduledAt, session.scheduledEndAt)}</span>
         <span>
           🏟️ {session.numCourts} court{session.numCourts > 1 ? "s" : ""}
         </span>

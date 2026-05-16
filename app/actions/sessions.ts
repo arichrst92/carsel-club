@@ -28,6 +28,11 @@ const CreateSessionSchema = z.object({
     .string()
     .min(1, "Tanggal & waktu wajib diisi")
     .refine((s) => !isNaN(new Date(s).getTime()), "Format tanggal tidak valid"),
+  durationMinutes: z.coerce
+    .number()
+    .int()
+    .min(30, "Durasi minimum 30 menit")
+    .max(720, "Durasi maksimum 12 jam"),
   numCourts: z.coerce.number().int().min(1, "Minimum 1 court").max(20, "Maksimum 20 court"),
   fixPartners: z.coerce.boolean().default(false),
   description: z.string().trim().max(500).optional().or(z.literal("")),
@@ -48,6 +53,7 @@ export async function createSessionAction(
     title: formData.get("title"),
     venueName: formData.get("venue_name"),
     scheduledAt: formData.get("scheduled_at"),
+    durationMinutes: formData.get("duration_minutes"),
     numCourts: formData.get("num_courts"),
     fixPartners: formData.get("fix_partners") === "on",
     description: formData.get("description"),
@@ -65,6 +71,9 @@ export async function createSessionAction(
   if (scheduledDate.getTime() < Date.now() - 60_000) {
     return { error: "Tanggal & waktu harus di masa depan" };
   }
+  const scheduledEndDate = new Date(
+    scheduledDate.getTime() + input.durationMinutes * 60 * 1000
+  );
 
   let newSessionId: string;
   try {
@@ -76,6 +85,7 @@ export async function createSessionAction(
           hostId: user!.id,
           venueName: input.venueName || null,
           scheduledAt: scheduledDate,
+          scheduledEndAt: scheduledEndDate,
           numCourts: input.numCourts,
           fixPartners: input.fixPartners,
           description: input.description || null,

@@ -8,7 +8,12 @@ import {
   isSessionStaff,
 } from "@/lib/db/queries/sessions";
 import { cancelSessionAction } from "@/app/actions/sessions";
-import { formatDate, formatTime } from "@/lib/utils";
+import {
+  formatDate,
+  formatTimeRange,
+  formatDuration,
+} from "@/lib/utils";
+import { ParticipantRow } from "@/components/sessions/ParticipantRow";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -87,7 +92,21 @@ export default async function SessionDetailPage({ params }: PageProps) {
 
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold opacity-95">
             <span>📅 {formatDate(session.scheduledAt)}</span>
-            <span>⏰ {formatTime(session.scheduledAt)}</span>
+            <span>
+              ⏰ {formatTimeRange(session.scheduledAt, session.scheduledEndAt)}
+            </span>
+            {session.scheduledEndAt && (
+              <span>
+                ·{" "}
+                {formatDuration(
+                  Math.round(
+                    (new Date(session.scheduledEndAt).getTime() -
+                      new Date(session.scheduledAt).getTime()) /
+                      60000
+                  )
+                )}
+              </span>
+            )}
             <span>
               🏟️ {session.numCourts} court{session.numCourts > 1 ? "s" : ""}
             </span>
@@ -112,18 +131,22 @@ export default async function SessionDetailPage({ params }: PageProps) {
               Pemain ({participants.length})
             </h2>
             {staff && !isTerminal && (
-              <button
-                disabled
-                className="text-xs font-bold text-text-400 cursor-not-allowed"
-                title="Coming soon"
+              <Link
+                href={`/sessions/${session.id}/participants`}
+                className="text-xs font-bold text-primary-600 hover:text-primary-700"
               >
-                + Tambah (soon)
-              </button>
+                + Tambah
+              </Link>
             )}
           </div>
           <ul className="space-y-2">
             {participants.map((p) => (
-              <ParticipantRow key={p.id} participant={p} />
+              <ParticipantRow
+                key={p.id}
+                participant={p}
+                sessionId={session.id}
+                canManage={staff && !isTerminal}
+              />
             ))}
           </ul>
         </div>
@@ -170,57 +193,4 @@ export default async function SessionDetailPage({ params }: PageProps) {
 async function cancelSessionFormAction(sessionId: string, _formData: FormData) {
   "use server";
   await cancelSessionAction(sessionId);
-}
-
-function ParticipantRow({
-  participant,
-}: {
-  participant: {
-    id: string;
-    userId: string | null;
-    guestName: string | null;
-    role: "host" | "co_host" | "player" | "guest";
-    isPlaying: boolean;
-    userDisplayName: string | null;
-  };
-}) {
-  const name = participant.guestName || participant.userDisplayName || "—";
-  const initials = name
-    .split(" ")
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-
-  const ROLE_LABELS: Record<typeof participant.role, string> = {
-    host: "Host",
-    co_host: "Co-Host",
-    player: "Player",
-    guest: "Guest",
-  };
-
-  const isStaff = participant.role === "host" || participant.role === "co_host";
-
-  return (
-    <li className="flex items-center gap-3 p-2.5 rounded-xl bg-bg-card border border-border-light">
-      <div className="size-10 rounded-full bg-gradient-to-br from-accent-500 to-accent-600 text-white grid place-items-center font-display font-bold text-sm shrink-0">
-        {initials}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="text-sm font-bold text-text-900 truncate">{name}</div>
-        <div className="text-xs text-text-500 flex items-center gap-2">
-          <span
-            className={
-              isStaff ? "text-primary-600 font-bold" : ""
-            }
-          >
-            {ROLE_LABELS[participant.role]}
-          </span>
-          {!participant.isPlaying && (
-            <span className="text-text-400">· tidak main</span>
-          )}
-        </div>
-      </div>
-    </li>
-  );
 }

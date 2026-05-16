@@ -178,6 +178,7 @@ export const sessions = pgTable(
       .references(() => users.id, { onDelete: "restrict" }),
     venueName: text("venue_name"),
     scheduledAt: timestamp("scheduled_at", { withTimezone: true }).notNull(),
+    scheduledEndAt: timestamp("scheduled_end_at", { withTimezone: true }),
     format: sessionFormatEnum("format").notNull().default("americano"),
     playType: sessionPlayTypeEnum("play_type").notNull().default("freeplay"),
     visibility: sessionVisibilityEnum("visibility").notNull().default("private"),
@@ -198,6 +199,10 @@ export const sessions = pgTable(
     index("idx_sessions_host").on(t.hostId),
     index("idx_sessions_scheduled").on(t.scheduledAt.desc()),
     check("num_courts_positive", sql`${t.numCourts} > 0 AND ${t.numCourts} <= 20`),
+    check(
+      "scheduled_end_after_start",
+      sql`${t.scheduledEndAt} IS NULL OR ${t.scheduledEndAt} > ${t.scheduledAt}`
+    ),
   ]
 );
 

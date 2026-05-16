@@ -51,6 +51,29 @@ export function formatTime(date: Date | string): string {
 }
 
 /**
+ * Format time range "HH:mm - HH:mm".
+ * Returns just start time if end is null.
+ */
+export function formatTimeRange(
+  start: Date | string,
+  end: Date | string | null
+): string {
+  const startStr = formatTime(start);
+  if (!end) return startStr;
+  return `${startStr} - ${formatTime(end)}`;
+}
+
+/**
+ * Format duration in minutes → "1 jam", "1,5 jam", "30 menit", etc.
+ */
+export function formatDuration(minutes: number): string {
+  if (minutes < 60) return `${minutes} menit`;
+  const hours = minutes / 60;
+  if (Number.isInteger(hours)) return `${hours} jam`;
+  return `${hours.toString().replace(".", ",")} jam`;
+}
+
+/**
  * Compute win rate as percentage (0-100).
  * Returns 0 when matches is 0 to avoid divide-by-zero.
  */

@@ -63,7 +63,7 @@ export function CreateSessionForm() {
       </Field>
 
       {/* Date & Time */}
-      <Field label="Tanggal & Waktu" required>
+      <Field label="Tanggal & Waktu Mulai" required>
         <input
           name="scheduled_at_local"
           type="datetime-local"
@@ -71,6 +71,23 @@ export function CreateSessionForm() {
           defaultValue={defaultDateTime()}
           className="input"
         />
+      </Field>
+
+      {/* Duration */}
+      <Field label="Durasi" required hint="Total waktu booking court">
+        <select
+          name="duration_minutes"
+          required
+          defaultValue="120"
+          className="input"
+        >
+          <option value="60">1 jam</option>
+          <option value="90">1,5 jam</option>
+          <option value="120">2 jam</option>
+          <option value="150">2,5 jam</option>
+          <option value="180">3 jam</option>
+          <option value="240">4 jam</option>
+        </select>
       </Field>
 
       {/* Num courts */}
