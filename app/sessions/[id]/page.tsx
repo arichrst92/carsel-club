@@ -14,6 +14,7 @@ import {
   formatDuration,
 } from "@/lib/utils";
 import { ParticipantRow } from "@/components/sessions/ParticipantRow";
+import { MatchesSection } from "@/components/sessions/MatchesSection";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -151,15 +152,13 @@ export default async function SessionDetailPage({ params }: PageProps) {
           </ul>
         </div>
 
-        {/* Match section placeholder */}
-        <div className="rounded-2xl bg-bg-soft border border-border-light p-5 text-center">
-          <p className="text-sm text-text-600 font-semibold">
-            🎾 Match Generator (Phase 5)
-          </p>
-          <p className="text-xs text-text-500 mt-1">
-            Setelah Add Participants done, baru bisa generate match.
-          </p>
-        </div>
+        {/* Matches */}
+        <MatchesSection
+          sessionId={session.id}
+          participants={participants}
+          staff={staff}
+          isTerminal={isTerminal}
+        />
 
         {/* Staff actions */}
         {staff && !isTerminal && (
