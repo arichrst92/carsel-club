@@ -7,6 +7,7 @@ import {
   endMatchAction,
   editCompletedMatchScoreAction,
 } from "@/app/actions/matches";
+import { ShareMatchButton } from "./ShareMatchButton";
 
 type ParticipantLookup = Record<
   string,
@@ -38,10 +39,14 @@ export function MatchCard({
   match,
   lookup,
   canManage,
+  sessionId,
+  sessionTitle,
 }: {
   match: Match;
   lookup: ParticipantLookup;
   canManage: boolean;
+  sessionId: string;
+  sessionTitle: string;
 }) {
   const [t1, setT1] = useState(match.team1Score);
   const [t2, setT2] = useState(match.team2Score);
@@ -285,6 +290,18 @@ export function MatchCard({
             {isPending ? "..." : "Save"}
           </button>
         </div>
+      )}
+
+      {/* Share button — only for completed matches */}
+      {isCompleted && !editing && (
+        <ShareMatchButton
+          sessionId={sessionId}
+          sessionTitle={sessionTitle}
+          team1Names={team1Names}
+          team2Names={team2Names}
+          team1Score={match.team1Score}
+          team2Score={match.team2Score}
+        />
       )}
     </div>
   );

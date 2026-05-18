@@ -1,0 +1,718 @@
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { getPublicSessionView } from "@/lib/db/queries/public-share";
+import { AutoRefresh } from "@/components/share/AutoRefresh";
+import { formatDate, formatTimeRange } from "@/lib/utils";
+
+export const dynamic = "force-dynamic";
+
+type PageProps = {
+  params: Promise<{ id: string }>;
+};
+
+export async function generateMetadata({ params }: PageProps) {
+  const { id } = await params;
+  const data = await getPublicSessionView(id);
+  if (!data) return { title: "Session — Carsel Club" };
+
+  const ogImage = `/api/og/session/${id}`;
+  const description = data.session.venueName
+    ? `Live padel session · ${data.session.venueName}`
+    : "Live padel session di Carsel Club";
+
+  return {
+    title: `LIVE — ${data.session.title} · Carsel Club`,
+    description,
+    openGraph: {
+      type: "website",
+      title: data.session.title,
+      description,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: data.session.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: data.session.title,
+      description,
+      images: [ogImage],
+    },
+  };
+}
+
+const STATUS_LABEL: Record<string, { label: string; color: string }> = {
+  upcoming: { label: "📅 Upcoming", color: "#FACC15" },
+  live: { label: "🔴 LIVE", color: "#EF4444" },
+  completed: { label: "✅ Selesai", color: "#10B981" },
+  cancelled: { label: "❌ Dibatalkan", color: "#94A3B8" },
+};
+
+export default async function PublicLiveView({ params }: PageProps) {
+  const { id } = await params;
+  const data = await getPublicSessionView(id);
+  if (!data) notFound();
+
+  const { session, participants, currentRound, currentMatches, totalRounds } =
+    data;
+
+  const lookup = participants.reduce<
+    Record<string, { name: string; isMember: boolean }>
+  >((acc, p) => {
+    acc[p.id] = {
+      name: p.guestName ?? p.userDisplayName ?? "?",
+      isMember: p.userId !== null,
+    };
+    return acc;
+  }, {});
+
+  // Session leaderboard (top 5 by points)
+  const leaderboard = [...participants]
+    .sort((a, b) => b.sessionPoints - a.sessionPoints)
+    .slice(0, 5);
+
+  const isLive = session.status === "live";
+  const statusInfo = STATUS_LABEL[session.status] ?? STATUS_LABEL.upcoming;
+
+  return (
+    <div className="app-shell">
+      {/* Auto-refresh when live */}
+      {isLive && <AutoRefresh intervalMs={5000} />}
+
+      {/* Public Header (no app navigation) */}
+      <header
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "var(--s-3) var(--s-4)",
+          background: "var(--bg)",
+          borderBottom: "1px solid var(--border-light)",
+          position: "sticky",
+          top: 0,
+          zIndex: 10,
+        }}
+      >
+        <div className="logo">
+          <div className="logo-mark">CC</div>
+          <span className="logo-text">Carsel Club</span>
+        </div>
+        <Link
+          href="/"
+          style={{
+            padding: "6px 12px",
+            borderRadius: "var(--r-full)",
+            background: "var(--primary)",
+            color: "#fff",
+            fontFamily: "var(--font-display)",
+            fontWeight: 700,
+            fontSize: 11,
+            textDecoration: "none",
+            boxShadow: "var(--shadow-sm)",
+          }}
+        >
+          Buka di App →
+        </Link>
+      </header>
+
+      <main className="app-content" style={{ paddingBottom: "var(--s-6)" }}>
+        {/* LIVE HERO */}
+        <section
+          style={{
+            background:
+              "linear-gradient(135deg, var(--primary) 0%, var(--primary-700) 100%)",
+            color: "#fff",
+            padding: "var(--s-5)",
+            borderRadius: "var(--r-2xl)",
+            position: "relative",
+            overflow: "hidden",
+            boxShadow: "var(--shadow-md)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              marginBottom: 12,
+              flexWrap: "wrap",
+            }}
+          >
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "4px 12px",
+                background: "rgba(255,255,255,0.22)",
+                color: "#fff",
+                borderRadius: "var(--r-full)",
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: "0.04em",
+              }}
+            >
+              {isLive && (
+                <span
+                  style={{
+                    width: 7,
+                    height: 7,
+                    background: "#FACC15",
+                    borderRadius: "50%",
+                    animation: "pulse 1.2s ease-in-out infinite",
+                  }}
+                />
+              )}
+              <span>{statusInfo.label}</span>
+            </span>
+            {isLive && (
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 800,
+                  opacity: 0.85,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                }}
+              >
+                Auto-refresh tiap 5 detik
+              </span>
+            )}
+          </div>
+
+          <div
+            style={{
+              fontFamily: "var(--font-display)",
+              fontWeight: 800,
+              fontSize: 26,
+              marginBottom: 8,
+            }}
+          >
+            {session.title}
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 4,
+              fontSize: 12,
+              fontWeight: 600,
+              opacity: 0.95,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <path d="M16 2v4M8 2v4M3 10h18" />
+              </svg>
+              <span>
+                {formatDate(session.scheduledAt)} ·{" "}
+                {formatTimeRange(session.scheduledAt, session.scheduledEndAt)}
+              </span>
+            </div>
+            {currentRound && (
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v6l4 2" />
+                </svg>
+                <span>
+                  Round {currentRound.roundNumber} dari {totalRounds}
+                </span>
+              </div>
+            )}
+            {session.venueName && (
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                <span>
+                  {session.venueName} · {session.numCourts} court
+                  {session.numCourts > 1 ? "s" : ""}
+                </span>
+              </div>
+            )}
+            {session.hostName && (
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4 21a8 8 0 0 1 16 0" />
+                </svg>
+                <span>
+                  Hosted by {session.hostName} · {participants.length} pemain
+                </span>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* CURRENT ROUND MATCHES */}
+        {currentRound && currentMatches.length > 0 && (
+          <section>
+            <div className="section-head">
+              <h3>Round {currentRound.roundNumber}</h3>
+              <span
+                style={{
+                  color: "var(--text-500)",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.04em",
+                }}
+              >
+                {currentRound.status === "completed"
+                  ? "Selesai"
+                  : currentRound.status === "in_progress"
+                    ? "Live"
+                    : "Pending"}
+              </span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "var(--s-3)",
+              }}
+            >
+              {currentMatches.map((m) => (
+                <PublicMatchCard key={m.id} match={m} lookup={lookup} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* SESSION LEADERBOARD */}
+        {leaderboard.length > 0 && (
+          <section>
+            <div className="section-head">
+              <h3>🏆 Top {Math.min(5, leaderboard.length)} Pemimpin</h3>
+              <span
+                style={{
+                  color: "var(--text-500)",
+                  fontSize: 11,
+                  fontWeight: 700,
+                }}
+              >
+                Session leaderboard
+              </span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+              }}
+            >
+              {leaderboard.map((p, idx) => (
+                <PublicLeaderboardRow
+                  key={p.id}
+                  rank={idx + 1}
+                  name={lookup[p.id]?.name ?? "?"}
+                  points={p.sessionPoints}
+                  wins={p.sessionWins}
+                  losses={p.sessionLosses}
+                  draws={p.sessionDraws}
+                  matches={p.sessionMatches}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* No matches yet */}
+        {!currentRound && (
+          <div className="empty-state">
+            <div className="empty-state-icon">⏳</div>
+            <div className="empty-state-title">Match belum dimulai</div>
+            <div className="empty-state-text">
+              Host belum generate round pertama. Refresh page saat match
+              dimulai.
+            </div>
+          </div>
+        )}
+
+        {/* CTA */}
+        <section
+          style={{
+            marginTop: "var(--s-4)",
+            padding: "var(--s-4)",
+            background: "var(--bg-soft)",
+            borderRadius: "var(--r-xl)",
+            border: "1px dashed var(--border)",
+            textAlign: "center",
+          }}
+        >
+          <div style={{ fontSize: 28, marginBottom: 6 }}>🎾</div>
+          <div
+            style={{
+              fontFamily: "var(--font-display)",
+              fontWeight: 800,
+              fontSize: 14,
+              color: "var(--text-900)",
+              marginBottom: 4,
+            }}
+          >
+            Powered by Carsel Club
+          </div>
+          <div
+            style={{
+              fontSize: 11,
+              color: "var(--text-500)",
+              fontWeight: 600,
+              marginBottom: "var(--s-3)",
+            }}
+          >
+            Padel community Indonesia · Buat session padel mudah
+          </div>
+          <Link
+            href="/"
+            style={{
+              display: "inline-block",
+              padding: "10px 18px",
+              borderRadius: "var(--r-full)",
+              background: "var(--primary)",
+              color: "#fff",
+              fontFamily: "var(--font-display)",
+              fontWeight: 800,
+              fontSize: 12,
+              textDecoration: "none",
+              boxShadow: "var(--shadow-sm)",
+            }}
+          >
+            Daftar Sekarang
+          </Link>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+function PublicMatchCard({
+  match,
+  lookup,
+}: {
+  match: {
+    id: string;
+    courtNumber: number;
+    team1P1Id: string;
+    team1P2Id: string;
+    team2P1Id: string;
+    team2P2Id: string;
+    team1Score: number;
+    team2Score: number;
+    status: "pending" | "live" | "completed";
+  };
+  lookup: Record<string, { name: string; isMember: boolean }>;
+}) {
+  const team1Names = [
+    lookup[match.team1P1Id]?.name ?? "?",
+    lookup[match.team1P2Id]?.name ?? "?",
+  ];
+  const team2Names = [
+    lookup[match.team2P1Id]?.name ?? "?",
+    lookup[match.team2P2Id]?.name ?? "?",
+  ];
+  const t1Won =
+    match.status === "completed" && match.team1Score > match.team2Score;
+  const t2Won =
+    match.status === "completed" && match.team2Score > match.team1Score;
+
+  const STATUS_STYLES: Record<
+    string,
+    { label: string; color: string; bg: string }
+  > = {
+    pending: { label: "Pending", color: "var(--text-500)", bg: "var(--bg-soft)" },
+    live: { label: "LIVE", color: "var(--accent-600)", bg: "var(--accent-50)" },
+    completed: {
+      label: "Selesai",
+      color: "var(--primary-700)",
+      bg: "var(--primary-50)",
+    },
+  };
+  const s = STATUS_STYLES[match.status];
+
+  return (
+    <div
+      style={{
+        background: "var(--bg)",
+        border: "1px solid var(--border-light)",
+        borderRadius: "var(--r-xl)",
+        padding: "var(--s-4)",
+        boxShadow: "var(--shadow-card)",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "var(--s-3)",
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "var(--font-display)",
+            fontWeight: 800,
+            fontSize: 12,
+            color: "var(--text-700)",
+            textTransform: "uppercase",
+            letterSpacing: "0.04em",
+          }}
+        >
+          Court {match.courtNumber}
+        </div>
+        <span
+          style={{
+            padding: "3px 10px",
+            borderRadius: "var(--r-full)",
+            fontSize: 10,
+            fontWeight: 800,
+            textTransform: "uppercase",
+            background: s.bg,
+            color: s.color,
+          }}
+        >
+          {s.label}
+        </span>
+      </div>
+
+      <TeamLine names={team1Names} score={match.team1Score} won={t1Won} />
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          margin: "4px 0",
+        }}
+      >
+        <div style={{ flex: 1, height: 1, background: "var(--border-light)" }} />
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 800,
+            color: "var(--text-400)",
+            textTransform: "uppercase",
+            fontFamily: "var(--font-display)",
+          }}
+        >
+          vs
+        </span>
+        <div style={{ flex: 1, height: 1, background: "var(--border-light)" }} />
+      </div>
+      <TeamLine names={team2Names} score={match.team2Score} won={t2Won} />
+    </div>
+  );
+}
+
+function TeamLine({
+  names,
+  score,
+  won,
+}: {
+  names: string[];
+  score: number;
+  won: boolean;
+}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 12,
+        padding: "6px 0",
+      }}
+    >
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div
+          style={{
+            fontSize: 14,
+            fontWeight: 700,
+            color: won ? "var(--text-900)" : "var(--text-700)",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            lineHeight: 1.3,
+          }}
+        >
+          {names[0]}
+        </div>
+        <div
+          style={{
+            fontSize: 12,
+            fontWeight: 600,
+            color: "var(--text-500)",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            lineHeight: 1.3,
+          }}
+        >
+          {names[1]}
+        </div>
+        {won && (
+          <span
+            style={{
+              display: "inline-block",
+              marginTop: 4,
+              padding: "2px 6px",
+              borderRadius: "var(--r-sm)",
+              fontSize: 9,
+              fontWeight: 800,
+              background: "var(--primary-100)",
+              color: "var(--primary-700)",
+              textTransform: "uppercase",
+            }}
+          >
+            Win
+          </span>
+        )}
+      </div>
+      <div
+        style={{
+          fontFamily: "var(--font-display)",
+          fontWeight: 800,
+          fontSize: 28,
+          color: won ? "var(--primary-700)" : "var(--text-400)",
+          minWidth: 36,
+          textAlign: "right",
+        }}
+      >
+        {score}
+      </div>
+    </div>
+  );
+}
+
+function PublicLeaderboardRow({
+  rank,
+  name,
+  points,
+  wins,
+  losses,
+  draws,
+  matches,
+}: {
+  rank: number;
+  name: string;
+  points: number;
+  wins: number;
+  losses: number;
+  draws: number;
+  matches: number;
+}) {
+  const MEDAL: Record<number, string> = { 1: "🥇", 2: "🥈", 3: "🥉" };
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "var(--s-3)",
+        padding: "var(--s-3)",
+        background: "var(--bg)",
+        border: "1px solid var(--border-light)",
+        borderRadius: "var(--r-lg)",
+      }}
+    >
+      <div
+        style={{
+          fontFamily: "var(--font-display)",
+          fontWeight: 800,
+          fontSize: 18,
+          width: 36,
+          textAlign: "center",
+        }}
+      >
+        {MEDAL[rank] ?? `#${rank}`}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontFamily: "var(--font-display)",
+            fontWeight: 700,
+            fontSize: 14,
+            color: "var(--text-900)",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {name}
+        </div>
+        <div
+          style={{
+            fontSize: 11,
+            color: "var(--text-500)",
+            fontWeight: 600,
+            marginTop: 2,
+          }}
+        >
+          {wins}W · {draws}D · {losses}L · {matches} match
+        </div>
+      </div>
+      <div
+        style={{
+          textAlign: "right",
+          fontFamily: "var(--font-display)",
+          fontWeight: 800,
+          fontSize: 18,
+          color: "var(--primary-700)",
+        }}
+      >
+        {points}
+        <span
+          style={{
+            fontSize: 10,
+            color: "var(--text-500)",
+            marginLeft: 2,
+            fontWeight: 700,
+          }}
+        >
+          pts
+        </span>
+      </div>
+    </div>
+  );
+}

@@ -12,6 +12,7 @@ type Participant = {
 
 type Props = {
   sessionId: string;
+  sessionTitle: string;
   participants: Participant[];
   staff: boolean;
   isTerminal: boolean;
@@ -19,6 +20,7 @@ type Props = {
 
 export async function MatchesSection({
   sessionId,
+  sessionTitle,
   participants,
   staff,
   isTerminal,
@@ -125,6 +127,8 @@ export async function MatchesSection({
                   match={m}
                   lookup={lookup}
                   canManage={staff && !isTerminal}
+                  sessionId={sessionId}
+                  sessionTitle={sessionTitle}
                 />
               ))}
             </div>

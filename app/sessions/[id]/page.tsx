@@ -11,6 +11,7 @@ import { formatDate, formatTimeRange } from "@/lib/utils";
 import { ParticipantRow } from "@/components/sessions/ParticipantRow";
 import { CancelSessionButton } from "@/components/sessions/CancelSessionButton";
 import { GenerateRoundButton } from "@/components/sessions/GenerateRoundButton";
+import { SessionShareActions } from "@/components/sessions/SessionShareActions";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -184,6 +185,22 @@ export default async function SessionDetailPage({ params }: PageProps) {
             </span>
           </div>
         </section>
+
+        {/* SHARE ACTIONS */}
+        {!isTerminal && (
+          <section>
+            <SessionShareActions
+              sessionId={session.id}
+              sessionTitle={session.title}
+              venueName={session.venueName}
+              scheduledAt={session.scheduledAt}
+              hostName={
+                participants.find((p) => p.role === "host")?.userDisplayName ??
+                null
+              }
+            />
+          </section>
+        )}
 
         {/* PLAYERS */}
         <section>

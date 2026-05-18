@@ -91,6 +91,7 @@ export default async function SessionMatchesPage({ params }: PageProps) {
 
         <MatchesSection
           sessionId={session.id}
+          sessionTitle={session.title}
           participants={participants}
           staff={staff}
           isTerminal={isTerminal}
