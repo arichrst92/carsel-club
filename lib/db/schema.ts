@@ -186,6 +186,8 @@ export const sessions = pgTable(
     status: sessionStatusEnum("status").notNull().default("upcoming"),
     fixPartners: boolean("fix_partners").notNull().default(false),
     coverPhotoUrl: text("cover_photo_url"),
+    mapsUrl: text("maps_url"),
+    maxRounds: integer("max_rounds"),
     description: text("description"),
     endedAt: timestamp("ended_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })

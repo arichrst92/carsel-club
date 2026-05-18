@@ -6,22 +6,23 @@ import { addGuestAction } from "@/app/actions/participants";
 export function AddGuestForm({ sessionId }: { sessionId: string }) {
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [addedGuests, setAddedGuests] = useState<string[]>([]);
   const [isPending, startTransition] = useTransition();
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setSuccess(null);
-    if (!name.trim()) return;
+
+    const trimmed = name.trim();
+    if (!trimmed) return;
 
     startTransition(async () => {
       const formData = new FormData();
       formData.set("session_id", sessionId);
-      formData.set("guest_name", name.trim());
+      formData.set("guest_name", trimmed);
       const result = await addGuestAction(null, formData);
       if (result?.success) {
-        setSuccess(`✓ ${result.success}`);
+        setAddedGuests((curr) => [trimmed, ...curr]);
         setName("");
       } else if (result?.error) {
         setError(result.error);
@@ -30,36 +31,102 @@ export function AddGuestForm({ sessionId }: { sessionId: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      <div className="flex gap-2">
-        <input
-          type="text"
-          maxLength={30}
-          placeholder="Misal: Budi"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="flex-1 px-4 py-3 rounded-xl border border-border text-base bg-bg-card outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100 transition"
-        />
-        <button
-          type="submit"
-          disabled={isPending || !name.trim()}
-          className="px-4 py-3 rounded-xl bg-primary-500 text-white text-sm font-display font-bold disabled:opacity-50 hover:bg-primary-600 transition"
-        >
-          {isPending ? "..." : "+ Guest"}
-        </button>
-      </div>
+    <>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label className="form-label">Nama Guest</label>
+          <div className="guest-input-row">
+            <input
+              type="text"
+              maxLength={30}
+              className="form-input"
+              placeholder="Contoh: Pak Budi"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <button
+              type="submit"
+              className="btn-add-guest"
+              disabled={isPending || !name.trim()}
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              <span>{isPending ? "..." : "Tambah"}</span>
+            </button>
+          </div>
+        </div>
+      </form>
 
       {error && (
-        <div className="px-3 py-2 rounded-lg bg-accent-50 border border-accent-100">
-          <p className="text-xs text-accent-600 font-semibold">{error}</p>
+        <div
+          style={{
+            marginTop: "var(--s-3)",
+            padding: "10px 12px",
+            background: "var(--accent-50)",
+            border: "1px solid var(--accent-100)",
+            borderRadius: "var(--r-md)",
+          }}
+        >
+          <p
+            style={{
+              fontSize: 12,
+              color: "var(--accent-600)",
+              fontWeight: 700,
+            }}
+          >
+            {error}
+          </p>
         </div>
       )}
 
-      {success && (
-        <div className="px-3 py-2 rounded-lg bg-primary-50 border border-primary-100">
-          <p className="text-xs text-primary-700 font-semibold">{success}</p>
+      <div style={{ marginTop: "var(--s-4)" }}>
+        <div className="sp-section-label">
+          {addedGuests.length === 0
+            ? "Belum ada guest ditambahkan"
+            : `Guest Baru Ditambahkan (${addedGuests.length})`}
         </div>
-      )}
-    </form>
+        {addedGuests.length === 0 ? (
+          <div
+            className="empty-guest"
+            style={{ marginTop: 8 }}
+          >
+            Ketik nama guest dan klik Tambah. Mereka akan langsung muncul di
+            session.
+          </div>
+        ) : (
+          <div className="guest-list">
+            {addedGuests.map((guestName, i) => (
+              <div key={i} className="guest-item">
+                <div className="sp-avatar">
+                  {guestName.trim()[0]?.toUpperCase() ?? "?"}
+                </div>
+                <div className="guest-item-name">{guestName}</div>
+                <span
+                  style={{
+                    fontSize: 10,
+                    color: "var(--primary-700)",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.04em",
+                  }}
+                >
+                  ✓ Added
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   );
 }

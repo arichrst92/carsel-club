@@ -1,8 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/get-current-user";
 import { listMySessions } from "@/lib/db/queries/sessions";
 import { SessionCard } from "@/components/sessions/SessionCard";
+import { BottomNav } from "@/components/nav/BottomNav";
 
 export const metadata = {
   title: "My Sessions",
@@ -12,7 +12,6 @@ export default async function SessionsPage() {
   const user = await requireUser();
   const allSessions = await listMySessions(user.id);
 
-  // Split: active (upcoming, live) vs done (completed, cancelled)
   const active = allSessions.filter(
     (s) => s.status === "upcoming" || s.status === "live"
   );
@@ -22,52 +21,60 @@ export default async function SessionsPage() {
 
   return (
     <div className="app-shell">
-      <header className="flex items-center justify-between px-4 py-3 border-b border-border-light bg-bg sticky top-0 z-10">
-        <Link href="/home" className="flex items-center gap-2">
-          <Image
-            src="/logo-icon.png"
-            alt="Carsel Club"
-            width={1024}
-            height={1024}
-            className="w-8 h-auto"
-          />
-          <span className="font-display font-bold text-base">Sessions</span>
-        </Link>
-        <Link
-          href="/sessions/new"
-          className="px-3 py-1.5 rounded-full bg-primary-500 text-white text-xs font-bold shadow-fab hover:bg-primary-600 transition"
-        >
-          + Baru
-        </Link>
+      <header className="app-header">
+        <div className="logo">
+          <div className="logo-mark">CC</div>
+          <span className="logo-text">My Sessions</span>
+        </div>
+        <div className="header-actions">
+          <Link
+            href="/sessions/new"
+            style={{
+              padding: "8px 14px",
+              borderRadius: "var(--r-full)",
+              background: "var(--primary-500, var(--primary))",
+              color: "#fff",
+              fontFamily: "var(--font-display)",
+              fontWeight: 700,
+              fontSize: 12,
+              boxShadow: "var(--shadow-fab)",
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+            }}
+          >
+            + Baru
+          </Link>
+        </div>
       </header>
 
-      <main className="flex-1 px-4 py-5 space-y-6">
+      <main
+        className="app-content"
+        style={{ paddingBottom: "calc(var(--bottomnav-h) + var(--s-6))" }}
+      >
         {allSessions.length === 0 ? (
           <EmptyState />
         ) : (
           <>
             {active.length > 0 && (
               <Section title="Aktif">
-                <div className="space-y-3">
-                  {active.map((s) => (
-                    <SessionCard key={s.id} session={s} />
-                  ))}
-                </div>
+                {active.map((s) => (
+                  <SessionCard key={s.id} session={s} />
+                ))}
               </Section>
             )}
 
             {done.length > 0 && (
               <Section title="Selesai">
-                <div className="space-y-3">
-                  {done.map((s) => (
-                    <SessionCard key={s.id} session={s} />
-                  ))}
-                </div>
+                {done.map((s) => (
+                  <SessionCard key={s.id} session={s} />
+                ))}
               </Section>
             )}
           </>
         )}
       </main>
+
+      <BottomNav />
     </div>
   );
 }
@@ -80,28 +87,46 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div>
-      <h2 className="text-sm font-display font-bold text-text-900 mb-3 uppercase tracking-wide">
-        {title}
-      </h2>
-      {children}
-    </div>
+    <section>
+      <div className="section-head">
+        <h3>{title}</h3>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "var(--s-3)",
+        }}
+      >
+        {children}
+      </div>
+    </section>
   );
 }
 
 function EmptyState() {
   return (
-    <div className="text-center py-12 space-y-4">
-      <div className="text-5xl">🎾</div>
-      <div>
-        <h3 className="font-display font-bold text-lg">Belum ada session</h3>
-        <p className="text-sm text-text-500 mt-1 max-w-xs mx-auto">
-          Buat session pertama kamu dan undang teman lewat WhatsApp.
-        </p>
+    <div className="empty-state">
+      <div className="empty-state-icon">🎾</div>
+      <div className="empty-state-title">Belum ada session</div>
+      <div className="empty-state-text">
+        Buat session pertama kamu dan undang teman lewat WhatsApp.
       </div>
       <Link
         href="/sessions/new"
-        className="inline-block px-5 py-2.5 rounded-full bg-primary-500 text-white font-display font-bold text-sm shadow-fab hover:bg-primary-600 transition"
+        style={{
+          marginTop: "var(--s-4)",
+          display: "inline-block",
+          padding: "12px 20px",
+          borderRadius: "var(--r-full)",
+          background: "var(--primary, var(--primary-500))",
+          color: "#fff",
+          fontFamily: "var(--font-display)",
+          fontWeight: 800,
+          fontSize: 14,
+          boxShadow: "var(--shadow-fab)",
+          textDecoration: "none",
+        }}
       >
         Buat Session Pertama
       </Link>

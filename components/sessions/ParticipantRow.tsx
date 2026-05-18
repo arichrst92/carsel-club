@@ -11,9 +11,23 @@ type ParticipantData = {
 
 const ROLE_LABELS: Record<ParticipantData["role"], string> = {
   host: "Host",
-  co_host: "Co-Host",
-  player: "Player",
+  co_host: "Co-host",
+  player: "",
   guest: "Guest",
+};
+
+const ROLE_AVATAR_CLASS: Record<ParticipantData["role"], string> = {
+  host: "host",
+  co_host: "cohost",
+  player: "member-1",
+  guest: "guest",
+};
+
+const ROLE_BADGE_CLASS: Record<ParticipantData["role"], string> = {
+  host: "host",
+  co_host: "cohost",
+  player: "",
+  guest: "guest",
 };
 
 export function ParticipantRow({
@@ -26,30 +40,28 @@ export function ParticipantRow({
   canManage: boolean;
 }) {
   const name = participant.guestName || participant.userDisplayName || "—";
-  const initials = name
-    .split(" ")
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-  const isStaff =
-    participant.role === "host" || participant.role === "co_host";
+  const initial = (name.trim()[0] ?? "?").toUpperCase();
   const isMember = participant.userId !== null;
+  const roleLabel = ROLE_LABELS[participant.role];
+  const avatarCls = ROLE_AVATAR_CLASS[participant.role];
+  const badgeCls = ROLE_BADGE_CLASS[participant.role];
 
   return (
-    <li className="flex items-center gap-3 p-2.5 rounded-xl bg-bg-card border border-border-light">
-      <div className="size-10 rounded-full bg-gradient-to-br from-accent-500 to-accent-600 text-white grid place-items-center font-display font-bold text-sm shrink-0">
-        {initials}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="text-sm font-bold text-text-900 truncate">{name}</div>
-        <div className="text-xs text-text-500 flex items-center gap-2">
-          <span className={isStaff ? "text-primary-600 font-bold" : ""}>
-            {ROLE_LABELS[participant.role]}
-          </span>
-          {!participant.isPlaying && (
-            <span className="text-text-400">· tidak main</span>
+    <div className="player-list-item">
+      <div className={`player-avatar-lg ${avatarCls}`}>{initial}</div>
+      <div className="player-info">
+        <div className="player-name">
+          <span>{name}</span>
+          {roleLabel && (
+            <span className={`role-badge ${badgeCls}`}>{roleLabel}</span>
           )}
+        </div>
+        <div className="player-meta-row">
+          <span style={{ fontSize: 12, color: "var(--text-500)" }}>
+            {!participant.isPlaying && "🚫 tidak main"}
+            {participant.role === "player" && participant.isPlaying && "Player"}
+            {participant.role === "guest" && participant.isPlaying && "Guest player"}
+          </span>
         </div>
       </div>
       {canManage && (
@@ -62,6 +74,6 @@ export function ParticipantRow({
           displayName={name}
         />
       )}
-    </li>
+    </div>
   );
 }

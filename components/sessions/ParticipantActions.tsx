@@ -12,7 +12,7 @@ type Props = {
   sessionId: string;
   role: "host" | "co_host" | "player" | "guest";
   isPlaying: boolean;
-  isMember: boolean; // false = guest (user_id null)
+  isMember: boolean;
   displayName: string;
 };
 
@@ -38,63 +38,73 @@ export function ParticipantActions({
   const canRemove = role !== "host";
 
   return (
-    <div className="flex items-center gap-1 shrink-0">
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 2,
+        flexShrink: 0,
+      }}
+    >
       {canPromote && (
-        <IconButton
+        <IconBtn
           title="Jadikan Co-Host"
-          onClick={() => runAction(() => toggleCohostAction(participantId, sessionId))}
+          onClick={() =>
+            runAction(() => toggleCohostAction(participantId, sessionId))
+          }
           disabled={isPending}
         >
           👑
-        </IconButton>
+        </IconBtn>
       )}
       {canDemote && (
-        <IconButton
+        <IconBtn
           title="Demote dari Co-Host"
-          onClick={() => runAction(() => toggleCohostAction(participantId, sessionId))}
+          onClick={() =>
+            runAction(() => toggleCohostAction(participantId, sessionId))
+          }
           disabled={isPending}
         >
           ⬇
-        </IconButton>
+        </IconBtn>
       )}
-      <IconButton
+      <IconBtn
         title={isPlaying ? "Set tidak main" : "Set ikut main"}
-        onClick={() => runAction(() => togglePlayingAction(participantId, sessionId))}
+        onClick={() =>
+          runAction(() => togglePlayingAction(participantId, sessionId))
+        }
         disabled={isPending}
         muted={!isPlaying}
       >
         {isPlaying ? "🎾" : "💤"}
-      </IconButton>
+      </IconBtn>
       {canRemove && (
-        <IconButton
+        <IconBtn
           title="Remove dari session"
           onClick={() => {
             if (!confirm(`Remove ${displayName} dari session?`)) return;
             runAction(() => removeParticipantAction(participantId, sessionId));
           }}
           disabled={isPending}
-          danger
         >
           🗑
-        </IconButton>
+        </IconBtn>
       )}
     </div>
   );
 }
 
-function IconButton({
+function IconBtn({
   children,
   title,
   onClick,
   disabled,
-  danger,
   muted,
 }: {
   children: React.ReactNode;
   title: string;
   onClick: () => void;
   disabled?: boolean;
-  danger?: boolean;
   muted?: boolean;
 }) {
   return (
@@ -103,13 +113,26 @@ function IconButton({
       title={title}
       onClick={onClick}
       disabled={disabled}
-      className={`size-9 rounded-lg flex items-center justify-center text-base transition disabled:opacity-40 ${
-        danger
-          ? "hover:bg-accent-50"
-          : muted
-            ? "opacity-50 hover:opacity-100 hover:bg-bg-soft"
-            : "hover:bg-bg-soft"
-      }`}
+      style={{
+        width: 32,
+        height: 32,
+        display: "grid",
+        placeItems: "center",
+        borderRadius: "var(--r-full)",
+        background: "transparent",
+        cursor: disabled ? "not-allowed" : "pointer",
+        fontSize: 14,
+        opacity: disabled ? 0.4 : muted ? 0.5 : 1,
+        transition: "all 0.15s",
+        border: "none",
+        padding: 0,
+      }}
+      onMouseEnter={(e) => {
+        if (!disabled) e.currentTarget.style.background = "var(--bg-soft)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = "transparent";
+      }}
     >
       {children}
     </button>

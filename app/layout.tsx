@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Quicksand, Nunito } from "next/font/google";
 import "./globals.css";
+import "./shared.css";
 
 const quicksand = Quicksand({
   subsets: ["latin"],

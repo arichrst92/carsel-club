@@ -1,210 +1,1013 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useMemo } from "react";
+import Link from "next/link";
 import { createSessionAction } from "@/app/actions/sessions";
 
-/**
- * Default scheduled_at = today + 2 hours (rounded to nearest 30min).
- * Used as initial value for datetime-local input.
- */
-function defaultDateTime(): string {
+// ============================================================
+// Types & defaults
+// ============================================================
+
+type FormData = {
+  name: string;
+  format: "americano" | "mexicano";
+  playType: "freeplay" | "tournament";
+  venueName: string;
+  mapsUrl: string;
+  date: string; // YYYY-MM-DD
+  timeStart: string; // HH:mm
+  timeEnd: string; // HH:mm (optional)
+  numCourts: number;
+  roundMode: "auto" | "manual";
+  roundCount: number;
+  visibility: "private" | "public";
+  hostIsPlaying: boolean;
+};
+
+function defaultDateStr(): string {
+  const d = new Date();
+  d.setHours(d.getHours() + 2);
+  d.setMinutes(0, 0, 0);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+function defaultTimeStart(): string {
   const d = new Date();
   d.setHours(d.getHours() + 2);
   d.setMinutes(Math.round(d.getMinutes() / 30) * 30, 0, 0);
-  // datetime-local format: YYYY-MM-DDTHH:mm (local time, no Z)
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
+function defaultTimeEnd(): string {
+  const d = new Date();
+  d.setHours(d.getHours() + 4);
+  d.setMinutes(Math.round(d.getMinutes() / 30) * 30, 0, 0);
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+
+const INITIAL: FormData = {
+  name: "Sabtu Sore Padel",
+  format: "americano",
+  playType: "freeplay",
+  venueName: "",
+  mapsUrl: "",
+  date: defaultDateStr(),
+  timeStart: defaultTimeStart(),
+  timeEnd: defaultTimeEnd(),
+  numCourts: 2,
+  roundMode: "auto",
+  roundCount: 7,
+  visibility: "private",
+  hostIsPlaying: true,
+};
+
+const TOTAL_STEPS = 5;
+
+// ============================================================
+// Main wizard
+// ============================================================
+
 export function CreateSessionForm() {
+  const [step, setStep] = useState(1);
+  const [data, setData] = useState<FormData>(INITIAL);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  async function handleSubmit(formData: FormData) {
+  function setField<K extends keyof FormData>(key: K, value: FormData[K]) {
+    setData((d) => ({ ...d, [key]: value }));
     setError(null);
+  }
 
-    // Convert datetime-local (local time, no TZ) → ISO UTC string for server
-    const localStr = String(formData.get("scheduled_at_local") ?? "");
-    if (localStr) {
-      const date = new Date(localStr); // parsed as user's local TZ
-      formData.set("scheduled_at", date.toISOString());
+  function validateStep(s: number): string | null {
+    if (s === 1 && !data.name.trim()) return "Nama session wajib diisi";
+    if (s === 2) {
+      if (!data.venueName.trim()) return "Venue wajib diisi";
+      if (!data.date) return "Tanggal wajib diisi";
+      if (!data.timeStart) return "Jam mulai wajib diisi";
+    }
+    return null;
+  }
+
+  function nextStep() {
+    const err = validateStep(step);
+    if (err) {
+      setError(err);
+      return;
+    }
+    if (step < TOTAL_STEPS) {
+      setStep(step + 1);
+      setError(null);
+    } else {
+      submit();
+    }
+  }
+
+  function prevStep() {
+    if (step > 1) {
+      setStep(step - 1);
+      setError(null);
+    }
+  }
+
+  function submit() {
+    // Final validation
+    const scheduledAt = new Date(`${data.date}T${data.timeStart}`);
+    if (isNaN(scheduledAt.getTime())) {
+      setError("Tanggal & jam tidak valid");
+      return;
+    }
+    if (scheduledAt.getTime() < Date.now() - 60_000) {
+      setError("Tanggal & waktu harus di masa depan");
+      return;
     }
 
+    let scheduledEndAt: Date | null = null;
+    if (data.timeEnd) {
+      scheduledEndAt = new Date(`${data.date}T${data.timeEnd}`);
+      if (scheduledEndAt.getTime() <= scheduledAt.getTime()) {
+        setError("Jam berakhir harus setelah jam mulai");
+        return;
+      }
+    }
+
+    const fd = new FormData();
+    fd.set("title", data.name);
+    fd.set("format", data.format);
+    fd.set("play_type", data.playType);
+    fd.set("visibility", data.visibility);
+    fd.set("venue_name", data.venueName);
+    fd.set("maps_url", data.mapsUrl);
+    fd.set("scheduled_at", scheduledAt.toISOString());
+    if (scheduledEndAt) fd.set("scheduled_end_at", scheduledEndAt.toISOString());
+    fd.set("num_courts", String(data.numCourts));
+    if (data.roundMode === "manual") fd.set("max_rounds", String(data.roundCount));
+    fd.set("host_is_playing", data.hostIsPlaying ? "on" : "off");
+
     startTransition(async () => {
-      const result = await createSessionAction(formData);
+      const result = await createSessionAction(fd);
       if (result?.error) setError(result.error);
     });
   }
 
+  const progressPct = Math.round((step / TOTAL_STEPS) * 100);
+
   return (
-    <form action={handleSubmit} className="space-y-5">
-      {/* Title */}
-      <Field label="Judul Session" required>
-        <input
-          name="title"
-          type="text"
-          required
-          minLength={2}
-          maxLength={60}
-          placeholder="Misal: Padel Minggu Pagi"
-          className="input"
-        />
-      </Field>
-
-      {/* Venue */}
-      <Field label="Lokasi / Venue" hint="Optional">
-        <input
-          name="venue_name"
-          type="text"
-          maxLength={80}
-          placeholder="Misal: Padel Hub Senayan"
-          className="input"
-        />
-      </Field>
-
-      {/* Date & Time */}
-      <Field label="Tanggal & Waktu Mulai" required>
-        <input
-          name="scheduled_at_local"
-          type="datetime-local"
-          required
-          defaultValue={defaultDateTime()}
-          className="input"
-        />
-      </Field>
-
-      {/* Duration */}
-      <Field label="Durasi" required hint="Total waktu booking court">
-        <select
-          name="duration_minutes"
-          required
-          defaultValue="120"
-          className="input"
-        >
-          <option value="60">1 jam</option>
-          <option value="90">1,5 jam</option>
-          <option value="120">2 jam</option>
-          <option value="150">2,5 jam</option>
-          <option value="180">3 jam</option>
-          <option value="240">4 jam</option>
-        </select>
-      </Field>
-
-      {/* Num courts */}
-      <Field label="Jumlah Court" required hint="1-20">
-        <input
-          name="num_courts"
-          type="number"
-          required
-          min={1}
-          max={20}
-          defaultValue={1}
-          className="input"
-        />
-      </Field>
-
-      {/* Fix partners toggle */}
-      <div className="rounded-xl border border-border-light bg-bg-soft p-3">
-        <label className="flex items-start gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            name="fix_partners"
-            className="mt-1 size-4 accent-primary-500"
-          />
-          <div>
-            <div className="text-sm font-bold text-text-900">Fix Partners</div>
-            <div className="text-xs text-text-500 mt-0.5">
-              Aktifkan kalau pasangan main tetap (Round Robin behavior).
-            </div>
+    <>
+      <main className="app-content subscreen with-footer">
+        {/* Progress */}
+        <section className="wizard-progress">
+          <div className="wizard-progress-meta">
+            <span className="wizard-step-label">
+              Step {step} of {TOTAL_STEPS}
+            </span>
+            <span
+              className="wizard-step-label"
+              style={{ color: "var(--primary-700)" }}
+            >
+              {progressPct}%
+            </span>
           </div>
-        </label>
-      </div>
-
-      {/* Host playing toggle */}
-      <div className="rounded-xl border border-border-light bg-bg-soft p-3">
-        <label className="flex items-start gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            name="host_is_playing"
-            defaultChecked
-            className="mt-1 size-4 accent-primary-500"
-          />
-          <div>
-            <div className="text-sm font-bold text-text-900">Saya ikut main</div>
-            <div className="text-xs text-text-500 mt-0.5">
-              Uncheck kalau cuma jadi host (gak ikut court).
-            </div>
+          <div className="wizard-progress-track">
+            {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
+              <div
+                key={i}
+                className={`wizard-progress-segment ${
+                  i + 1 < step ? "done" : i + 1 === step ? "current" : ""
+                }`}
+              />
+            ))}
           </div>
-        </label>
-      </div>
+        </section>
 
-      {/* Description */}
-      <Field label="Catatan" hint="Optional, max 500 char">
-        <textarea
-          name="description"
-          maxLength={500}
-          rows={3}
-          placeholder="Info tambahan: dress code, biaya patungan, dll"
-          className="input resize-none"
-        />
-      </Field>
-
-      {error && (
-        <div className="px-3 py-2 rounded-lg bg-accent-50 border border-accent-100">
-          <p className="text-xs text-accent-600 font-semibold">{error}</p>
+        {/* Steps */}
+        <div className="wizard-step active">
+          {step === 1 && <Step1Info data={data} setField={setField} />}
+          {step === 2 && <Step2Location data={data} setField={setField} />}
+          {step === 3 && <Step3Players data={data} setField={setField} />}
+          {step === 4 && <Step4Visibility data={data} setField={setField} />}
+          {step === 5 && <Step5Review data={data} goToStep={setStep} />}
         </div>
-      )}
 
-      <button
-        type="submit"
-        disabled={isPending}
-        className="w-full py-3 rounded-xl bg-primary-500 text-white font-display font-bold text-base shadow-fab disabled:opacity-60 disabled:cursor-not-allowed hover:bg-primary-600 active:scale-[0.98] transition"
-      >
-        {isPending ? "Membuat..." : "Buat Session"}
-      </button>
+        {error && (
+          <div
+            style={{
+              padding: "10px 12px",
+              background: "var(--accent-50)",
+              border: "1px solid var(--accent-100)",
+              borderRadius: "var(--r-md)",
+              marginTop: "var(--s-3)",
+            }}
+          >
+            <p
+              style={{
+                fontSize: 12,
+                color: "var(--accent-600)",
+                fontWeight: 700,
+              }}
+            >
+              {error}
+            </p>
+          </div>
+        )}
+      </main>
 
-      <style jsx>{`
-        :global(.input) {
-          width: 100%;
-          padding: 12px 16px;
-          border-radius: 12px;
-          border: 1px solid var(--color-border);
-          background: var(--color-bg-card);
-          font-size: 15px;
-          font-family: inherit;
-          outline: none;
-          transition: all 0.15s;
-        }
-        :global(.input:focus) {
-          border-color: var(--color-primary-500);
-          box-shadow: 0 0 0 4px var(--color-primary-100);
-        }
-      `}</style>
-    </form>
+      {/* Sticky Footer */}
+      <div className="sticky-footer dual">
+        {step > 1 ? (
+          <button
+            type="button"
+            className="btn-secondary-lg"
+            onClick={prevStep}
+            disabled={isPending}
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            <span>Back</span>
+          </button>
+        ) : (
+          <Link href="/sessions" className="btn-secondary-lg">
+            <span>Batal</span>
+          </Link>
+        )}
+        <button
+          type="button"
+          className={`btn-primary-lg ${isPending ? "loading" : ""}`}
+          onClick={nextStep}
+          disabled={isPending}
+        >
+          <span>
+            {step === TOTAL_STEPS
+              ? isPending
+                ? "Creating..."
+                : "Create Session"
+              : "Next"}
+          </span>
+          {step !== TOTAL_STEPS && (
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          )}
+          {step === TOTAL_STEPS && !isPending && (
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
+          )}
+        </button>
+      </div>
+    </>
   );
 }
 
-function Field({
-  label,
-  hint,
-  required,
-  children,
+// ============================================================
+// Step 1 — Info Session
+// ============================================================
+
+function Step1Info({
+  data,
+  setField,
 }: {
-  label: string;
-  hint?: string;
-  required?: boolean;
-  children: React.ReactNode;
+  data: FormData;
+  setField: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
 }) {
   return (
-    <div>
-      <label className="flex items-baseline justify-between mb-2">
-        <span className="text-xs font-bold text-text-700 uppercase tracking-wide">
-          {label}
-          {required && <span className="text-accent-600"> *</span>}
-        </span>
-        {hint && <span className="text-xs text-text-400">{hint}</span>}
-      </label>
-      {children}
-    </div>
+    <>
+      <h2 className="wizard-step-title">Info Session</h2>
+
+      <section className="form-section">
+        <div className="form-group">
+          <label className="form-label">
+            Nama Session <span className="req">*</span>
+          </label>
+          <input
+            type="text"
+            className="form-input"
+            placeholder="Sabtu Sore Padel"
+            value={data.name}
+            onChange={(e) => setField("name", e.target.value)}
+            maxLength={60}
+          />
+          <p className="form-help">
+            Beri nama yang mudah diingat untuk session kamu.
+          </p>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Format Permainan</label>
+          <div className="segmented">
+            <button
+              type="button"
+              className={`segmented-option ${data.format === "americano" ? "active" : ""}`}
+              onClick={() => setField("format", "americano")}
+            >
+              <span>Americano</span>
+              <span className="seg-sub">Partner rotate</span>
+            </button>
+            <button
+              type="button"
+              className="segmented-option disabled"
+              title="Mexicano akan tersedia di v1.5"
+            >
+              <span>
+                Mexicano <span className="badge soon">Soon</span>
+              </span>
+              <span className="seg-sub">Ranking pairing</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Type</label>
+          <div className="segmented">
+            <button
+              type="button"
+              className={`segmented-option ${data.playType === "freeplay" ? "active" : ""}`}
+              onClick={() => setField("playType", "freeplay")}
+            >
+              <span>Freeplay</span>
+              <span className="seg-sub">Casual session</span>
+            </button>
+            <button
+              type="button"
+              className="segmented-option disabled"
+              title="Tournament akan tersedia di v1.5"
+            >
+              <span>
+                Tournament <span className="badge soon">Soon</span>
+              </span>
+              <span className="seg-sub">Competitive</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+// ============================================================
+// Step 2 — Location & Time
+// ============================================================
+
+function Step2Location({
+  data,
+  setField,
+}: {
+  data: FormData;
+  setField: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
+}) {
+  return (
+    <>
+      <h2 className="wizard-step-title">Lokasi & Waktu</h2>
+
+      <section className="form-section">
+        <div className="form-group">
+          <label className="form-label">
+            Venue / Lapangan <span className="req">*</span>
+          </label>
+          <div className="input-with-icon">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <input
+              type="text"
+              className="form-input"
+              placeholder="GBK Padel Court"
+              value={data.venueName}
+              onChange={(e) => setField("venueName", e.target.value)}
+              maxLength={80}
+            />
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Google Maps Link (Optional)</label>
+          <div className="input-with-icon">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+            </svg>
+            <input
+              type="url"
+              className="form-input"
+              placeholder="https://maps.app.goo.gl/..."
+              value={data.mapsUrl}
+              onChange={(e) => setField("mapsUrl", e.target.value)}
+            />
+          </div>
+          {data.mapsUrl && (
+            <div className="map-preview">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              <span>Link akan dibagikan ke pemain saat invite via WhatsApp.</span>
+            </div>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">
+            Tanggal <span className="req">*</span>
+          </label>
+          <input
+            type="date"
+            className="form-input"
+            value={data.date}
+            onChange={(e) => setField("date", e.target.value)}
+          />
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label">
+              Jam Mulai <span className="req">*</span>
+            </label>
+            <input
+              type="time"
+              className="form-input"
+              value={data.timeStart}
+              onChange={(e) => setField("timeStart", e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Jam Berakhir</label>
+            <input
+              type="time"
+              className="form-input"
+              value={data.timeEnd}
+              onChange={(e) => setField("timeEnd", e.target.value)}
+            />
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+// ============================================================
+// Step 3 — Players & Format
+// ============================================================
+
+function Step3Players({
+  data,
+  setField,
+}: {
+  data: FormData;
+  setField: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
+}) {
+  return (
+    <>
+      <h2 className="wizard-step-title">Pemain & Format Match</h2>
+
+      <section className="form-section">
+        <div className="form-group">
+          <label className="form-label">Jumlah Court</label>
+          <div className="chip-group">
+            {[1, 2, 3, 4].map((n) => (
+              <button
+                key={n}
+                type="button"
+                className={`chip ${data.numCourts === n ? "active" : ""}`}
+                onClick={() => setField("numCourts", n)}
+              >
+                {n} Court{n > 1 ? "s" : ""}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 10,
+            padding: "10px 12px",
+            background: "var(--primary-50)",
+            borderRadius: "var(--r-md)",
+            border: "1px solid var(--primary-100)",
+          }}
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ color: "var(--primary-700)", flexShrink: 0, marginTop: 1 }}
+          >
+            <circle cx="9" cy="7" r="4" />
+            <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
+            <path d="M16 11h6M19 8v6" />
+          </svg>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: "var(--primary-700)",
+              lineHeight: 1.5,
+            }}
+          >
+            Tidak ada batas maksimal pemain. Tambah pemain via WhatsApp invite
+            — kapan saja sebelum/saat session.
+          </div>
+        </div>
+      </section>
+
+      <section className="form-section">
+        <div className="form-section-head">
+          <div className="sec-icon">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 12a9 9 0 1 1-3-6.7L21 8" />
+              <path d="M21 3v5h-5" />
+            </svg>
+          </div>
+          <h3>Jumlah Round</h3>
+        </div>
+
+        <div className="form-group">
+          <div className="segmented">
+            <button
+              type="button"
+              className={`segmented-option ${data.roundMode === "auto" ? "active" : ""}`}
+              onClick={() => setField("roundMode", "auto")}
+            >
+              <span>Auto</span>
+              <span className="seg-sub">Hitung otomatis</span>
+            </button>
+            <button
+              type="button"
+              className={`segmented-option ${data.roundMode === "manual" ? "active" : ""}`}
+              onClick={() => setField("roundMode", "manual")}
+            >
+              <span>Manual</span>
+              <span className="seg-sub">Set sendiri</span>
+            </button>
+          </div>
+          {data.roundMode === "manual" && (
+            <div className="form-group" style={{ marginTop: 8 }}>
+              <div className="stepper">
+                <button
+                  type="button"
+                  className="stepper-btn"
+                  onClick={() =>
+                    setField("roundCount", Math.max(1, data.roundCount - 1))
+                  }
+                >
+                  −
+                </button>
+                <div className="stepper-value">{data.roundCount}</div>
+                <button
+                  type="button"
+                  className="stepper-btn"
+                  onClick={() =>
+                    setField("roundCount", Math.min(30, data.roundCount + 1))
+                  }
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 10,
+            padding: "10px 12px",
+            background: "var(--primary-50)",
+            borderRadius: "var(--r-md)",
+            border: "1px solid var(--primary-100)",
+          }}
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ color: "var(--primary-700)", flexShrink: 0, marginTop: 1 }}
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 8v4M12 16h.01" />
+          </svg>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: "var(--primary-700)",
+              lineHeight: 1.5,
+            }}
+          >
+            Match tidak punya batas poin/waktu. Host atau co-host memutuskan
+            kapan match berakhir saat scoring.
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+// ============================================================
+// Step 4 — Visibility & Co-Host
+// ============================================================
+
+function Step4Visibility({
+  data,
+  setField,
+}: {
+  data: FormData;
+  setField: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
+}) {
+  return (
+    <>
+      <h2 className="wizard-step-title">Visibility & Co-Host</h2>
+
+      <section className="form-section">
+        <div className="form-section-head">
+          <div className="sec-icon">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
+            </svg>
+          </div>
+          <h3>Visibility</h3>
+        </div>
+
+        <div className="form-group">
+          <div className="segmented">
+            <button
+              type="button"
+              className={`segmented-option ${data.visibility === "private" ? "active" : ""}`}
+              onClick={() => setField("visibility", "private")}
+            >
+              <span>🔒 Private</span>
+              <span className="seg-sub">Invite only</span>
+            </button>
+            <button
+              type="button"
+              className="segmented-option disabled"
+              title="Public session & Find Session akan tersedia di v2"
+            >
+              <span>
+                🌍 Public <span className="badge soon">Soon</span>
+              </span>
+              <span className="seg-sub">Discoverable</span>
+            </button>
+          </div>
+          <p className="form-help">
+            Hanya pemain yang dapat link WA yang bisa join.
+          </p>
+        </div>
+      </section>
+
+      <section className="form-section">
+        <div className="form-section-head">
+          <div className="sec-icon">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="9" cy="7" r="4" />
+              <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
+              <circle cx="17" cy="7" r="3" />
+              <path d="M21 21v-2a4 4 0 0 0-3-3.87" />
+            </svg>
+          </div>
+          <h3>Co-Host & Host Settings</h3>
+        </div>
+
+        <div className="toggle-row">
+          <div className="toggle-info">
+            <div className="form-label">Saya akan ikut main</div>
+            <p className="form-help">
+              Disable kalau kamu hanya jadi organizer/wasit.
+            </p>
+          </div>
+          <button
+            type="button"
+            className={`toggle ${data.hostIsPlaying ? "on" : ""}`}
+            onClick={() => setField("hostIsPlaying", !data.hostIsPlaying)}
+            aria-pressed={data.hostIsPlaying}
+          />
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            padding: 14,
+            background: "var(--bg-soft)",
+            border: "1.5px dashed var(--border)",
+            borderRadius: "var(--r-md)",
+            fontSize: 12,
+            color: "var(--text-600)",
+            fontWeight: 600,
+          }}
+        >
+          ℹ️ Co-Host bisa di-assign nanti dari halaman detail session setelah
+          add pemain.
+        </div>
+      </section>
+    </>
+  );
+}
+
+// ============================================================
+// Step 5 — Review
+// ============================================================
+
+function Step5Review({
+  data,
+  goToStep,
+}: {
+  data: FormData;
+  goToStep: (s: number) => void;
+}) {
+  const dateLabel = useMemo(() => {
+    if (!data.date) return "—";
+    const dt = new Date(`${data.date}T${data.timeStart || "00:00"}`);
+    const days = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "Mei",
+      "Jun",
+      "Jul",
+      "Agu",
+      "Sep",
+      "Okt",
+      "Nov",
+      "Des",
+    ];
+    return `${days[dt.getDay()]}, ${dt.getDate()} ${months[dt.getMonth()]} ${dt.getFullYear()}`;
+  }, [data.date, data.timeStart]);
+
+  const timeLabel = data.timeEnd
+    ? `${data.timeStart} – ${data.timeEnd}`
+    : data.timeStart;
+
+  return (
+    <>
+      <h2 className="wizard-step-title">Review & Create</h2>
+      <p
+        style={{
+          color: "var(--text-500)",
+          fontWeight: 600,
+          fontSize: 13,
+          marginTop: -12,
+        }}
+      >
+        Cek detail sebelum create. Tap edit kalau mau ubah.
+      </p>
+
+      <div className="review-card">
+        <div className="review-section">
+          <div className="review-info">
+            <div className="review-label">Info Session</div>
+            <div className="review-value">{data.name || "—"}</div>
+            <div className="review-value-list" style={{ marginTop: 4 }}>
+              <span>
+                {data.format === "americano" ? "Americano" : "Mexicano"} ·{" "}
+                {data.playType === "freeplay" ? "Freeplay" : "Tournament"}
+              </span>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="review-edit"
+            onClick={() => goToStep(1)}
+          >
+            Edit
+          </button>
+        </div>
+
+        <div className="review-section">
+          <div className="review-info">
+            <div className="review-label">Lokasi & Waktu</div>
+            <div className="review-value">{data.venueName || "—"}</div>
+            <div className="review-value-list" style={{ marginTop: 4 }}>
+              <span>
+                {dateLabel} · {timeLabel}
+              </span>
+              <span
+                style={{
+                  color: data.mapsUrl
+                    ? "var(--primary-700)"
+                    : "var(--text-500)",
+                  fontWeight: 700,
+                  fontSize: 12,
+                }}
+              >
+                📍{" "}
+                {data.mapsUrl
+                  ? "Maps link tersedia"
+                  : "Maps link belum ditambahkan"}
+              </span>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="review-edit"
+            onClick={() => goToStep(2)}
+          >
+            Edit
+          </button>
+        </div>
+
+        <div className="review-section">
+          <div className="review-info">
+            <div className="review-label">Court & Round</div>
+            <div className="review-value">
+              {data.numCourts} court{data.numCourts > 1 ? "s" : ""}
+            </div>
+            <div className="review-value-list" style={{ marginTop: 4 }}>
+              <span>
+                {data.roundMode === "auto"
+                  ? "Auto round count"
+                  : `${data.roundCount} round (manual)`}
+              </span>
+              <span style={{ color: "var(--text-500)" }}>
+                Tanpa batas pemain · match end manual
+              </span>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="review-edit"
+            onClick={() => goToStep(3)}
+          >
+            Edit
+          </button>
+        </div>
+
+        <div className="review-section">
+          <div className="review-info">
+            <div className="review-label">Visibility & Host</div>
+            <div className="review-value">
+              {data.visibility === "public"
+                ? "🌍 Public — discoverable"
+                : "🔒 Private — invite only"}
+            </div>
+            <div className="review-value-list" style={{ marginTop: 4 }}>
+              <span>
+                {data.hostIsPlaying
+                  ? "Host (kamu) ikut main"
+                  : "Host hanya organizer (tidak ikut main)"}
+              </span>
+              <span style={{ color: "var(--text-500)" }}>Belum ada co-host</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="review-edit"
+            onClick={() => goToStep(4)}
+          >
+            Edit
+          </button>
+        </div>
+      </div>
+
+      <div
+        style={{
+          background: "var(--primary-50)",
+          border: "1px solid var(--primary-100)",
+          borderRadius: "var(--r-md)",
+          padding: 14,
+          display: "flex",
+          gap: 10,
+          alignItems: "flex-start",
+        }}
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ color: "var(--primary-700)", flexShrink: 0, marginTop: 2 }}
+        >
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 8v4M12 16h.01" />
+        </svg>
+        <div>
+          <div
+            style={{
+              fontFamily: "var(--font-display)",
+              fontWeight: 700,
+              fontSize: 13,
+              color: "var(--primary-700)",
+              marginBottom: 2,
+            }}
+          >
+            Setelah dibuat:
+          </div>
+          <div
+            style={{
+              fontSize: 12,
+              color: "var(--text-700)",
+              fontWeight: 600,
+              lineHeight: 1.5,
+            }}
+          >
+            Session akan masuk ke &quot;My Sessions&quot;. Kamu bisa undang
+            pemain via WhatsApp link & atur match di dalam session.
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

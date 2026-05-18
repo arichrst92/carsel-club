@@ -1,4 +1,12 @@
+"use client";
+
+import { useState, useTransition } from "react";
 import type { Match } from "@/lib/db/types";
+import {
+  updateMatchScoreAction,
+  endMatchAction,
+  editCompletedMatchScoreAction,
+} from "@/app/actions/matches";
 
 type ParticipantLookup = Record<
   string,
@@ -7,123 +15,453 @@ type ParticipantLookup = Record<
 
 const STATUS_STYLES: Record<
   Match["status"],
-  { label: string; classes: string }
+  { label: string; color: string; bg: string }
 > = {
   pending: {
     label: "Pending",
-    classes: "bg-bg-soft text-text-500",
+    color: "var(--text-500)",
+    bg: "var(--bg-soft)",
   },
   live: {
-    label: "Live",
-    classes: "bg-accent-50 text-accent-600",
+    label: "LIVE",
+    color: "var(--accent-600)",
+    bg: "var(--accent-50)",
   },
   completed: {
     label: "Selesai",
-    classes: "bg-primary-50 text-primary-700",
+    color: "var(--primary-700)",
+    bg: "var(--primary-50)",
   },
 };
 
 export function MatchCard({
   match,
   lookup,
+  canManage,
 }: {
   match: Match;
   lookup: ParticipantLookup;
+  canManage: boolean;
 }) {
+  const [t1, setT1] = useState(match.team1Score);
+  const [t2, setT2] = useState(match.team2Score);
+  const [editing, setEditing] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  const isCompleted = match.status === "completed";
   const status = STATUS_STYLES[match.status];
-  const isDone = match.status === "completed";
+
+  const showLiveControls = canManage && !isCompleted;
+  const showEditControls = canManage && isCompleted;
+  const canAdjust = showLiveControls || editing;
+
+  const showWinner = isCompleted && !editing;
+  const t1Won = showWinner && match.team1Score > match.team2Score;
+  const t2Won = showWinner && match.team2Score > match.team1Score;
+
+  const team1Names = [
+    lookup[match.team1P1Id]?.name ?? "?",
+    lookup[match.team1P2Id]?.name ?? "?",
+  ];
+  const team2Names = [
+    lookup[match.team2P1Id]?.name ?? "?",
+    lookup[match.team2P2Id]?.name ?? "?",
+  ];
+
+  function adjustScore(team: 1 | 2, delta: number) {
+    const newT1 =
+      team === 1 ? Math.max(0, Math.min(99, t1 + delta)) : t1;
+    const newT2 =
+      team === 2 ? Math.max(0, Math.min(99, t2 + delta)) : t2;
+    setT1(newT1);
+    setT2(newT2);
+
+    if (editing) return;
+    if (isCompleted) return;
+
+    startTransition(async () => {
+      const result = await updateMatchScoreAction(match.id, newT1, newT2);
+      if (result?.error) {
+        alert(result.error);
+        setT1(match.team1Score);
+        setT2(match.team2Score);
+      }
+    });
+  }
+
+  function handleEnd() {
+    if (!confirm(`End match dengan score ${t1} - ${t2}?`)) return;
+    startTransition(async () => {
+      const result = await endMatchAction(match.id, t1, t2);
+      if (result?.error) alert(result.error);
+    });
+  }
+
+  function handleSaveEdit() {
+    startTransition(async () => {
+      const result = await editCompletedMatchScoreAction(match.id, t1, t2);
+      if (result?.error) {
+        alert(result.error);
+      } else {
+        setEditing(false);
+      }
+    });
+  }
+
+  function handleCancelEdit() {
+    setT1(match.team1Score);
+    setT2(match.team2Score);
+    setEditing(false);
+  }
 
   return (
-    <div className="rounded-2xl bg-bg-card border border-border-light p-4 shadow-card">
-      <div className="flex items-center justify-between mb-3">
-        <div className="text-xs font-display font-bold text-text-700 uppercase tracking-wide">
+    <div
+      style={{
+        background: "var(--bg)",
+        border: "1px solid var(--border-light)",
+        borderRadius: "var(--r-xl)",
+        padding: "var(--s-4)",
+        boxShadow: "var(--shadow-card)",
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "var(--s-3)",
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "var(--font-display)",
+            fontWeight: 800,
+            fontSize: 12,
+            color: "var(--text-700)",
+            textTransform: "uppercase",
+            letterSpacing: "0.04em",
+          }}
+        >
           Court {match.courtNumber}
         </div>
         <span
-          className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${status.classes}`}
+          style={{
+            padding: "3px 10px",
+            borderRadius: "var(--r-full)",
+            fontSize: 10,
+            fontWeight: 800,
+            textTransform: "uppercase",
+            letterSpacing: "0.06em",
+            background: status.bg,
+            color: status.color,
+          }}
         >
           {status.label}
         </span>
       </div>
 
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-        {/* Team 1 */}
-        <Team
-          p1Id={match.team1P1Id}
-          p2Id={match.team1P2Id}
-          score={match.team1Score}
-          isWinner={isDone && match.team1Score > match.team2Score}
-          lookup={lookup}
-        />
+      {/* Teams */}
+      <TeamRow
+        names={team1Names}
+        score={t1}
+        canAdjust={canAdjust}
+        onMinus={() => adjustScore(1, -1)}
+        onPlus={() => adjustScore(1, 1)}
+        onScoreChange={(val) => setT1(val)}
+        editing={editing}
+        won={t1Won}
+        disabled={isPending}
+      />
 
-        <div className="text-text-300 font-display font-bold text-xs">vs</div>
-
-        {/* Team 2 */}
-        <Team
-          p1Id={match.team2P1Id}
-          p2Id={match.team2P2Id}
-          score={match.team2Score}
-          isWinner={isDone && match.team2Score > match.team1Score}
-          lookup={lookup}
-          alignRight
-        />
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "var(--s-2)",
+          margin: "var(--s-1) 0",
+        }}
+      >
+        <div style={{ flex: 1, height: 1, background: "var(--border-light)" }} />
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 800,
+            color: "var(--text-400)",
+            textTransform: "uppercase",
+            letterSpacing: "0.06em",
+            fontFamily: "var(--font-display)",
+          }}
+        >
+          vs
+        </span>
+        <div style={{ flex: 1, height: 1, background: "var(--border-light)" }} />
       </div>
-    </div>
-  );
-}
 
-function Team({
-  p1Id,
-  p2Id,
-  score,
-  isWinner,
-  lookup,
-  alignRight,
-}: {
-  p1Id: string;
-  p2Id: string;
-  score: number;
-  isWinner: boolean;
-  lookup: ParticipantLookup;
-  alignRight?: boolean;
-}) {
-  const p1 = lookup[p1Id]?.name ?? "?";
-  const p2 = lookup[p2Id]?.name ?? "?";
+      <TeamRow
+        names={team2Names}
+        score={t2}
+        canAdjust={canAdjust}
+        onMinus={() => adjustScore(2, -1)}
+        onPlus={() => adjustScore(2, 1)}
+        onScoreChange={(val) => setT2(val)}
+        editing={editing}
+        won={t2Won}
+        disabled={isPending}
+      />
 
-  return (
-    <div
-      className={`flex flex-col gap-1 ${alignRight ? "items-end text-right" : "items-start"}`}
-    >
-      <div className="flex items-center gap-2">
-        {alignRight && (
-          <span
-            className={`font-display font-bold text-2xl ${isWinner ? "text-primary-600" : "text-text-400"}`}
+      {/* Actions */}
+      {showLiveControls && (
+        <button
+          type="button"
+          onClick={handleEnd}
+          disabled={isPending}
+          className="btn-primary-lg"
+          style={{
+            marginTop: "var(--s-3)",
+            padding: "10px 16px",
+            fontSize: 13,
+            width: "100%",
+          }}
+        >
+          {isPending ? "Saving..." : "End Match"}
+        </button>
+      )}
+
+      {showEditControls && !editing && (
+        <button
+          type="button"
+          onClick={() => setEditing(true)}
+          style={{
+            marginTop: "var(--s-3)",
+            padding: "8px 14px",
+            width: "100%",
+            borderRadius: "var(--r-md)",
+            border: "1px solid var(--border-light)",
+            background: "transparent",
+            fontFamily: "var(--font-display)",
+            fontWeight: 700,
+            fontSize: 12,
+            color: "var(--text-700)",
+            cursor: "pointer",
+          }}
+        >
+          ✏️ Edit Score
+        </button>
+      )}
+
+      {showEditControls && editing && (
+        <div style={{ display: "flex", gap: 8, marginTop: "var(--s-3)" }}>
+          <button
+            type="button"
+            onClick={handleCancelEdit}
+            disabled={isPending}
+            style={{
+              flex: 1,
+              padding: "8px 14px",
+              borderRadius: "var(--r-md)",
+              border: "1px solid var(--border-light)",
+              background: "transparent",
+              fontFamily: "var(--font-display)",
+              fontWeight: 700,
+              fontSize: 12,
+              color: "var(--text-700)",
+              cursor: "pointer",
+            }}
           >
-            {score}
-          </span>
-        )}
-        <div className={alignRight ? "text-right" : ""}>
-          <PlayerName name={p1} winner={isWinner} />
-          <PlayerName name={p2} winner={isWinner} />
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleSaveEdit}
+            disabled={isPending}
+            className="btn-primary-lg"
+            style={{
+              flex: 1,
+              padding: "8px 14px",
+              fontSize: 12,
+            }}
+          >
+            {isPending ? "..." : "Save"}
+          </button>
         </div>
-        {!alignRight && (
-          <span
-            className={`font-display font-bold text-2xl ${isWinner ? "text-primary-600" : "text-text-400"}`}
-          >
-            {score}
-          </span>
-        )}
-      </div>
+      )}
     </div>
   );
 }
 
-function PlayerName({ name, winner }: { name: string; winner: boolean }) {
+function TeamRow({
+  names,
+  score,
+  canAdjust,
+  onMinus,
+  onPlus,
+  onScoreChange,
+  editing,
+  won,
+  disabled,
+}: {
+  names: string[];
+  score: number;
+  canAdjust: boolean;
+  onMinus: () => void;
+  onPlus: () => void;
+  onScoreChange: (val: number) => void;
+  editing: boolean;
+  won: boolean;
+  disabled?: boolean;
+}) {
   return (
-    <div
-      className={`text-sm font-bold leading-tight truncate ${winner ? "text-text-900" : "text-text-700"}`}
-    >
-      {name}
+    <div style={{ padding: "var(--s-2) 0" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "var(--s-3)",
+        }}
+      >
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div
+            style={{
+              fontSize: 14,
+              fontWeight: 700,
+              color: won ? "var(--text-900)" : "var(--text-700)",
+              lineHeight: 1.3,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {names[0]}
+          </div>
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: "var(--text-500)",
+              lineHeight: 1.3,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {names[1]}
+          </div>
+          {won && (
+            <span
+              style={{
+                display: "inline-block",
+                marginTop: 4,
+                padding: "2px 6px",
+                borderRadius: "var(--r-sm)",
+                fontSize: 9,
+                fontWeight: 800,
+                background: "var(--primary-100)",
+                color: "var(--primary-700)",
+                textTransform: "uppercase",
+                letterSpacing: "0.04em",
+              }}
+            >
+              Win
+            </span>
+          )}
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            flexShrink: 0,
+          }}
+        >
+          {canAdjust && (
+            <button
+              type="button"
+              onClick={onMinus}
+              disabled={disabled || score === 0}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: "var(--r-full)",
+                background: "var(--bg-soft)",
+                color: "var(--text-700)",
+                fontSize: 18,
+                fontWeight: 700,
+                border: "none",
+                cursor: disabled || score === 0 ? "not-allowed" : "pointer",
+                opacity: disabled || score === 0 ? 0.3 : 1,
+              }}
+            >
+              −
+            </button>
+          )}
+
+          {editing ? (
+            <input
+              type="number"
+              min={0}
+              max={99}
+              value={score}
+              onChange={(e) =>
+                onScoreChange(
+                  Math.max(
+                    0,
+                    Math.min(99, parseInt(e.target.value || "0", 10))
+                  )
+                )
+              }
+              style={{
+                width: 60,
+                textAlign: "center",
+                fontSize: 24,
+                fontWeight: 800,
+                fontFamily: "var(--font-display)",
+                border: "2px solid var(--border)",
+                borderRadius: "var(--r-md)",
+                padding: "4px 6px",
+                outline: "none",
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                minWidth: 36,
+                textAlign: "center",
+                fontSize: 28,
+                fontWeight: 800,
+                fontFamily: "var(--font-display)",
+                color: won ? "var(--primary-700)" : "var(--text-400)",
+              }}
+            >
+              {score}
+            </div>
+          )}
+
+          {canAdjust && (
+            <button
+              type="button"
+              onClick={onPlus}
+              disabled={disabled || score === 99}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: "var(--r-full)",
+                background: "var(--primary-50)",
+                color: "var(--primary-700)",
+                fontSize: 18,
+                fontWeight: 700,
+                border: "none",
+                cursor: disabled || score === 99 ? "not-allowed" : "pointer",
+                opacity: disabled || score === 99 ? 0.3 : 1,
+              }}
+            >
+              +
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

@@ -20,7 +20,7 @@ export function AddMemberSearch({ sessionId }: { sessionId: string }) {
     setFoundUser(null);
   }
 
-  async function handleSearch(e: React.FormEvent) {
+  function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     reset();
     if (!phone.trim()) return;
@@ -55,68 +55,135 @@ export function AddMemberSearch({ sessionId }: { sessionId: string }) {
   }
 
   return (
-    <div className="space-y-3">
-      <form onSubmit={handleSearch} className="flex gap-2">
-        <input
-          type="tel"
-          inputMode="tel"
-          placeholder="08123456789"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          className="flex-1 px-4 py-3 rounded-xl border border-border text-base bg-bg-card outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100 transition"
-        />
-        <button
-          type="submit"
-          disabled={isPending || !phone.trim()}
-          className="px-4 py-3 rounded-xl bg-bg-soft border border-border-light text-text-700 font-bold text-sm disabled:opacity-50 hover:border-primary-200 transition"
-        >
-          {isPending ? "..." : "Cari"}
-        </button>
+    <>
+      <form onSubmit={handleSearch}>
+        <div className="form-group">
+          <label className="form-label">Nomor WhatsApp</label>
+          <div className="input-with-icon">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+            <input
+              type="tel"
+              inputMode="tel"
+              className="form-input"
+              placeholder="08123456789"
+              value={phone}
+              onChange={(e) =>
+                setPhone(e.target.value.replace(/[^\d]/g, ""))
+              }
+            />
+          </div>
+          <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+            <button
+              type="submit"
+              className="btn-primary-lg"
+              disabled={isPending || !phone.trim()}
+              style={{
+                flex: 1,
+                padding: "10px 16px",
+                fontSize: 13,
+              }}
+            >
+              {isPending ? "Mencari..." : "Cari Member"}
+            </button>
+          </div>
+        </div>
       </form>
 
       {error && (
-        <div className="px-3 py-2 rounded-lg bg-accent-50 border border-accent-100">
-          <p className="text-xs text-accent-600 font-semibold">{error}</p>
+        <div
+          style={{
+            marginTop: "var(--s-3)",
+            padding: "10px 12px",
+            background: "var(--accent-50)",
+            border: "1px solid var(--accent-100)",
+            borderRadius: "var(--r-md)",
+          }}
+        >
+          <p
+            style={{
+              fontSize: 12,
+              color: "var(--accent-600)",
+              fontWeight: 700,
+              lineHeight: 1.5,
+            }}
+          >
+            {error}
+          </p>
         </div>
       )}
 
       {success && (
-        <div className="px-3 py-2 rounded-lg bg-primary-50 border border-primary-100">
-          <p className="text-xs text-primary-700 font-semibold">{success}</p>
+        <div
+          style={{
+            marginTop: "var(--s-3)",
+            padding: "10px 12px",
+            background: "var(--primary-50)",
+            border: "1px solid var(--primary-100)",
+            borderRadius: "var(--r-md)",
+          }}
+        >
+          <p
+            style={{
+              fontSize: 12,
+              color: "var(--primary-700)",
+              fontWeight: 700,
+            }}
+          >
+            {success}
+          </p>
         </div>
       )}
 
       {foundUser && (
-        <div className="rounded-xl bg-bg-card border border-primary-200 p-3 shadow-card">
-          <div className="flex items-center gap-3">
-            <div className="size-11 rounded-full bg-gradient-to-br from-accent-500 to-accent-600 text-white grid place-items-center font-display font-bold text-sm shrink-0">
-              {foundUser.displayName
-                .split(" ")
-                .map((w) => w[0])
-                .slice(0, 2)
-                .join("")
-                .toUpperCase()}
+        <div style={{ marginTop: "var(--s-3)" }}>
+          <div className="sp-section-label">Member Ditemukan</div>
+          <div className="player-list-item" style={{ marginTop: 8 }}>
+            <div
+              className="player-avatar-lg member-1"
+              style={{ background: "linear-gradient(135deg, #06B6D4, #0EA5E9)" }}
+            >
+              {foundUser.displayName.trim()[0]?.toUpperCase() ?? "?"}
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-bold text-text-900 truncate">
-                {foundUser.displayName}
+            <div className="player-info">
+              <div className="player-name">
+                <span>{foundUser.displayName}</span>
               </div>
-              <div className="text-xs text-text-500 truncate">
-                +{foundUser.whatsappNumber}
-                {foundUser.city && ` · ${foundUser.city}`}
+              <div className="player-meta-row">
+                <span style={{ fontSize: 12, color: "var(--text-500)" }}>
+                  +{foundUser.whatsappNumber}
+                  {foundUser.city && ` · 📍 ${foundUser.city}`}
+                </span>
               </div>
             </div>
             <button
               type="button"
               onClick={handleAdd}
               disabled={isPending}
-              className="px-3 py-2 rounded-lg bg-primary-500 text-white text-xs font-bold shadow-sm disabled:opacity-50 hover:bg-primary-600 transition"
+              className="btn-primary-lg"
+              style={{
+                padding: "8px 14px",
+                fontSize: 12,
+                width: "auto",
+                flexShrink: 0,
+              }}
             >
               {isPending ? "..." : "+ Tambah"}
             </button>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -3,7 +3,7 @@ import { requireUser } from "@/lib/auth/get-current-user";
 import { CreateSessionForm } from "@/components/sessions/CreateSessionForm";
 
 export const metadata = {
-  title: "Buat Session",
+  title: "Create Session",
 };
 
 export default async function NewSessionPage() {
@@ -11,20 +11,29 @@ export default async function NewSessionPage() {
 
   return (
     <div className="app-shell">
-      <header className="flex items-center justify-between px-4 py-3 border-b border-border-light bg-bg sticky top-0 z-10">
+      <header className="subscreen-header">
         <Link
           href="/sessions"
-          className="text-sm font-bold text-text-700 hover:text-primary-600"
+          className="back-btn"
+          aria-label="Back"
         >
-          ← Batal
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
         </Link>
-        <h1 className="font-display font-bold text-base">Session Baru</h1>
-        <div className="w-12" /> {/* spacer for layout balance */}
+        <h2 className="subscreen-title">Create Session</h2>
       </header>
 
-      <main className="flex-1 px-4 py-5">
-        <CreateSessionForm />
-      </main>
+      <CreateSessionForm />
     </div>
   );
 }

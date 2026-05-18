@@ -2,48 +2,92 @@ import Link from "next/link";
 import type { Session } from "@/lib/db/types";
 import { formatDate, formatTimeRange } from "@/lib/utils";
 
-const STATUS_STYLES: Record<
+const STATUS_BADGES: Record<
   Session["status"],
-  { label: string; bg: string; text: string }
+  { label: string; color: string }
 > = {
-  upcoming: { label: "Upcoming", bg: "bg-sky-50", text: "text-sky" },
-  live: { label: "Live", bg: "bg-accent-50", text: "text-accent-600" },
-  completed: { label: "Selesai", bg: "bg-bg-soft", text: "text-text-500" },
-  cancelled: { label: "Dibatalkan", bg: "bg-bg-soft", text: "text-text-400" },
+  upcoming: { label: "Upcoming", color: "var(--sky)" },
+  live: { label: "Live", color: "var(--accent-600)" },
+  completed: { label: "Selesai", color: "var(--text-500)" },
+  cancelled: { label: "Dibatalkan", color: "var(--text-400)" },
 };
 
 export function SessionCard({ session }: { session: Session }) {
-  const status = STATUS_STYLES[session.status];
+  const status = STATUS_BADGES[session.status];
 
   return (
     <Link
       href={`/sessions/${session.id}`}
-      className="block rounded-2xl bg-bg-card border border-border-light p-4 shadow-card hover:shadow-md hover:border-primary-200 transition"
+      className="session-card"
+      style={{ display: "block", textDecoration: "none" }}
     >
-      <div className="flex items-start justify-between gap-3 mb-2">
-        <div className="min-w-0 flex-1">
-          <h3 className="font-display font-bold text-base text-text-900 truncate">
-            {session.title}
-          </h3>
-          {session.venueName && (
-            <p className="text-xs text-text-500 truncate mt-0.5">
-              📍 {session.venueName}
-            </p>
-          )}
+      <div className="session-banner">
+        <div className="session-banner-text">
+          <div className="session-banner-tag">
+            {status.label}
+          </div>
+          <div className="session-banner-title">{session.title}</div>
         </div>
-        <span
-          className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${status.bg} ${status.text}`}
-        >
-          {status.label}
-        </span>
       </div>
-
-      <div className="flex items-center gap-3 text-xs text-text-700 font-semibold flex-wrap">
-        <span>📅 {formatDate(session.scheduledAt)}</span>
-        <span>⏰ {formatTimeRange(session.scheduledAt, session.scheduledEndAt)}</span>
-        <span>
-          🏟️ {session.numCourts} court{session.numCourts > 1 ? "s" : ""}
-        </span>
+      <div className="session-body">
+        <div className="session-meta">
+          {session.venueName && (
+            <div className="session-meta-row">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              <span>{session.venueName}</span>
+            </div>
+          )}
+          <div className="session-meta-row">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <path d="M16 2v4M8 2v4M3 10h18" />
+            </svg>
+            <span>
+              {formatDate(session.scheduledAt)} ·{" "}
+              {formatTimeRange(session.scheduledAt, session.scheduledEndAt)}
+            </span>
+          </div>
+          <div className="session-meta-row">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 6v6l4 2" />
+            </svg>
+            <span style={{ textTransform: "capitalize" }}>
+              {session.format} · {session.numCourts} court
+              {session.numCourts > 1 ? "s" : ""}
+            </span>
+          </div>
+        </div>
       </div>
     </Link>
   );

@@ -1,5 +1,4 @@
-import { notFound, redirect } from "next/navigation";
-import Image from "next/image";
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/get-current-user";
 import {
@@ -7,14 +6,11 @@ import {
   getSessionWithParticipants,
   isSessionStaff,
 } from "@/lib/db/queries/sessions";
-import { cancelSessionAction } from "@/app/actions/sessions";
-import {
-  formatDate,
-  formatTimeRange,
-  formatDuration,
-} from "@/lib/utils";
+import { getRoundsWithMatches } from "@/lib/db/queries/matches";
+import { formatDate, formatTimeRange } from "@/lib/utils";
 import { ParticipantRow } from "@/components/sessions/ParticipantRow";
-import { MatchesSection } from "@/components/sessions/MatchesSection";
+import { CancelSessionButton } from "@/components/sessions/CancelSessionButton";
+import { GenerateRoundButton } from "@/components/sessions/GenerateRoundButton";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -28,6 +24,16 @@ export async function generateMetadata({ params }: PageProps) {
   };
 }
 
+const STATUS_LABEL: Record<
+  "upcoming" | "live" | "completed" | "cancelled",
+  { label: string; icon: string }
+> = {
+  upcoming: { label: "Upcoming", icon: "📅" },
+  live: { label: "Live", icon: "🔴" },
+  completed: { label: "Selesai", icon: "✅" },
+  cancelled: { label: "Dibatalkan", icon: "❌" },
+};
+
 export default async function SessionDetailPage({ params }: PageProps) {
   const { id } = await params;
   const user = await requireUser();
@@ -40,107 +46,159 @@ export default async function SessionDetailPage({ params }: PageProps) {
 
   const { session, participants } = result;
   const staff = await isSessionStaff(id, user.id);
+  const rounds = await getRoundsWithMatches(id);
 
-  const STATUS_STYLES = {
-    upcoming: { label: "Upcoming", color: "bg-sky-50 text-sky" },
-    live: { label: "Live", color: "bg-accent-50 text-accent-600" },
-    completed: { label: "Selesai", color: "bg-bg-soft text-text-500" },
-    cancelled: { label: "Dibatalkan", color: "bg-bg-soft text-text-400" },
-  } as const;
-
-  const status = STATUS_STYLES[session.status];
   const isTerminal =
     session.status === "completed" || session.status === "cancelled";
+  const statusInfo = STATUS_LABEL[session.status];
+  const cohostCount = participants.filter((p) => p.role === "co_host").length;
+  const activeCount = participants.filter((p) => p.isPlaying).length;
+  const completedMatches = rounds.reduce(
+    (acc, r) => acc + r.matches.filter((m) => m.status === "completed").length,
+    0
+  );
+  const totalMatches = rounds.reduce((acc, r) => acc + r.matches.length, 0);
+  const nextRoundNumber = (rounds.at(-1)?.roundNumber ?? 0) + 1;
 
   return (
     <div className="app-shell">
-      <header className="flex items-center justify-between px-4 py-3 border-b border-border-light bg-bg sticky top-0 z-10">
-        <Link
-          href="/sessions"
-          className="text-sm font-bold text-text-700 hover:text-primary-600"
-        >
-          ← Sessions
+      <header className="subscreen-header">
+        <Link href="/sessions" className="back-btn" aria-label="Back">
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
         </Link>
-        <Image
-          src="/logo-icon.png"
-          alt="Carsel Club"
-          width={1024}
-          height={1024}
-          className="w-7 h-auto"
-        />
-        <div className="w-16" />
+        <h2 className="subscreen-title">Session Detail</h2>
+        <div style={{ width: 40 }} />
       </header>
 
-      <main className="flex-1 px-4 py-5 space-y-5">
-        {/* Header card */}
-        <div className="rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 p-5 text-white shadow-md">
-          <div className="flex items-start justify-between gap-3 mb-3">
-            <h1 className="font-display font-bold text-2xl leading-tight">
-              {session.title}
-            </h1>
-            <span
-              className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-white text-primary-700`}
-            >
-              {status.label}
+      <main className="app-content subscreen with-footer">
+        {/* HERO */}
+        <section className="hero-session">
+          <div
+            className={`status-pill ${session.status === "live" ? "live" : ""}`}
+          >
+            <span className="status-dot"></span>
+            <span>
+              {statusInfo.icon} {statusInfo.label}
             </span>
           </div>
-
-          {session.venueName && (
-            <p className="text-sm opacity-90 font-semibold mb-2">
-              📍 {session.venueName}
-            </p>
-          )}
-
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold opacity-95">
-            <span>📅 {formatDate(session.scheduledAt)}</span>
-            <span>
-              ⏰ {formatTimeRange(session.scheduledAt, session.scheduledEndAt)}
-            </span>
-            {session.scheduledEndAt && (
+          <div className="hero-title">{session.title}</div>
+          <div className="hero-meta">
+            <div className="hero-meta-row">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <path d="M16 2v4M8 2v4M3 10h18" />
+              </svg>
               <span>
-                ·{" "}
-                {formatDuration(
-                  Math.round(
-                    (new Date(session.scheduledEndAt).getTime() -
-                      new Date(session.scheduledAt).getTime()) /
-                      60000
-                  )
-                )}
+                {formatDate(session.scheduledAt)} ·{" "}
+                {formatTimeRange(session.scheduledAt, session.scheduledEndAt)}
               </span>
+            </div>
+            {session.venueName && (
+              <div className="hero-meta-row">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                <span>
+                  {session.venueName}
+                  {session.mapsUrl && (
+                    <>
+                      {" · "}
+                      <a
+                        href={session.mapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Maps
+                      </a>
+                    </>
+                  )}
+                </span>
+              </div>
             )}
-            <span>
-              🏟️ {session.numCourts} court{session.numCourts > 1 ? "s" : ""}
+            <div className="hero-meta-row">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="9" cy="7" r="4" />
+                <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
+              </svg>
+              <span>
+                Host:{" "}
+                {participants.find((p) => p.role === "host")?.userDisplayName ??
+                  "—"}
+              </span>
+            </div>
+          </div>
+          <div className="hero-format-chips">
+            <span className="format-chip" style={{ textTransform: "capitalize" }}>
+              {session.format}
             </span>
-            <span className="uppercase tracking-wide">{session.format}</span>
-            {session.fixPartners && <span>· Fix Partners</span>}
+            <span className="format-chip" style={{ textTransform: "capitalize" }}>
+              {session.playType}
+            </span>
+            <span className="format-chip">
+              {session.numCourts} Court{session.numCourts > 1 ? "s" : ""}
+            </span>
+            {session.fixPartners && (
+              <span className="format-chip">Fix Partners</span>
+            )}
+            <span className="format-chip">
+              {session.visibility === "public" ? "🌍 Public" : "🔒 Private"}
+            </span>
           </div>
-        </div>
+        </section>
 
-        {/* Description */}
-        {session.description && (
-          <div className="rounded-xl bg-bg-soft border border-border-light p-4">
-            <p className="text-sm text-text-700 whitespace-pre-wrap">
-              {session.description}
-            </p>
-          </div>
-        )}
-
-        {/* Participants */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-display font-bold text-text-900 uppercase tracking-wide">
-              Pemain ({participants.length})
-            </h2>
+        {/* PLAYERS */}
+        <section>
+          <div className="section-head">
+            <h3>Pemain ({participants.length})</h3>
             {staff && !isTerminal && (
               <Link
                 href={`/sessions/${session.id}/participants`}
-                className="text-xs font-bold text-primary-600 hover:text-primary-700"
+                className="section-link"
               >
                 + Tambah
               </Link>
             )}
           </div>
-          <ul className="space-y-2">
+          <div className="player-list">
             {participants.map((p) => (
               <ParticipantRow
                 key={p.id}
@@ -149,47 +207,287 @@ export default async function SessionDetailPage({ params }: PageProps) {
                 canManage={staff && !isTerminal}
               />
             ))}
-          </ul>
-        </div>
 
-        {/* Matches */}
-        <MatchesSection
-          sessionId={session.id}
-          participants={participants}
-          staff={staff}
-          isTerminal={isTerminal}
-        />
-
-        {/* Staff actions */}
-        {staff && !isTerminal && (
-          <div className="pt-4 border-t border-border-light">
-            <form action={cancelSessionFormAction.bind(null, session.id)}>
-              <button
-                type="submit"
-                className="w-full py-3 rounded-xl border border-accent-100 text-accent-600 text-sm font-bold hover:bg-accent-50 transition"
+            {staff && !isTerminal && (
+              <Link
+                href={`/sessions/${session.id}/participants`}
+                className="add-player-btn"
+                style={{ textDecoration: "none" }}
               >
-                Cancel Session
-              </button>
-            </form>
+                <div className="plus-circle">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                </div>
+                <div className="plus-text">
+                  <div>Tambah Pemain</div>
+                  <div
+                    style={{
+                      fontSize: 12,
+                      color: "var(--text-500)",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Member atau Guest · tanpa batas
+                  </div>
+                </div>
+              </Link>
+            )}
           </div>
-        )}
+        </section>
 
-        {/* Debug */}
-        <details className="rounded-xl bg-bg-soft border border-border-light p-4 text-xs">
-          <summary className="font-bold text-text-700 cursor-pointer">
-            Debug: Session data
-          </summary>
-          <pre className="mt-2 text-text-500 overflow-auto">
-            {JSON.stringify({ session, participants }, null, 2)}
-          </pre>
-        </details>
+        {/* MATCH SETTINGS RECAP */}
+        <section>
+          <div className="section-head">
+            <h3>Match Settings</h3>
+          </div>
+          <div className="info-row-list">
+            <div className="info-row">
+              <div className="ir-icon teal">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <path d="M3 12h18M12 3v18" />
+                </svg>
+              </div>
+              <div className="ir-info">
+                <div className="ir-label">Court</div>
+                <div className="ir-value">
+                  {session.numCourts} Court{session.numCourts > 1 ? "s" : ""}{" "}
+                  {session.numCourts > 1 && "(paralel)"}
+                </div>
+              </div>
+            </div>
+            <div className="info-row">
+              <div className="ir-icon coral">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M9 11l3 3L22 4" />
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                </svg>
+              </div>
+              <div className="ir-info">
+                <div className="ir-label">Match End</div>
+                <div className="ir-value">Manual oleh host/co-host</div>
+              </div>
+            </div>
+            <div className="info-row">
+              <div className="ir-icon yellow">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M21 12a9 9 0 1 1-3-6.7L21 8" />
+                  <path d="M21 3v5h-5" />
+                </svg>
+              </div>
+              <div className="ir-info">
+                <div className="ir-label">Round</div>
+                <div className="ir-value">
+                  {session.maxRounds
+                    ? `${session.maxRounds} round (manual)`
+                    : "Auto count"}
+                </div>
+              </div>
+            </div>
+            <div className="info-row">
+              <div className="ir-icon purple">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
+                  <circle cx="17" cy="7" r="3" />
+                </svg>
+              </div>
+              <div className="ir-info">
+                <div className="ir-label">Co-Host</div>
+                <div className="ir-value">
+                  {cohostCount === 0
+                    ? "Belum ada co-host"
+                    : `${cohostCount} co-host`}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* MATCH STATUS */}
+        <section>
+          <div className="section-head">
+            <h3>Match Round Set</h3>
+            {rounds.length > 0 && (
+              <Link
+                href={`/sessions/${session.id}/matches`}
+                className="section-link"
+              >
+                View All
+              </Link>
+            )}
+          </div>
+          {rounds.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-state-icon">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v6l4 2" />
+                </svg>
+              </div>
+              <div className="empty-state-title">
+                Belum ada match yang dibuat
+              </div>
+              <div className="empty-state-text">
+                Klik &quot;Generate Match&quot; di bawah saat semua pemain
+                sudah datang. Kamu bisa buat extra match kapan saja saat session
+                berjalan.
+              </div>
+            </div>
+          ) : (
+            <Link
+              href={`/sessions/${session.id}/matches`}
+              style={{
+                display: "block",
+                padding: "var(--s-4)",
+                background: "var(--bg)",
+                border: "1px solid var(--border-light)",
+                borderRadius: "var(--r-xl)",
+                boxShadow: "var(--shadow-card)",
+                textDecoration: "none",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: 8,
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontWeight: 800,
+                    fontSize: 15,
+                    color: "var(--text-900)",
+                  }}
+                >
+                  {rounds.length} round{rounds.length > 1 ? "s" : ""} ·{" "}
+                  {completedMatches}/{totalMatches} match selesai
+                </div>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="var(--primary-700)"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "var(--text-500)",
+                  fontWeight: 600,
+                }}
+              >
+                Tap untuk lihat detail match + scoring
+              </div>
+            </Link>
+          )}
+        </section>
+
+        {/* DANGER ZONE */}
+        {staff && !isTerminal && (
+          <section style={{ marginTop: "var(--s-2)" }}>
+            <CancelSessionButton sessionId={session.id} />
+          </section>
+        )}
       </main>
+
+      {/* STICKY FOOTER */}
+      {staff && !isTerminal && rounds.length === 0 && (
+        <GenerateRoundButton
+          sessionId={session.id}
+          nextRoundNumber={1}
+          activePlayerCount={activeCount}
+          redirectAfter={`/sessions/${session.id}/matches`}
+          variant="footer"
+        />
+      )}
+      {!isTerminal && rounds.length > 0 && (
+        <div className="sticky-footer">
+          <Link
+            href={`/sessions/${session.id}/matches`}
+            className="btn-primary-lg"
+            style={{ textDecoration: "none" }}
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M9 11H4l3-3M9 13H4l3 3M14 11h5l-3-3M14 13h5l-3 3" />
+            </svg>
+            <span>View Matches & Score</span>
+          </Link>
+        </div>
+      )}
     </div>
   );
-}
-
-// Server Action wrapper that accepts sessionId (for form bind)
-async function cancelSessionFormAction(sessionId: string, _formData: FormData) {
-  "use server";
-  await cancelSessionAction(sessionId);
 }
