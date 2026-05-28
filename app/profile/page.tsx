@@ -5,6 +5,12 @@ import { getRecentMatches } from "@/lib/db/queries/home";
 import { BottomNav } from "@/components/nav/BottomNav";
 import { logoutAction } from "@/app/actions/auth";
 import { winRate } from "@/lib/utils";
+import { ReferralShare } from "@/components/profile/ReferralShare";
+import {
+  ACHIEVEMENTS,
+  getUnlockedCount,
+  type UserStatsForAchievement,
+} from "@/lib/achievements";
 
 export const metadata = {
   title: "Profile",
@@ -423,10 +429,39 @@ export default async function ProfilePage() {
           </div>
         </section>
 
+        {/* ACHIEVEMENTS */}
+        <ProfileAchievements
+          stats={{
+            totalPoints: profile.totalPoints,
+            totalMatches: profile.totalMatches,
+            totalWins: profile.totalWins,
+            totalLosses: profile.totalLosses,
+            totalDraws: profile.totalDraws,
+            hostedCount: profile.hostedCount,
+            tierOrder: profile.tierOrder ?? 1,
+          }}
+        />
+
+        {/* ACHIEVEMENTS PREVIEW */}
+        <ProfileAchievements
+          stats={{
+            totalPoints: profile.totalPoints,
+            totalMatches: profile.totalMatches,
+            totalWins: profile.totalWins,
+            totalLosses: profile.totalLosses,
+            totalDraws: profile.totalDraws,
+            tierOrder: profile.tierOrder ?? 1,
+            hostedCount: profile.hostedCount,
+          }}
+        />
+
         {/* RECENT MATCHES */}
         <section>
           <div className="section-head">
             <h3>Recent Matches</h3>
+            <Link href="/profile/matches" className="section-link">
+              View All
+            </Link>
           </div>
           {recent.length === 0 ? (
             <div className="empty-state">
@@ -476,6 +511,9 @@ export default async function ProfilePage() {
           )}
         </section>
 
+        {/* REFERRAL SHARE */}
+        <ReferralShare userId={profile.id} displayName={profile.displayName} />
+
         {/* SETTINGS */}
         <section>
           <div className="section-head">
@@ -493,12 +531,34 @@ export default async function ProfilePage() {
               boxShadow: "var(--shadow-card)",
             }}
           >
-            <SettingsRow
-              icon="✏️"
-              title="Edit Profile"
-              sub="Nama, kota, avatar"
-              disabled
-            />
+            <Link href="/profile/edit" style={{ textDecoration: "none" }}>
+              <SettingsRow
+                icon="✏️"
+                title="Edit Profile"
+                sub="Nama, kota"
+              />
+            </Link>
+            <Link href="/friends" style={{ textDecoration: "none" }}>
+              <SettingsRow
+                icon="👥"
+                title="Friends"
+                sub="Following + followers"
+              />
+            </Link>
+            <Link href="/friends" style={{ textDecoration: "none" }}>
+              <SettingsRow
+                icon="👥"
+                title="Friends"
+                sub="Teman padel kamu"
+              />
+            </Link>
+            <Link href="/achievements" style={{ textDecoration: "none" }}>
+              <SettingsRow
+                icon="🏆"
+                title="Achievements"
+                sub="Badge & milestones"
+              />
+            </Link>
             <SettingsRow
               icon="🔔"
               title="Notifikasi"
@@ -572,6 +632,87 @@ export default async function ProfilePage() {
 
       <BottomNav />
     </div>
+  );
+}
+
+function ProfileAchievements({
+  stats,
+}: {
+  stats: UserStatsForAchievement;
+}) {
+  const { unlocked, total } = getUnlockedCount(stats);
+  const earned = ACHIEVEMENTS.filter((a) => a.check(stats)).slice(0, 6);
+
+  return (
+    <section>
+      <div className="section-head">
+        <h3>
+          Achievements{" "}
+          <span
+            style={{
+              color: "var(--text-500)",
+              fontSize: 12,
+              fontWeight: 700,
+            }}
+          >
+            {unlocked} / {total}
+          </span>
+        </h3>
+        <Link href="/achievements" className="section-link">
+          View All
+        </Link>
+      </div>
+      {earned.length === 0 ? (
+        <div
+          style={{
+            padding: "var(--s-4)",
+            background: "var(--bg-soft)",
+            borderRadius: "var(--r-lg)",
+            textAlign: "center",
+            fontSize: 12,
+            color: "var(--text-500)",
+            fontWeight: 600,
+          }}
+        >
+          🔒 Belum ada achievement. Mulai main untuk unlock!
+        </div>
+      ) : (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: 8,
+          }}
+        >
+          {earned.map((a) => (
+            <div
+              key={a.code}
+              style={{
+                background: "var(--bg)",
+                border: "1px solid var(--primary-200)",
+                borderRadius: "var(--r-md)",
+                padding: "var(--s-3)",
+                textAlign: "center",
+                boxShadow: "var(--shadow-xs)",
+              }}
+            >
+              <div style={{ fontSize: 28, marginBottom: 4 }}>{a.emoji}</div>
+              <div
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 700,
+                  fontSize: 10,
+                  color: "var(--text-900)",
+                  lineHeight: 1.2,
+                }}
+              >
+                {a.name}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }
 

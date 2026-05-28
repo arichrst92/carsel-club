@@ -20,6 +20,7 @@ export async function getPublicSessionView(sessionId: string) {
       title: sessions.title,
       venueName: sessions.venueName,
       mapsUrl: sessions.mapsUrl,
+      coverPhotoUrl: sessions.coverPhotoUrl,
       scheduledAt: sessions.scheduledAt,
       scheduledEndAt: sessions.scheduledEndAt,
       format: sessions.format,

@@ -32,6 +32,7 @@ const CreateSessionSchema = z.object({
   visibility: z.enum(["private", "public"]).default("private"),
   venueName: z.string().trim().min(1, "Venue wajib diisi").max(80),
   mapsUrl: z.string().trim().max(500).optional(),
+  coverPhotoUrl: z.string().trim().max(1000).optional(),
   scheduledAt: z
     .string()
     .min(1, "Tanggal & waktu wajib diisi")
@@ -77,6 +78,7 @@ export async function createSessionAction(
     visibility: s("visibility") ?? "private",
     venueName: s("venue_name"),
     mapsUrl: s("maps_url"),
+    coverPhotoUrl: s("cover_photo_url"),
     scheduledAt: s("scheduled_at"),
     scheduledEndAt: s("scheduled_end_at"),
     numCourts: s("num_courts"),
@@ -114,6 +116,7 @@ export async function createSessionAction(
           hostId: user!.id,
           venueName: input.venueName,
           mapsUrl: input.mapsUrl || null,
+          coverPhotoUrl: input.coverPhotoUrl || null,
           scheduledAt: scheduledDate,
           scheduledEndAt: scheduledEndDate,
           numCourts: input.numCourts,

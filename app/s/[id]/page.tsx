@@ -317,7 +317,7 @@ export default async function PublicLiveView({ params }: PageProps) {
               }}
             >
               {currentMatches.map((m) => (
-                <PublicMatchCard key={m.id} match={m} lookup={lookup} />
+                <CourtMatchCard key={m.id} match={m} lookup={lookup} />
               ))}
             </div>
           </section>
@@ -429,7 +429,15 @@ export default async function PublicLiveView({ params }: PageProps) {
   );
 }
 
-function PublicMatchCard({
+function elapsedMin(startedAt: Date | string | null): string | null {
+  if (!startedAt) return null;
+  const start = typeof startedAt === "string" ? new Date(startedAt) : startedAt;
+  const mins = Math.floor((Date.now() - start.getTime()) / 60000);
+  if (mins < 1) return "Just started";
+  return `${mins} min`;
+}
+
+function CourtMatchCard({
   match,
   lookup,
 }: {
@@ -443,184 +451,102 @@ function PublicMatchCard({
     team1Score: number;
     team2Score: number;
     status: "pending" | "live" | "completed";
+    startedAt: Date | string | null;
+    endedAt: Date | string | null;
   };
   lookup: Record<string, { name: string; isMember: boolean }>;
 }) {
-  const team1Names = [
-    lookup[match.team1P1Id]?.name ?? "?",
-    lookup[match.team1P2Id]?.name ?? "?",
-  ];
-  const team2Names = [
-    lookup[match.team2P1Id]?.name ?? "?",
-    lookup[match.team2P2Id]?.name ?? "?",
-  ];
-  const t1Won =
-    match.status === "completed" && match.team1Score > match.team2Score;
-  const t2Won =
-    match.status === "completed" && match.team2Score > match.team1Score;
+  const t1p1 = lookup[match.team1P1Id]?.name ?? "?";
+  const t1p2 = lookup[match.team1P2Id]?.name ?? "?";
+  const t2p1 = lookup[match.team2P1Id]?.name ?? "?";
+  const t2p2 = lookup[match.team2P2Id]?.name ?? "?";
+  const initial = (n: string) => (n.trim()[0] ?? "?").toUpperCase();
 
-  const STATUS_STYLES: Record<
-    string,
-    { label: string; color: string; bg: string }
-  > = {
-    pending: { label: "Pending", color: "var(--text-500)", bg: "var(--bg-soft)" },
-    live: { label: "LIVE", color: "var(--accent-600)", bg: "var(--accent-50)" },
-    completed: {
-      label: "Selesai",
-      color: "var(--primary-700)",
-      bg: "var(--primary-50)",
-    },
-  };
-  const s = STATUS_STYLES[match.status];
+  const isLive = match.status === "live";
+  const isCompleted = match.status === "completed";
+  const elapsed = isLive ? elapsedMin(match.startedAt) : null;
 
   return (
-    <div
-      style={{
-        background: "var(--bg)",
-        border: "1px solid var(--border-light)",
-        borderRadius: "var(--r-xl)",
-        padding: "var(--s-4)",
-        boxShadow: "var(--shadow-card)",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: "var(--s-3)",
-        }}
-      >
-        <div
-          style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 800,
-            fontSize: 12,
-            color: "var(--text-700)",
-            textTransform: "uppercase",
-            letterSpacing: "0.04em",
-          }}
-        >
-          Court {match.courtNumber}
-        </div>
-        <span
-          style={{
-            padding: "3px 10px",
-            borderRadius: "var(--r-full)",
-            fontSize: 10,
-            fontWeight: 800,
-            textTransform: "uppercase",
-            background: s.bg,
-            color: s.color,
-          }}
-        >
-          {s.label}
-        </span>
-      </div>
-
-      <TeamLine names={team1Names} score={match.team1Score} won={t1Won} />
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-          margin: "4px 0",
-        }}
-      >
-        <div style={{ flex: 1, height: 1, background: "var(--border-light)" }} />
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 800,
-            color: "var(--text-400)",
-            textTransform: "uppercase",
-            fontFamily: "var(--font-display)",
-          }}
-        >
-          vs
-        </span>
-        <div style={{ flex: 1, height: 1, background: "var(--border-light)" }} />
-      </div>
-      <TeamLine names={team2Names} score={match.team2Score} won={t2Won} />
-    </div>
-  );
-}
-
-function TeamLine({
-  names,
-  score,
-  won,
-}: {
-  names: string[];
-  score: number;
-  won: boolean;
-}) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 12,
-        padding: "6px 0",
-      }}
-    >
-      <div style={{ minWidth: 0, flex: 1 }}>
-        <div
-          style={{
-            fontSize: 14,
-            fontWeight: 700,
-            color: won ? "var(--text-900)" : "var(--text-700)",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            lineHeight: 1.3,
-          }}
-        >
-          {names[0]}
-        </div>
-        <div
-          style={{
-            fontSize: 12,
-            fontWeight: 600,
-            color: "var(--text-500)",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            lineHeight: 1.3,
-          }}
-        >
-          {names[1]}
-        </div>
-        {won && (
-          <span
-            style={{
-              display: "inline-block",
-              marginTop: 4,
-              padding: "2px 6px",
-              borderRadius: "var(--r-sm)",
-              fontSize: 9,
-              fontWeight: 800,
-              background: "var(--primary-100)",
-              color: "var(--primary-700)",
-              textTransform: "uppercase",
-            }}
-          >
-            Win
+    <div className="live-court-card">
+      <div className="live-court-head">
+        <div className="live-court-head-left">
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            {isLive && (
+              <span
+                style={{
+                  width: 7,
+                  height: 7,
+                  background: "var(--accent)",
+                  borderRadius: "50%",
+                  animation: "pulse 1.2s ease-in-out infinite",
+                  display: "inline-block",
+                }}
+              />
+            )}
+            <span>
+              Court {match.courtNumber} ·{" "}
+              {isCompleted ? "Selesai" : isLive ? "LIVE" : "Pending"}
+            </span>
           </span>
-        )}
+        </div>
+        {elapsed && <div className="live-court-head-time">{elapsed}</div>}
       </div>
-      <div
-        style={{
-          fontFamily: "var(--font-display)",
-          fontWeight: 800,
-          fontSize: 28,
-          color: won ? "var(--primary-700)" : "var(--text-400)",
-          minWidth: 36,
-          textAlign: "right",
-        }}
-      >
-        {score}
+      <div className="live-court-body">
+        <div className="padel-court mini">
+          {/* Top score */}
+          <div className="court-score-overlay top">{match.team1Score}</div>
+
+          {/* Top team */}
+          <div className="court-team top">
+            <div className="court-team-positions">
+              <div className="court-player team-1">
+                <div className="cp-avatar">{initial(t1p1)}</div>
+                <div className="cp-name">{t1p1}</div>
+              </div>
+              <div className="court-player team-1">
+                <div className="cp-avatar">{initial(t1p2)}</div>
+                <div className="cp-name">{t1p2}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Net */}
+          <div className="court-net">
+            <span className="court-net-label">NET</span>
+          </div>
+
+          {/* Bottom team */}
+          <div className="court-team bottom">
+            <div className="court-team-positions">
+              <div className="court-player team-2">
+                <div className="cp-avatar">{initial(t2p1)}</div>
+                <div className="cp-name">{t2p1}</div>
+              </div>
+              <div className="court-player team-2">
+                <div className="cp-avatar">{initial(t2p2)}</div>
+                <div className="cp-name">{t2p2}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom score */}
+          <div className="court-score-overlay bottom">{match.team2Score}</div>
+        </div>
+
+        {/* Team strip below court */}
+        <div className="live-team-strip">
+          <div className="lts-team">
+            <span className="lts-name">
+              {t1p1} · {t1p2}
+            </span>
+          </div>
+          <div className="lts-vs">vs</div>
+          <div className="lts-team right">
+            <span className="lts-name">
+              {t2p1} · {t2p2}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );

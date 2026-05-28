@@ -6,9 +6,14 @@
  */
 
 import { redirect } from "next/navigation";
+import { nanoid } from "nanoid";
 import { and, desc, eq, gte, isNull } from "drizzle-orm";
 import { db } from "@/lib/db/client";
-import { otpVerifications, users } from "@/lib/db/schema";
+import { otpVerifications, referrals, users } from "@/lib/db/schema";
+import {
+  clearReferrerCookie,
+  getReferrerCookie,
+} from "@/lib/auth/referral";
 import {
   normalizePhone,
   isValidIndonesianPhone,
@@ -181,6 +186,32 @@ export async function verifyOtpAction(
     }
   }
 
+  // Referral attribution (new user only)
+  if (isNewUser) {
+    try {
+      const referrerCode = await getReferrerCookie();
+      if (referrerCode && referrerCode !== userId) {
+        const [referrer] = await db
+          .select({ id: users.id })
+          .from(users)
+          .where(eq(users.id, referrerCode))
+          .limit(1);
+        if (referrer) {
+          await db.insert(referrals).values({
+            code: nanoid(10),
+            referrerUserId: referrer.id,
+            referredUserId: userId,
+            claimedAt: new Date(),
+          });
+        }
+      }
+      await clearReferrerCookie();
+    } catch (e) {
+      // Don't fail signup over referral logging
+      console.warn("[verifyOtpAction] referral attribution failed:", e);
+    }
+  }
+
   // Issue session
   await createSession(userId);
 
@@ -218,6 +249,9 @@ export async function completeOnboardingAction(
 
   if (displayName.length < 2 || displayName.length > 30) {
     return { error: "Nama harus 2-30 karakter" };
+  }
+  if (city && city.length > 50) {
+    return { error: "Nama kota maksimal 50 karakter" };
   }
 
   try {

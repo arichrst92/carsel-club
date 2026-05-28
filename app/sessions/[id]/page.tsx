@@ -12,6 +12,7 @@ import { ParticipantRow } from "@/components/sessions/ParticipantRow";
 import { CancelSessionButton } from "@/components/sessions/CancelSessionButton";
 import { GenerateRoundButton } from "@/components/sessions/GenerateRoundButton";
 import { SessionShareActions } from "@/components/sessions/SessionShareActions";
+import { JoinPublicSessionButton } from "@/components/sessions/JoinPublicSessionButton";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -48,6 +49,11 @@ export default async function SessionDetailPage({ params }: PageProps) {
   const { session, participants } = result;
   const staff = await isSessionStaff(id, user.id);
   const rounds = await getRoundsWithMatches(id);
+  const isParticipant = participants.some((p) => p.userId === user.id);
+  const canJoinPublic =
+    !isParticipant &&
+    session.visibility === "public" &&
+    (session.status === "upcoming" || session.status === "live");
 
   const isTerminal =
     session.status === "completed" || session.status === "cancelled";
@@ -83,6 +89,21 @@ export default async function SessionDetailPage({ params }: PageProps) {
       </header>
 
       <main className="app-content subscreen with-footer">
+        {/* COVER PHOTO */}
+        {session.coverPhotoUrl && (
+          <div
+            style={{
+              width: "100%",
+              height: 160,
+              background: `url(${session.coverPhotoUrl}) center/cover no-repeat`,
+              borderRadius: "var(--r-xl)",
+              marginBottom: "var(--s-2)",
+              boxShadow: "var(--shadow-card)",
+            }}
+            aria-label="Session cover photo"
+          />
+        )}
+
         {/* HERO */}
         <section className="hero-session">
           <div
@@ -186,8 +207,48 @@ export default async function SessionDetailPage({ params }: PageProps) {
           </div>
         </section>
 
+        {/* JOIN PUBLIC SESSION (non-participants) */}
+        {canJoinPublic && (
+          <section>
+            <div
+              style={{
+                background:
+                  "linear-gradient(135deg, var(--primary-50), var(--bg))",
+                border: "1px solid var(--primary-200)",
+                borderRadius: "var(--r-xl)",
+                padding: "var(--s-4)",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 800,
+                  fontSize: 15,
+                  color: "var(--text-900)",
+                  marginBottom: 4,
+                }}
+              >
+                🌍 Session ini Public
+              </div>
+              <p
+                style={{
+                  fontSize: 12,
+                  color: "var(--text-600)",
+                  fontWeight: 600,
+                  marginBottom: 12,
+                  lineHeight: 1.4,
+                }}
+              >
+                Kamu belum join session ini. Tap di bawah untuk langsung join
+                sebagai pemain.
+              </p>
+              <JoinPublicSessionButton sessionId={session.id} />
+            </div>
+          </section>
+        )}
+
         {/* SHARE ACTIONS */}
-        {!isTerminal && (
+        {!isTerminal && isParticipant && (
           <section>
             <SessionShareActions
               sessionId={session.id}

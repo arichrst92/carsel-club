@@ -14,6 +14,7 @@ type FormData = {
   playType: "freeplay" | "tournament";
   venueName: string;
   mapsUrl: string;
+  coverPhotoUrl: string;
   date: string; // YYYY-MM-DD
   timeStart: string; // HH:mm
   timeEnd: string; // HH:mm (optional)
@@ -52,6 +53,7 @@ const INITIAL: FormData = {
   playType: "freeplay",
   venueName: "",
   mapsUrl: "",
+  coverPhotoUrl: "",
   date: defaultDateStr(),
   timeStart: defaultTimeStart(),
   timeEnd: defaultTimeEnd(),
@@ -138,6 +140,7 @@ export function CreateSessionForm() {
     fd.set("visibility", data.visibility);
     fd.set("venue_name", data.venueName);
     fd.set("maps_url", data.mapsUrl);
+    fd.set("cover_photo_url", data.coverPhotoUrl);
     fd.set("scheduled_at", scheduledAt.toISOString());
     if (scheduledEndAt) fd.set("scheduled_end_at", scheduledEndAt.toISOString());
     fd.set("num_courts", String(data.numCourts));
@@ -462,6 +465,37 @@ function Step2Location({
         </div>
 
         <div className="form-group">
+          <label className="form-label">Cover Photo URL (Optional)</label>
+          <div className="input-with-icon">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <circle cx="9" cy="9" r="2" />
+              <path d="M21 15l-5-5L5 21" />
+            </svg>
+            <input
+              type="url"
+              className="form-input"
+              placeholder="https://imgur.com/...jpg"
+              value={data.coverPhotoUrl}
+              onChange={(e) => setField("coverPhotoUrl", e.target.value)}
+            />
+          </div>
+          <p className="form-help">
+            URL foto venue/court. Bisa Imgur, Cloudinary, atau hosting gambar
+            lain.
+          </p>
+        </div>
+
+        <div className="form-group">
           <label className="form-label">
             Tanggal <span className="req">*</span>
           </label>
@@ -727,17 +761,17 @@ function Step4Visibility({
             </button>
             <button
               type="button"
-              className="segmented-option disabled"
-              title="Public session & Find Session akan tersedia di v2"
+              className={`segmented-option ${data.visibility === "public" ? "active" : ""}`}
+              onClick={() => setField("visibility", "public")}
             >
-              <span>
-                🌍 Public <span className="badge soon">Soon</span>
-              </span>
+              <span>🌍 Public</span>
               <span className="seg-sub">Discoverable</span>
             </button>
           </div>
           <p className="form-help">
-            Hanya pemain yang dapat link WA yang bisa join.
+            {data.visibility === "public"
+              ? "Session muncul di Find Session untuk pemain padel — anyone bisa join langsung."
+              : "Hanya pemain yang dapat link WA yang bisa join."}
           </p>
         </div>
       </section>

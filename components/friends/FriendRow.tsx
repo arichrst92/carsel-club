@@ -1,0 +1,90 @@
+"use client";
+
+import { useTransition } from "react";
+import { removeFriendAction } from "@/app/actions/friends";
+
+const TIER_EMOJI: Record<string, string> = {
+  Rookie: "🥚",
+  Bronze: "🥉",
+  Silver: "🥈",
+  Gold: "🥇",
+  Platinum: "💎",
+  Master: "👑",
+};
+
+type Props = {
+  friendId: string;
+  displayName: string;
+  city: string | null;
+  totalPoints: number;
+  totalMatches: number;
+  tierName: string | null;
+};
+
+export function FriendRow(props: Props) {
+  const [isPending, startTransition] = useTransition();
+  const initial = (props.displayName.trim()[0] ?? "?").toUpperCase();
+  const tier = props.tierName ?? "Rookie";
+
+  function handleRemove() {
+    if (!confirm(`Remove ${props.displayName} dari friends?`)) return;
+    startTransition(async () => {
+      const result = await removeFriendAction(props.friendId);
+      if (result?.error) alert(result.error);
+    });
+  }
+
+  return (
+    <div className="player-list-item">
+      <div
+        className="player-avatar-lg member-1"
+        style={{
+          background: "linear-gradient(135deg, #06B6D4, #0EA5E9)",
+        }}
+      >
+        {initial}
+      </div>
+      <div className="player-info">
+        <div className="player-name">
+          <span>{props.displayName}</span>
+        </div>
+        <div className="player-meta-row">
+          <span style={{ fontSize: 12, color: "var(--text-500)" }}>
+            {TIER_EMOJI[tier]} {tier}
+            {props.city && ` · 📍 ${props.city}`}
+          </span>
+        </div>
+        <div
+          style={{
+            fontSize: 11,
+            color: "var(--text-500)",
+            fontWeight: 600,
+            marginTop: 2,
+          }}
+        >
+          {props.totalPoints} pts · {props.totalMatches} match
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={handleRemove}
+        disabled={isPending}
+        title="Remove friend"
+        style={{
+          width: 36,
+          height: 36,
+          display: "grid",
+          placeItems: "center",
+          borderRadius: "var(--r-full)",
+          background: "transparent",
+          border: "none",
+          fontSize: 14,
+          cursor: "pointer",
+          opacity: isPending ? 0.4 : 0.7,
+        }}
+      >
+        🗑
+      </button>
+    </div>
+  );
+}

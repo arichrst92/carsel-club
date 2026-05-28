@@ -284,6 +284,32 @@ export const matchRoundSets = pgTable(
 );
 
 // ============================================================
+// FRIENDSHIPS (mutual, canonical pair lo < hi)
+// ============================================================
+
+export const friendships = pgTable(
+  "friendships",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    userIdLo: uuid("user_id_lo")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    userIdHi: uuid("user_id_hi")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    unique("uq_friendship_pair").on(t.userIdLo, t.userIdHi),
+    index("idx_friendship_lo").on(t.userIdLo),
+    index("idx_friendship_hi").on(t.userIdHi),
+    check("canonical_pair_order", sql`${t.userIdLo} < ${t.userIdHi}`),
+  ]
+);
+
+// ============================================================
 // MATCHES
 // ============================================================
 

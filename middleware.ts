@@ -11,7 +11,7 @@ import {
 
 // Public routes — accessible without auth
 const PUBLIC_EXACT = ["/", "/login", "/login/verify"];
-const PUBLIC_PREFIXES = ["/s/"]; // /s/* = public session share
+const PUBLIC_PREFIXES = ["/s/", "/invite/"]; // /s/* = public share, /invite/* = referral landing
 
 function isPublic(path: string): boolean {
   if (PUBLIC_EXACT.includes(path)) return true;
