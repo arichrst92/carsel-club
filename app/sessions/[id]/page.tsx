@@ -277,6 +277,37 @@ export default async function SessionDetailPage({ params }: PageProps) {
             )}
           </div>
           <div className="player-list">
+            {participants.length === 0 && (
+              <div className="empty-state" style={{ padding: "var(--s-5)" }}>
+                <div className="empty-state-icon">🎾</div>
+                <div className="empty-state-title">Belum ada pemain</div>
+                <div className="empty-state-text">
+                  {staff
+                    ? "Tambah pemain via WhatsApp atau invite link untuk mulai session."
+                    : "Host belum invite pemain. Tunggu invitation atau hubungi host."}
+                </div>
+                {staff && !isTerminal && (
+                  <Link
+                    href={`/sessions/${session.id}/participants`}
+                    style={{
+                      marginTop: "var(--s-3)",
+                      display: "inline-block",
+                      padding: "10px 20px",
+                      borderRadius: "var(--r-full)",
+                      background: "var(--primary)",
+                      color: "#fff",
+                      fontFamily: "var(--font-display)",
+                      fontWeight: 800,
+                      fontSize: 13,
+                      textDecoration: "none",
+                      boxShadow: "var(--shadow-sm)",
+                    }}
+                  >
+                    + Tambah Pemain
+                  </Link>
+                )}
+              </div>
+            )}
             {participants.map((p) => (
               <ParticipantRow
                 key={p.id}
@@ -286,7 +317,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
               />
             ))}
 
-            {staff && !isTerminal && (
+            {participants.length > 0 && staff && !isTerminal && (
               <Link
                 href={`/sessions/${session.id}/participants`}
                 className="add-player-btn"
