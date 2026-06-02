@@ -23,6 +23,7 @@ import {
 } from "@/lib/db/queries/matches";
 import { generateRound } from "@/lib/match/generator";
 import { applyMatchScoreChange } from "@/lib/match/stats-sync";
+import { event } from "@/lib/log";
 
 export async function generateRoundAction(
   sessionId: string
@@ -126,6 +127,15 @@ export async function generateRoundAction(
     console.error("[generateRoundAction] insert error:", e);
     return { error: "Gagal save round. Coba lagi." };
   }
+
+  event("round_generated", {
+    sessionId,
+    roundNumber: nextRoundNumber,
+    courts: result.matches.length,
+    players: activeParticipants.length,
+    sitOuts: result.sitOuts.length,
+    violations: result.violations,
+  });
 
   revalidatePath(`/sessions/${sessionId}`);
   return null;
@@ -233,6 +243,19 @@ export async function endMatchAction(
     console.error("[endMatchAction]", e);
     return { error: "Gagal end match." };
   }
+
+  event("match_completed", {
+    matchId,
+    sessionId: loaded.sessionId,
+    team1Score,
+    team2Score,
+    outcome:
+      team1Score > team2Score
+        ? "team1_win"
+        : team2Score > team1Score
+          ? "team2_win"
+          : "draw",
+  });
 
   revalidatePath(`/sessions/${loaded.sessionId}`);
   return null;

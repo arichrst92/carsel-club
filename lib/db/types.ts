@@ -16,6 +16,7 @@ import type {
   matches,
   otpVerifications,
   referrals,
+  appLogs,
 } from "./schema";
 
 // Select types (rows yang di-fetch dari DB)
@@ -27,6 +28,7 @@ export type MatchRoundSet = InferSelectModel<typeof matchRoundSets>;
 export type Match = InferSelectModel<typeof matches>;
 export type OtpVerification = InferSelectModel<typeof otpVerifications>;
 export type Referral = InferSelectModel<typeof referrals>;
+export type AppLog = InferSelectModel<typeof appLogs>;
 
 // Insert types (rows yang di-create)
 export type NewUser = InferInsertModel<typeof users>;
@@ -36,3 +38,4 @@ export type NewMatchRoundSet = InferInsertModel<typeof matchRoundSets>;
 export type NewMatch = InferInsertModel<typeof matches>;
 export type NewOtpVerification = InferInsertModel<typeof otpVerifications>;
 export type NewReferral = InferInsertModel<typeof referrals>;
+export type NewAppLog = InferInsertModel<typeof appLogs>;

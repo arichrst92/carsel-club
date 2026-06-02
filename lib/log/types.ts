@@ -1,0 +1,32 @@
+/**
+ * Type definitions untuk log/event system.
+ *
+ * Refs: docs/SPRINT_BACKLOG.md Sprint 2 (revised: self-hosted /monitor)
+ */
+
+export type LogLevel = "info" | "warn" | "error" | "fatal";
+export type LogType = "log" | "event";
+
+/** Arbitrary key-value context attached to a log entry. */
+export type LogContext = Record<string, unknown>;
+
+/** Event names yang di-instrument oleh app — Sprint 2 scope (8 events). */
+export type EventName =
+  | "signup"
+  | "login"
+  | "session_created"
+  | "session_cancelled"
+  | "round_generated"
+  | "match_completed"
+  | "referral_claimed"
+  | "upload_success";
+
+export type LogPayload = {
+  type: LogType;
+  level: LogLevel | null;
+  name: string;
+  context: LogContext;
+  userId: string | null;
+  route: string | null;
+  userAgent: string | null;
+};

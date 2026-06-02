@@ -14,6 +14,7 @@ import { db } from "@/lib/db/client";
 import { sessions, sessionParticipants } from "@/lib/db/schema";
 import { getCurrentUser } from "@/lib/auth/get-current-user";
 import { isSessionStaff } from "@/lib/db/queries/sessions";
+import { event } from "@/lib/log";
 
 export type SessionActionState = { error?: string } | null;
 
@@ -145,6 +146,15 @@ export async function createSessionAction(
     return { error: "Gagal create session. Coba lagi." };
   }
 
+  event("session_created", {
+    sessionId: newSessionId,
+    format: input.format,
+    playType: input.playType,
+    numCourts: input.numCourts,
+    visibility: input.visibility,
+    fixPartners: input.fixPartners,
+  });
+
   revalidatePath("/sessions");
   redirect(`/sessions/${newSessionId}`);
 }
@@ -164,6 +174,13 @@ export async function cancelSessionAction(
     return { error: "Hanya host/co-host yang bisa cancel" };
   }
 
+  // Capture prior status untuk event context
+  const [before] = await db
+    .select({ status: sessions.status })
+    .from(sessions)
+    .where(eq(sessions.id, sessionId))
+    .limit(1);
+
   try {
     await db
       .update(sessions)
@@ -173,6 +190,12 @@ export async function cancelSessionAction(
     console.error("[cancelSessionAction] error:", e);
     return { error: "Gagal cancel. Coba lagi." };
   }
+
+  event("session_cancelled", {
+    sessionId,
+    wasLive: before?.status === "live",
+    priorStatus: before?.status ?? null,
+  });
 
   revalidatePath("/sessions");
   revalidatePath(`/sessions/${sessionId}`);

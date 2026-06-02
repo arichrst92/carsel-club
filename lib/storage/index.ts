@@ -22,6 +22,7 @@ import {
   type ImagePreset,
 } from "./image";
 import type { StorageProvider, SavedFile } from "./types";
+import { event } from "@/lib/log";
 
 export type { ImagePreset, ProcessedImage } from "./image";
 export type { StorageProvider, SaveFileInput, SavedFile } from "./types";
@@ -67,11 +68,21 @@ export async function saveImage(
       `File terlalu besar. Maksimum ${Math.round(MAX_UPLOAD_BYTES / 1024 / 1024)} MB.`
     );
   }
-  await validateImageBuffer(buffer);
+  const detected = await validateImageBuffer(buffer);
   const processed = await processImage(buffer, preset);
-  return storage.saveFile({
+  const saved = await storage.saveFile({
     buffer: processed.buffer,
     key,
     contentType: processed.contentType,
   });
+  event("upload_success", {
+    preset,
+    key,
+    originalMime: detected.mime,
+    originalBytes: buffer.byteLength,
+    processedBytes: processed.bytes,
+    width: processed.width,
+    height: processed.height,
+  });
+  return saved;
 }

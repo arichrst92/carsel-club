@@ -12,6 +12,7 @@ import {
   check,
   index,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   serial,
@@ -66,6 +67,14 @@ export const generationMethodEnum = pgEnum("generation_method", [
   "manual_drag",
 ]);
 
+export const logTypeEnum = pgEnum("log_type", ["log", "event"]);
+export const logLevelEnum = pgEnum("log_level", [
+  "info",
+  "warn",
+  "error",
+  "fatal",
+]);
+
 // ============================================================
 // TIER DEFINITIONS
 // ============================================================
@@ -100,6 +109,7 @@ export const users = pgTable(
     currentTierId: integer("current_tier_id").references(
       () => tierDefinitions.id
     ).default(1),
+    isAdmin: boolean("is_admin").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -359,6 +369,47 @@ export const matches = pgTable(
     check(
       "scores_non_negative",
       sql`${t.team1Score} >= 0 AND ${t.team2Score} >= 0`
+    ),
+  ]
+);
+
+// ============================================================
+// APP LOGS — observability (Sprint 2)
+// ============================================================
+// Single table dengan discriminator `type`:
+//   - type='log'   → message + level (info/warn/error/fatal)
+//   - type='event' → analytics event (level NULL)
+// User-scoped (nullable, anonymous events allowed). Cleanup oleh
+// /api/cron/clean-logs setelah LOG_RETENTION_DAYS (default 30).
+
+export const appLogs = pgTable(
+  "app_logs",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    type: logTypeEnum("type").notNull(),
+    level: logLevelEnum("level"), // NULL untuk events
+    name: text("name").notNull(), // message (untuk log) atau event name
+    context: jsonb("context").notNull().default(sql`'{}'::jsonb`),
+    userId: uuid("user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    route: text("route"),
+    userAgent: text("user_agent"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("idx_app_logs_created").on(t.createdAt.desc()),
+    index("idx_app_logs_type_level_created").on(
+      t.type,
+      t.level,
+      t.createdAt.desc()
+    ),
+    index("idx_app_logs_user_created").on(t.userId, t.createdAt.desc()),
+    check(
+      "log_level_required_for_logs",
+      sql`(${t.type} = 'event') OR (${t.type} = 'log' AND ${t.level} IS NOT NULL)`
     ),
   ]
 );

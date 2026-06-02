@@ -35,6 +35,10 @@ export default defineConfig({
         "lib/storage/image.ts",
         "lib/storage/local.ts",
         "lib/storage/rate-limit.ts",
+        // Sprint 2 — log foundation
+        "lib/log/sanitize.ts",
+        "lib/log/format.ts",
+        "lib/log/filter.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

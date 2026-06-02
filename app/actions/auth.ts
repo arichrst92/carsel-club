@@ -30,6 +30,7 @@ import {
   getSession,
 } from "@/lib/auth/session";
 import { checkOtpRequestRate } from "@/lib/auth/rate-limit";
+import { event } from "@/lib/log";
 
 export type AuthActionState = { error?: string } | null;
 
@@ -203,6 +204,7 @@ export async function verifyOtpAction(
             referredUserId: userId,
             claimedAt: new Date(),
           });
+          event("referral_claimed", { referrerUserId: referrer.id });
         }
       }
       await clearReferrerCookie();
@@ -214,6 +216,13 @@ export async function verifyOtpAction(
 
   // Issue session
   await createSession(userId);
+
+  // Track signup vs login
+  if (isNewUser) {
+    event("signup", { phone });
+  } else {
+    event("login", { phone });
+  }
 
   const needsOnboarding =
     isNewUser ||
