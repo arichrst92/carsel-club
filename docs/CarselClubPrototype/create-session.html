@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Create Session — Carsel Club</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="subscreen-header">
+      <button class="back-btn" id="backBtn" onclick="handleBack()" aria-label="Back">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <h2 class="subscreen-title">Create Session</h2>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="app-content subscreen with-footer">
+
+      <!-- WIZARD PROGRESS -->
+      <section class="wizard-progress">
+        <div class="wizard-progress-meta">
+          <span class="wizard-step-label">Step <span id="stepNum">1</span> of 5</span>
+          <span class="wizard-step-label" style="color:var(--primary-700);" id="stepPercent">20%</span>
+        </div>
+        <div class="wizard-progress-track">
+          <div class="wizard-progress-segment current"></div>
+          <div class="wizard-progress-segment"></div>
+          <div class="wizard-progress-segment"></div>
+          <div class="wizard-progress-segment"></div>
+          <div class="wizard-progress-segment"></div>
+        </div>
+      </section>
+
+      <!-- STEP 1: INFO SESSION -->
+      <div class="wizard-step active" data-step="1">
+        <h2 class="wizard-step-title">Info Session</h2>
+
+        <section class="form-section">
+          <div class="form-group">
+            <label class="form-label">Nama Session <span class="req">*</span></label>
+            <input type="text" id="sessionName" class="form-input" placeholder="Sabtu Sore Padel" value="Sabtu Sore Padel">
+            <p class="form-help">Beri nama yang mudah diingat untuk session kamu.</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Format Permainan</label>
+            <div class="segmented" id="seg-format">
+              <button type="button" class="segmented-option active" data-val="americano">
+                <span>Americano</span>
+                <span class="seg-sub">Partner rotate</span>
+              </button>
+              <button type="button" class="segmented-option disabled" data-val="mexicano" onclick="showToast('Mexicano akan tersedia di v1.5')">
+                <span>Mexicano <span class="badge soon">Soon</span></span>
+                <span class="seg-sub">Ranking pairing</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Type</label>
+            <div class="segmented" id="seg-type">
+              <button type="button" class="segmented-option active" data-val="freeplay">
+                <span>Freeplay</span>
+                <span class="seg-sub">Casual session</span>
+              </button>
+              <button type="button" class="segmented-option disabled" data-val="tournament" onclick="showToast('Tournament akan tersedia di v1.5')">
+                <span>Tournament <span class="badge soon">Soon</span></span>
+                <span class="seg-sub">Competitive</span>
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- STEP 2: LOCATION & TIME -->
+      <div class="wizard-step" data-step="2">
+        <h2 class="wizard-step-title">Lokasi & Waktu</h2>
+
+        <section class="form-section">
+          <div class="form-group">
+            <label class="form-label">Venue / Lapangan <span class="req">*</span></label>
+            <div class="input-with-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <input type="text" id="venue" class="form-input" placeholder="GBK Padel Court" value="GBK Padel Court">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Google Maps Link (Optional)</label>
+            <div class="input-with-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              <input type="url" id="mapsUrl" class="form-input" placeholder="https://maps.google.com/..." value="https://maps.app.goo.gl/abc123xyz">
+            </div>
+            <div class="map-preview" id="mapPreview">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Link akan dibagikan ke pemain saat invite via WhatsApp.</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tanggal <span class="req">*</span></label>
+            <input type="date" id="date" class="form-input" value="2026-05-16">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Jam Mulai <span class="req">*</span></label>
+              <input type="time" id="timeStart" class="form-input" value="16:00">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Jam Berakhir</label>
+              <input type="time" id="timeEnd" class="form-input" value="18:30">
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- STEP 3: PLAYERS & FORMAT -->
+      <div class="wizard-step" data-step="3">
+        <h2 class="wizard-step-title">Pemain & Format Match</h2>
+
+        <section class="form-section">
+          <div class="form-group">
+            <label class="form-label">Jumlah Court</label>
+            <div class="chip-group" id="chip-court">
+              <button type="button" class="chip" data-val="1">1 Court</button>
+              <button type="button" class="chip active" data-val="2">2 Courts</button>
+              <button type="button" class="chip" data-val="3">3 Courts</button>
+              <button type="button" class="chip" data-val="4">4 Courts</button>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:flex-start; gap:10px; padding:10px 12px; background:var(--primary-50); border-radius:var(--r-md); border:1px solid var(--primary-100);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary-700); flex-shrink:0; margin-top:1px;"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 11h6M19 8v6"/></svg>
+            <div style="font-size:11px; font-weight:700; color:var(--primary-700); line-height:1.5;">
+              Tidak ada batas maksimal pemain. Tambah pemain via WhatsApp invite — kapan saja sebelum/saat session.
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="form-section-head">
+            <div class="sec-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+            </div>
+            <h3>Jumlah Round</h3>
+          </div>
+
+          <div class="form-group">
+            <div class="segmented" id="seg-round">
+              <button type="button" class="segmented-option active" data-val="auto">
+                <span>Auto</span>
+                <span class="seg-sub">Hitung otomatis</span>
+              </button>
+              <button type="button" class="segmented-option" data-val="manual">
+                <span>Manual</span>
+                <span class="seg-sub">Set sendiri</span>
+              </button>
+            </div>
+            <div class="form-group" id="round-manual" style="display:none; margin-top:8px;">
+              <div class="stepper">
+                <button type="button" class="stepper-btn" onclick="adjustStep('roundCount', -1, 1, 30)">−</button>
+                <div class="stepper-value" id="roundCount">7</div>
+                <button type="button" class="stepper-btn" onclick="adjustStep('roundCount', 1, 1, 30)">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:flex-start; gap:10px; padding:10px 12px; background:var(--primary-50); border-radius:var(--r-md); border:1px solid var(--primary-100);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary-700); flex-shrink:0; margin-top:1px;"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            <div style="font-size:11px; font-weight:700; color:var(--primary-700); line-height:1.5;">
+              Match tidak punya batas poin/waktu. Host atau co-host memutuskan kapan match berakhir saat scoring.
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- STEP 4: VISIBILITY & CO-HOST -->
+      <div class="wizard-step" data-step="4">
+        <h2 class="wizard-step-title">Visibility & Co-Host</h2>
+
+        <section class="form-section">
+          <div class="form-section-head">
+            <div class="sec-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/></svg>
+            </div>
+            <h3>Visibility</h3>
+          </div>
+
+          <div class="form-group">
+            <div class="segmented" id="seg-visibility">
+              <button type="button" class="segmented-option active" data-val="private">
+                <span>🔒 Private</span>
+                <span class="seg-sub">Invite only</span>
+              </button>
+              <button type="button" class="segmented-option disabled" data-val="public" onclick="showToast('Public session & Find Session akan tersedia di v2')">
+                <span>🌍 Public <span class="badge soon">Soon</span></span>
+                <span class="seg-sub">Discoverable</span>
+              </button>
+            </div>
+            <p class="form-help" id="visibility-help">Hanya pemain yang dapat link WA yang bisa join.</p>
+          </div>
+
+          <div class="form-group" id="public-options" style="display:none;">
+            <label class="form-label">Mekanisme Join</label>
+            <div class="segmented">
+              <button type="button" class="segmented-option active" data-val="auto">
+                <span>Auto-join</span>
+                <span class="seg-sub">Langsung masuk</span>
+              </button>
+              <button type="button" class="segmented-option" data-val="approval">
+                <span>Approval</span>
+                <span class="seg-sub">Host approve</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="form-section-head">
+            <div class="sec-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><circle cx="17" cy="7" r="3"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg>
+            </div>
+            <h3>Co-Host & Host Settings</h3>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="form-label">Saya akan ikut main</div>
+              <p class="form-help">Disable kalau kamu hanya jadi organizer/wasit.</p>
+            </div>
+            <button class="toggle on" id="toggleHostPlay" onclick="this.classList.toggle('on')"></button>
+          </div>
+
+          <button type="button" style="display:flex; align-items:center; gap:12px; padding:14px; background:var(--bg-soft); border:1.5px dashed var(--border); border-radius:var(--r-md); width:100%; transition:all 0.15s;" onclick="showToast('Add co-host modal — segera dibuat')">
+            <div style="width:36px; height:36px; border-radius:var(--r-md); background:var(--primary-50); color:var(--primary-700); display:grid; place-items:center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </div>
+            <div style="flex:1; text-align:left;">
+              <div class="qa-title">Tambah Co-Host</div>
+              <div class="qa-sub" style="color:var(--text-500);">Mereka bisa kelola scoring & match</div>
+            </div>
+          </button>
+        </section>
+      </div>
+
+      <!-- STEP 5: REVIEW -->
+      <div class="wizard-step" data-step="5">
+        <h2 class="wizard-step-title">Review & Create</h2>
+        <p style="color:var(--text-500); font-weight:600; font-size:13px; margin-top:-12px;">Cek detail sebelum create. Tap edit kalau mau ubah.</p>
+
+        <div class="review-card">
+          <div class="review-section">
+            <div class="review-info">
+              <div class="review-label">Info Session</div>
+              <div class="review-value" id="rev-name">Sabtu Sore Padel</div>
+              <div class="review-value-list" style="margin-top:4px;">
+                <span id="rev-format">Americano · Freeplay</span>
+              </div>
+            </div>
+            <button class="review-edit" onclick="goToStep(1)">Edit</button>
+          </div>
+
+          <div class="review-section">
+            <div class="review-info">
+              <div class="review-label">Lokasi & Waktu</div>
+              <div class="review-value" id="rev-venue">GBK Padel Court</div>
+              <div class="review-value-list" style="margin-top:4px;">
+                <span id="rev-date">Sabtu, 16 Mei 2026 · 16:00 – 18:30</span>
+                <span id="rev-maps" style="color:var(--primary-700); font-weight:700; font-size:12px;">📍 Maps link tersedia</span>
+              </div>
+            </div>
+            <button class="review-edit" onclick="goToStep(2)">Edit</button>
+          </div>
+
+          <div class="review-section">
+            <div class="review-info">
+              <div class="review-label">Court & Round</div>
+              <div class="review-value" id="rev-players">2 courts</div>
+              <div class="review-value-list" style="margin-top:4px;">
+                <span id="rev-round">Auto round count</span>
+                <span style="color:var(--text-500);">Tanpa batas pemain · match end manual</span>
+              </div>
+            </div>
+            <button class="review-edit" onclick="goToStep(3)">Edit</button>
+          </div>
+
+          <div class="review-section">
+            <div class="review-info">
+              <div class="review-label">Visibility & Host</div>
+              <div class="review-value" id="rev-visibility">🔒 Private — invite only</div>
+              <div class="review-value-list" style="margin-top:4px;">
+                <span id="rev-host">Host (kamu) ikut main</span>
+                <span style="color:var(--text-500);">Belum ada co-host</span>
+              </div>
+            </div>
+            <button class="review-edit" onclick="goToStep(4)">Edit</button>
+          </div>
+        </div>
+
+        <div style="background:var(--primary-50); border:1px solid var(--primary-100); border-radius:var(--r-md); padding:14px; display:flex; gap:10px; align-items:flex-start;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary-700); flex-shrink:0; margin-top:2px;"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <div>
+            <div style="font-family:var(--font-display); font-weight:700; font-size:13px; color:var(--primary-700); margin-bottom:2px;">Setelah dibuat:</div>
+            <div style="font-size:12px; color:var(--text-700); font-weight:600; line-height:1.5;">Session akan masuk ke "My Sessions". Kamu bisa undang pemain via WhatsApp link & atur match di dalam session.</div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- STICKY FOOTER -->
+    <div class="sticky-footer dual" id="wizardFooter">
+      <button class="btn-secondary-lg" id="btnPrev" onclick="prevStep()" style="display:none;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span>Back</span>
+      </button>
+      <button class="btn-primary-lg" id="btnNext" onclick="nextStep()">
+        <span>Next</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+  </div>
+
+  <script>
+    let currentStep = 1;
+    const totalSteps = 5;
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._tt);
+      window._tt = setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    function updateProgress() {
+      document.getElementById('stepNum').textContent = currentStep;
+      document.getElementById('stepPercent').textContent = Math.round((currentStep / totalSteps) * 100) + '%';
+
+      const segs = document.querySelectorAll('.wizard-progress-segment');
+      segs.forEach((s, i) => {
+        s.classList.remove('done', 'current');
+        if (i + 1 < currentStep) s.classList.add('done');
+        else if (i + 1 === currentStep) s.classList.add('current');
+      });
+    }
+
+    function showStep(step) {
+      document.querySelectorAll('.wizard-step').forEach(el => el.classList.remove('active'));
+      document.querySelector(`.wizard-step[data-step="${step}"]`).classList.add('active');
+
+      // Buttons
+      document.getElementById('btnPrev').style.display = step === 1 ? 'none' : 'flex';
+      const next = document.getElementById('btnNext');
+      if (step === totalSteps) {
+        next.querySelector('span').textContent = 'Create Session';
+        next.querySelector('svg').outerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+      } else {
+        next.querySelector('span').textContent = 'Next';
+      }
+
+      // Scroll to top
+      document.querySelector('.app-content').scrollTop = 0;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      currentStep = step;
+      updateProgress();
+
+      // Update review card if entering step 5
+      if (step === 5) updateReview();
+    }
+
+    function nextStep() {
+      if (currentStep === totalSteps) {
+        // Create session
+        const btn = document.getElementById('btnNext');
+        btn.classList.add('loading');
+        btn.querySelector('span').textContent = 'Creating...';
+        setTimeout(() => {
+          window.location.href = 'session-detail.html';
+        }, 700);
+        return;
+      }
+      showStep(currentStep + 1);
+    }
+
+    function prevStep() {
+      if (currentStep > 1) showStep(currentStep - 1);
+    }
+
+    function goToStep(step) {
+      showStep(step);
+    }
+
+    function handleBack() {
+      if (currentStep === 1) {
+        window.location.href = 'index.html';
+      } else {
+        prevStep();
+      }
+    }
+
+    function updateReview() {
+      const name = document.getElementById('sessionName').value || '—';
+      const venue = document.getElementById('venue').value || '—';
+      const date = document.getElementById('date').value;
+      const start = document.getElementById('timeStart').value;
+      const end = document.getElementById('timeEnd').value;
+      const maps = document.getElementById('mapsUrl').value;
+      const courts = document.querySelector('#chip-court .chip.active')?.dataset.val || 1;
+      const roundMode = document.querySelector('#seg-round .segmented-option.active').dataset.val;
+      const roundCount = document.getElementById('roundCount').textContent;
+      const visibility = document.querySelector('#seg-visibility .segmented-option.active').dataset.val;
+      const hostPlay = document.getElementById('toggleHostPlay').classList.contains('on');
+
+      // Format date Indonesia
+      const dt = new Date(date);
+      const dayNames = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+      const monthNames = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+      const dateStr = `${dayNames[dt.getDay()]}, ${dt.getDate()} ${monthNames[dt.getMonth()]} ${dt.getFullYear()}`;
+      const timeStr = end ? `${start} – ${end}` : start;
+
+      document.getElementById('rev-name').textContent = name;
+      document.getElementById('rev-venue').textContent = venue;
+      document.getElementById('rev-date').textContent = `${dateStr} · ${timeStr}`;
+      document.getElementById('rev-maps').textContent = maps ? '📍 Maps link tersedia' : '📍 Maps link belum ditambahkan';
+      document.getElementById('rev-maps').style.color = maps ? 'var(--primary-700)' : 'var(--text-500)';
+      document.getElementById('rev-players').textContent = `${courts} court${courts > 1 ? 's' : ''}`;
+
+      document.getElementById('rev-round').textContent = roundMode === 'auto'
+        ? 'Auto round count'
+        : `${roundCount} round (manual)`;
+
+      document.getElementById('rev-visibility').textContent = visibility === 'public'
+        ? '🌍 Public — discoverable'
+        : '🔒 Private — invite only';
+      document.getElementById('rev-host').textContent = hostPlay
+        ? 'Host (kamu) ikut main'
+        : 'Host hanya organizer (tidak ikut main)';
+    }
+
+    // ===== Segmented control behavior =====
+    document.querySelectorAll('.segmented').forEach(group => {
+      group.querySelectorAll('.segmented-option:not(.disabled)').forEach(btn => {
+        btn.addEventListener('click', () => {
+          group.querySelectorAll('.segmented-option').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          if (group.id === 'seg-visibility') {
+            const isPublic = btn.dataset.val === 'public';
+            document.getElementById('public-options').style.display = isPublic ? 'flex' : 'none';
+            document.getElementById('visibility-help').textContent = isPublic
+              ? 'Session muncul di Find Session untuk pemain di kotamu (Find Session aktif di v2).'
+              : 'Hanya pemain yang dapat link WA yang bisa join.';
+          }
+
+          if (group.id === 'seg-round') {
+            const isManual = btn.dataset.val === 'manual';
+            document.getElementById('round-manual').style.display = isManual ? 'flex' : 'none';
+          }
+        });
+      });
+    });
+
+    function attachChipBehavior(group) {
+      group.querySelectorAll('.chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          group.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+        });
+      });
+    }
+    document.querySelectorAll('.chip-group').forEach(attachChipBehavior);
+
+    function adjustStep(id, delta, min, max) {
+      const el = document.getElementById(id);
+      let v = parseInt(el.textContent, 10) + delta;
+      if (v < min) v = min;
+      if (v > max) v = max;
+      el.textContent = v;
+    }
+
+    // Init
+    updateProgress();
+  </script>
+</body>
+</html>

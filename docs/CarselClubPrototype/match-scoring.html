@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Match Scoring — Carsel Club</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="subscreen-header">
+      <button class="back-btn" onclick="window.location.href='match-list.html'" aria-label="Back">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <h2 class="subscreen-title" id="matchTitle">Court 1 · Round 3</h2>
+      <button class="menu-btn" onclick="showToast('Menu: Share live link, View leaderboard, End round')" aria-label="Menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+      </button>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="app-content subscreen with-footer" id="mainContent">
+
+      <!-- STATUS STRIP -->
+      <section class="status-strip" id="statusStrip">
+        <div class="status-strip-left">
+          <span class="live-pill" id="liveBadge">
+            <span class="live-dot"></span>
+            <span id="liveLabel">LIVE</span>
+          </span>
+          <span id="timerText">Round 3 · 0 min</span>
+        </div>
+        <div class="status-strip-right">
+          <span id="statusHint" style="color:var(--text-500); font-weight:700; font-size:12px;">Host akhiri saat siap</span>
+        </div>
+      </section>
+
+      <!-- PRE-MATCH (Start Game) -->
+      <section id="preMatchSection" style="display:none;">
+        <div class="pre-match-card">
+          <div class="pre-match-emoji">🎾</div>
+          <div class="pre-match-title">Match siap dimulai</div>
+          <div class="pre-match-sub">Pemain sudah di lapangan? Klik <strong>Start Game</strong> untuk mulai timer dan scoring.</div>
+          <button class="btn-start-game" onclick="startGame()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9V3z"/></svg>
+            <span>Start Game</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- MATCH DONE BANNER -->
+      <section id="doneBannerSection" style="display:none;">
+        <div class="match-done-banner">
+          <div class="match-done-emoji">🏆</div>
+          <div class="match-done-info">
+            <div class="match-done-title" id="doneTitle">Match selesai</div>
+            <div class="match-done-sub" id="doneSub">Final score saved · Pindah ke match berikutnya?</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PADEL COURT VISUAL -->
+      <section class="padel-court" id="padelCourt">
+        <!-- Score overlay -->
+        <div class="court-score-overlay top" id="scoreT1Court">0</div>
+
+        <!-- Top team (Team 1 / Coral) -->
+        <div class="court-team top">
+          <div class="court-team-positions">
+            <div class="court-player team-1">
+              <div class="cp-avatar">A</div>
+              <div class="cp-name">Ari</div>
+              <div class="cp-tier">INT</div>
+            </div>
+            <div class="court-player team-1">
+              <div class="cp-avatar">D</div>
+              <div class="cp-name">Dimas</div>
+              <div class="cp-tier">ADV</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Net -->
+        <div class="court-net">
+          <span class="court-net-label">NET</span>
+        </div>
+
+        <!-- Bottom team (Team 2 / Teal) -->
+        <div class="court-team bottom">
+          <div class="court-team-positions">
+            <div class="court-player team-2">
+              <div class="cp-avatar">M</div>
+              <div class="cp-name">Maya</div>
+              <div class="cp-tier">ADV</div>
+            </div>
+            <div class="court-player team-2">
+              <div class="cp-avatar">R</div>
+              <div class="cp-name">Rizki</div>
+              <div class="cp-tier">INT</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom team score overlay -->
+        <div class="court-score-overlay bottom" id="scoreT2Court">0</div>
+      </section>
+
+      <!-- SCOREBOARD (digital) -->
+      <section class="scoreboard" id="scoreboard">
+        <div class="sb-team left">
+          <div class="sb-team-label">Team 1</div>
+          <div class="sb-team-names">Ari · Dimas</div>
+          <div class="sb-score" id="scoreT1">0</div>
+        </div>
+        <div class="sb-vs">vs</div>
+        <div class="sb-team right">
+          <div class="sb-team-label">Team 2</div>
+          <div class="sb-team-names">Maya · Rizki</div>
+          <div class="sb-score" id="scoreT2">0</div>
+        </div>
+      </section>
+
+      <!-- LIVE-ONLY scoring controls (hidden when pending or done) -->
+      <div id="scoringControls">
+
+        <!-- TAP ZONES (+1) -->
+        <section class="tap-zones">
+          <button class="tap-zone team-1" onclick="addPoint(1)">
+            <div class="tap-zone-label">Team 1</div>
+            <div class="tap-zone-plus">+1</div>
+            <div class="tap-zone-sub">Ari · Dimas</div>
+          </button>
+          <button class="tap-zone team-2" onclick="addPoint(2)">
+            <div class="tap-zone-label">Team 2</div>
+            <div class="tap-zone-plus">+1</div>
+            <div class="tap-zone-sub">Maya · Rizki</div>
+          </button>
+        </section>
+
+        <!-- ADJUST CONTROLS -->
+        <section class="score-adjust-row">
+          <button class="score-adjust-btn" onclick="addPoint(1, -1)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+            <span>Team 1</span>
+          </button>
+          <button class="score-adjust-btn" onclick="addPoint(2, -1)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+            <span>Team 2</span>
+          </button>
+        </section>
+
+        <!-- UNDO -->
+        <section>
+          <button class="score-adjust-btn" style="width:100%;" onclick="undoLast()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+            <span>Undo Last Point</span>
+            <span id="lastAction" style="color:var(--text-400); margin-left:auto;">—</span>
+          </button>
+        </section>
+
+      </div>
+
+      <!-- HOST/CO-HOST INFO -->
+      <section style="margin-top:var(--s-2);" id="hostInfo">
+        <div style="display:flex; align-items:center; gap:8px; padding:10px 12px; background:var(--primary-50); border-radius:var(--r-md); border:1px solid var(--primary-100);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary-700); flex-shrink:0;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <div style="font-size:11px; font-weight:700; color:var(--primary-700);" id="hostInfoText">
+            Score input hanya untuk host & co-host. Pemain lain melihat read-only.
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- STICKY FOOTER -->
+    <div class="sticky-footer dual" id="footer">
+      <!-- Buttons rendered via JS based on state -->
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+  </div>
+
+  <script>
+    // Read URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    let matchStatus = urlParams.get('status') || 'pending';  // pending | live | done
+    const round = urlParams.get('round') || '3';
+    const court = parseInt(urlParams.get('court') || '1', 10);
+
+    // State
+    const state = {
+      court1: {
+        team1: { score: 0, names: 'Ari · Dimas', players: [{n:'Ari',t:'INT'},{n:'Dimas',t:'ADV'}] },
+        team2: { score: 0, names: 'Maya · Rizki', players: [{n:'Maya',t:'ADV'},{n:'Rizki',t:'INT'}] }
+      },
+      court2: {
+        team1: { score: 0, names: 'Sari · Rizki', players: [{n:'Sari',t:'INT'},{n:'Rizki',t:'INT'}] },
+        team2: { score: 0, names: 'Budi · Pak Eko', players: [{n:'Budi',t:'ROOK'},{n:'Pak Eko',t:'GST'}] }
+      },
+      currentCourt: court,
+      history: [],
+      startTime: null,
+      finalDuration: null,
+      timerInterval: null
+    };
+
+    // For demo: if URL says live, set initial scores
+    if (matchStatus === 'live') {
+      state.court1.team1.score = 14;
+      state.court1.team2.score = 11;
+      state.startTime = Date.now() - 5 * 60 * 1000; // 5 min ago
+    } else if (matchStatus === 'done') {
+      state.court1.team1.score = 21;
+      state.court1.team2.score = 18;
+      state.finalDuration = '12 min';
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._tt);
+      window._tt = setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    function getCurrentCourt() {
+      return state.currentCourt === 1 ? state.court1 : state.court2;
+    }
+
+    function updateScoreUI() {
+      const c = getCurrentCourt();
+      const sb1 = document.getElementById('scoreT1');
+      const sb2 = document.getElementById('scoreT2');
+      const co1 = document.getElementById('scoreT1Court');
+      const co2 = document.getElementById('scoreT2Court');
+
+      [sb1, co1].forEach(el => { if (el) el.textContent = c.team1.score; });
+      [sb2, co2].forEach(el => { if (el) el.textContent = c.team2.score; });
+    }
+
+    function bumpScore(team) {
+      const sb = document.getElementById('scoreT' + team);
+      const co = document.getElementById('scoreT' + team + 'Court');
+      [sb, co].forEach(el => {
+        if (!el) return;
+        el.classList.add('bump');
+        setTimeout(() => el.classList.remove('bump'), 200);
+      });
+    }
+
+    function addPoint(team, delta = 1) {
+      if (matchStatus !== 'live') return;
+      const c = getCurrentCourt();
+      const t = team === 1 ? c.team1 : c.team2;
+      if (t.score + delta < 0) return;
+      t.score += delta;
+      state.history.push({ court: state.currentCourt, team, delta });
+
+      updateScoreUI();
+      bumpScore(team);
+
+      const last = document.getElementById('lastAction');
+      const sign = delta > 0 ? '+' : '';
+      last.textContent = `Team ${team} ${sign}${delta}`;
+      last.style.color = delta > 0
+        ? (team === 1 ? 'var(--accent-600)' : 'var(--primary-700)')
+        : 'var(--text-500)';
+    }
+
+    function undoLast() {
+      if (matchStatus !== 'live') return;
+      if (state.history.length === 0) {
+        showToast('Tidak ada aksi untuk di-undo');
+        return;
+      }
+      const last = state.history.pop();
+      const c = last.court === 1 ? state.court1 : state.court2;
+      const t = last.team === 1 ? c.team1 : c.team2;
+      t.score -= last.delta;
+      updateScoreUI();
+      showToast('Last point di-undo');
+      document.getElementById('lastAction').textContent = '—';
+      document.getElementById('lastAction').style.color = 'var(--text-400)';
+    }
+
+    function startGame() {
+      matchStatus = 'live';
+      state.startTime = Date.now();
+      applyState();
+      showToast('Game dimulai · Timer running');
+    }
+
+    function endMatch() {
+      const c = getCurrentCourt();
+      const winner = c.team1.score > c.team2.score ? 1 : 2;
+      const winnerNames = winner === 1 ? c.team1.names : c.team2.names;
+      const score = `${c.team1.score} – ${c.team2.score}`;
+
+      const elapsed = state.startTime ? Math.floor((Date.now() - state.startTime) / 60000) : 0;
+      state.finalDuration = `${Math.max(elapsed, 1)} min`;
+
+      matchStatus = 'done';
+      applyState();
+      showToast(`Match ended · Winner: ${winnerNames} (${score})`);
+    }
+
+    function tickTimer() {
+      if (matchStatus !== 'live' || !state.startTime) return;
+      const elapsed = Math.floor((Date.now() - state.startTime) / 60000);
+      document.getElementById('timerText').textContent = `Round ${round} · ${elapsed} min`;
+    }
+
+    function applyState() {
+      const liveBadge = document.getElementById('liveBadge');
+      const liveLabel = document.getElementById('liveLabel');
+      const timerText = document.getElementById('timerText');
+      const statusHint = document.getElementById('statusHint');
+      const preMatch = document.getElementById('preMatchSection');
+      const doneBanner = document.getElementById('doneBannerSection');
+      const scoringControls = document.getElementById('scoringControls');
+      const mainContent = document.getElementById('mainContent');
+      const padelCourt = document.getElementById('padelCourt');
+      const scoreboard = document.getElementById('scoreboard');
+      const hostInfo = document.getElementById('hostInfo');
+      const footer = document.getElementById('footer');
+
+      // Clear timer
+      if (state.timerInterval) {
+        clearInterval(state.timerInterval);
+        state.timerInterval = null;
+      }
+
+      mainContent.classList.remove('scoring-disabled');
+
+      if (matchStatus === 'pending') {
+        // Pre-match state
+        preMatch.style.display = 'block';
+        doneBanner.style.display = 'none';
+        scoringControls.style.display = 'none';
+        hostInfo.style.display = 'none';
+        mainContent.classList.add('scoring-disabled');
+
+        liveBadge.style.background = 'var(--bg-canvas)';
+        liveBadge.style.color = 'var(--text-600)';
+        liveLabel.textContent = '⏳ PENDING';
+        liveBadge.querySelector('.live-dot').style.background = 'var(--text-500)';
+        liveBadge.querySelector('.live-dot').style.animation = 'none';
+        timerText.textContent = `Round ${round} · Belum mulai`;
+        statusHint.textContent = 'Klik Start Game untuk mulai';
+
+        footer.innerHTML = `
+          <button class="btn-secondary-lg" onclick="window.location.href='match-list.html'">
+            <span>Cancel</span>
+          </button>
+          <button class="btn-primary-lg" onclick="startGame()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9V3z"/></svg>
+            <span>Start Game</span>
+          </button>
+        `;
+      } else if (matchStatus === 'live') {
+        // Live state
+        preMatch.style.display = 'none';
+        doneBanner.style.display = 'none';
+        scoringControls.style.display = 'block';
+        hostInfo.style.display = 'block';
+
+        liveBadge.style.background = 'var(--accent-100)';
+        liveBadge.style.color = 'var(--accent-600)';
+        liveLabel.textContent = 'LIVE';
+        liveBadge.querySelector('.live-dot').style.background = 'var(--accent-600)';
+        liveBadge.querySelector('.live-dot').style.animation = 'pulse 1.2s ease-in-out infinite';
+        statusHint.textContent = 'Host akhiri saat siap';
+        tickTimer();
+        state.timerInterval = setInterval(tickTimer, 30000); // every 30s update
+
+        footer.innerHTML = `
+          <button class="btn-secondary-lg" onclick="if(confirm('Pause match?')) showToast('Paused')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+            <span>Pause</span>
+          </button>
+          <button class="btn-primary-lg" onclick="endMatch()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            <span>End Match</span>
+          </button>
+        `;
+      } else if (matchStatus === 'done') {
+        // Done state
+        preMatch.style.display = 'none';
+        doneBanner.style.display = 'block';
+        scoringControls.style.display = 'none';
+        hostInfo.style.display = 'none';
+        mainContent.classList.add('scoring-disabled');
+
+        const c = getCurrentCourt();
+        const winnerName = c.team1.score > c.team2.score ? c.team1.names : c.team2.names;
+        const score = `${c.team1.score}–${c.team2.score}`;
+        document.getElementById('doneTitle').textContent = `${winnerName} menang!`;
+        document.getElementById('doneSub').textContent = `Final score: ${score} · Durasi: ${state.finalDuration || '—'}`;
+
+        liveBadge.style.background = '#DCFCE7';
+        liveBadge.style.color = 'var(--success)';
+        liveLabel.textContent = '✓ DONE';
+        liveBadge.querySelector('.live-dot').style.background = 'var(--success)';
+        liveBadge.querySelector('.live-dot').style.animation = 'none';
+        timerText.textContent = `Round ${round} · ${state.finalDuration || '—'}`;
+        statusHint.textContent = 'Match selesai';
+
+        footer.innerHTML = `
+          <button class="btn-secondary-lg" onclick="window.location.href='match-list.html'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            <span>Match List</span>
+          </button>
+          <button class="btn-primary-lg" onclick="window.location.href='match-list.html'">
+            <span>Next Match</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        `;
+      }
+
+      updateScoreUI();
+    }
+
+    // Update header title
+    document.getElementById('matchTitle').textContent = `Court ${court} · Round ${round}`;
+
+    // Init based on URL state
+    applyState();
+  </script>
+</body>
+</html>

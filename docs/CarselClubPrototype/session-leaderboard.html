@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Session Leaderboard — Carsel Club</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="subscreen-header">
+      <button class="back-btn" onclick="window.location.href='match-scoring.html'" aria-label="Back">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <h2 class="subscreen-title">Session Leaderboard</h2>
+      <button class="menu-btn" onclick="showToast('Share live leaderboard link...')" aria-label="Share">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>
+      </button>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="app-content subscreen with-footer">
+
+      <!-- HERO -->
+      <section class="lb-hero">
+        <div class="lb-hero-title">Sabtu Sore Padel</div>
+        <div class="lb-hero-meta">
+          <span class="live-pill" style="background:rgba(255,255,255,0.22); color:white;">
+            <span class="live-dot" style="background:#FACC15;"></span>
+            <span>LIVE</span>
+          </span>
+          <span>·</span>
+          <span>Round 3 of 7</span>
+          <span>·</span>
+          <span>20 menit berlalu</span>
+        </div>
+        <div class="lb-hero-stats">
+          <div class="lb-hero-stat">
+            <div class="lb-hero-stat-value">8</div>
+            <div class="lb-hero-stat-label">Pemain</div>
+          </div>
+          <div class="lb-hero-stat">
+            <div class="lb-hero-stat-value">12</div>
+            <div class="lb-hero-stat-label">Match Done</div>
+          </div>
+          <div class="lb-hero-stat">
+            <div class="lb-hero-stat-value">187</div>
+            <div class="lb-hero-stat-label">Total Pts</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SORT TABS -->
+      <section class="leaderboard-tabs" id="lb-tabs">
+        <button class="lb-tab active" data-sort="point" onclick="sortBy('point')">
+          <span>🏆 Point</span>
+          <span class="lb-tab-sub">Total poin</span>
+        </button>
+        <button class="lb-tab" data-sort="winrate" onclick="sortBy('winrate')">
+          <span>📈 Win Rate</span>
+          <span class="lb-tab-sub">% menang</span>
+        </button>
+        <button class="lb-tab" data-sort="match" onclick="sortBy('match')">
+          <span>🎯 Match</span>
+          <span class="lb-tab-sub">Total main</span>
+        </button>
+      </section>
+
+      <!-- LEADERBOARD LIST -->
+      <section>
+        <div class="leaderboard-list" id="lbList">
+          <!-- Rendered via JS -->
+        </div>
+      </section>
+
+      <!-- INFO CARD -->
+      <section style="margin-top:var(--s-2);">
+        <div style="display:flex; align-items:flex-start; gap:10px; padding:12px 14px; background:var(--primary-50); border-radius:var(--r-md); border:1px solid var(--primary-100);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary-700); flex-shrink:0; margin-top:1px;"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <div>
+            <div style="font-family:var(--font-display); font-weight:700; font-size:13px; color:var(--primary-700); margin-bottom:2px;">Tentang Leaderboard</div>
+            <div style="font-size:11px; color:var(--text-700); font-weight:600; line-height:1.5;">
+              Point = total poin yang dimenangkan tim kamu dalam setiap match. Win Rate = % match menang. Untuk Guest, point hanya muncul di session ini, tidak masuk ke profil.
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- STICKY FOOTER -->
+    <div class="sticky-footer dual">
+      <button class="btn-secondary-lg" onclick="window.location.href='session-detail.html'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M9 21V12h6v9"/></svg>
+        <span>Session</span>
+      </button>
+      <button class="btn-primary-lg" onclick="window.location.href='match-scoring.html'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9V3z"/></svg>
+        <span>Back to Match</span>
+      </button>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+  </div>
+
+  <script>
+    // Mock data
+    const players = [
+      { id: 'dimas', name: 'Dimas Aryo', role: 'cohost', avatar: 'cohost', initial: 'D', tier: 'advanced', tierLabel: '🏅 Adv', point: 32, wins: 3, losses: 1, isMe: false },
+      { id: 'maya', name: 'Maya Sari', role: null, avatar: 'member-1', initial: 'M', tier: 'advanced', tierLabel: '🏅 Adv', point: 28, wins: 2, losses: 2, isMe: false },
+      { id: 'ari', name: 'Ari Christian', role: 'host', avatar: 'host', initial: 'A', tier: 'intermediate', tierLabel: '🥈 Int', point: 24, wins: 2, losses: 2, isMe: true },
+      { id: 'rizki', name: 'Rizki Pratama', role: 'cohost', avatar: 'cohost', initial: 'R', tier: 'intermediate', tierLabel: '🥈 Int', point: 22, wins: 2, losses: 2, isMe: false },
+      { id: 'rio', name: 'Rio Hartono', role: null, avatar: 'member-3', initial: 'R', tier: 'pro', tierLabel: '👑 Pro', point: 19, wins: 1, losses: 2, isMe: false },
+      { id: 'ekosari', name: 'Pak Eko', role: 'guest', avatar: 'guest', initial: 'P', tier: null, tierLabel: '👤 Guest', point: 14, wins: 1, losses: 2, isMe: false },
+      { id: 'sari', name: 'Sari Wulan', role: null, avatar: 'member-2', initial: 'S', tier: 'intermediate', tierLabel: '🥈 Int', point: 12, wins: 1, losses: 2, isMe: false },
+      { id: 'budi', name: 'Budi Santoso', role: null, avatar: 'member-2', initial: 'B', tier: 'rookie', tierLabel: '⚪ Rookie', point: 8, wins: 0, losses: 3, isMe: false }
+    ];
+
+    let currentSort = 'point';
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._tt);
+      window._tt = setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    function getMatches(p) { return p.wins + p.losses; }
+    function getWinRate(p) {
+      const m = getMatches(p);
+      return m === 0 ? 0 : Math.round((p.wins / m) * 100);
+    }
+
+    function sortBy(metric) {
+      currentSort = metric;
+      document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
+      document.querySelector(`.lb-tab[data-sort="${metric}"]`).classList.add('active');
+      render();
+    }
+
+    function rankIcon(rank) {
+      if (rank === 1) return '🥇';
+      if (rank === 2) return '🥈';
+      if (rank === 3) return '🥉';
+      return rank;
+    }
+
+    function render() {
+      const sorted = [...players].sort((a, b) => {
+        if (currentSort === 'point') return b.point - a.point;
+        if (currentSort === 'winrate') return getWinRate(b) - getWinRate(a);
+        if (currentSort === 'match') return getMatches(b) - getMatches(a);
+      });
+
+      const list = document.getElementById('lbList');
+      list.innerHTML = sorted.map((p, i) => {
+        const rank = i + 1;
+        const wr = getWinRate(p);
+        const matches = getMatches(p);
+        const topClass = rank <= 3 ? `top-${rank}` : '';
+        const meClass = p.isMe ? 'is-me' : '';
+        const roleBadge = p.role === 'host' ? '<span class="role-badge host">Host</span>'
+                       : p.role === 'cohost' ? '<span class="role-badge cohost">Co-host</span>'
+                       : p.role === 'guest' ? '<span class="role-badge guest">Guest</span>'
+                       : '';
+
+        // Primary stat highlight
+        const primaryClass = (m) => currentSort === m ? 'primary' : '';
+
+        return `
+          <div class="lb-item ${topClass} ${meClass}">
+            <div class="lb-rank ${rank<=3?'medal':''}">${rankIcon(rank)}</div>
+            <div class="lb-avatar ${p.avatar}">${p.initial}</div>
+            <div class="lb-info">
+              <div class="lb-name">
+                <span>${p.name}</span>
+                ${roleBadge}
+              </div>
+              <div class="lb-meta">
+                <span>${p.tierLabel}</span>
+                <span>·</span>
+                <span>${p.wins}W ${p.losses}L</span>
+              </div>
+            </div>
+            <div class="lb-stats">
+              <div class="lb-stat ${primaryClass('point')}">
+                <div class="lb-stat-value">${p.point}</div>
+                <div class="lb-stat-label">Pts</div>
+              </div>
+              <div class="lb-stat ${primaryClass('winrate')}">
+                <div class="lb-stat-value">${wr}%</div>
+                <div class="lb-stat-label">WR</div>
+              </div>
+              <div class="lb-stat ${primaryClass('match')}">
+                <div class="lb-stat-value">${matches}</div>
+                <div class="lb-stat-label">Match</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Init
+    render();
+  </script>
+</body>
+</html>

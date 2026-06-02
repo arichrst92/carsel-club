@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Profile — Carsel Club</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="logo">
+        <div class="logo-mark">CC</div>
+        <span class="logo-text">Profile</span>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="showToast('Edit profile — segera dibuat')" aria-label="Edit Profile">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="icon-btn" onclick="showToast('Settings — segera dibuat')" aria-label="Settings">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="app-content">
+
+      <!-- PROFILE HERO -->
+      <section class="profile-hero">
+        <div class="profile-avatar-big">
+          <div class="profile-avatar-big-inner">A</div>
+          <div class="profile-avatar-tier-pill">🥈 Intermediate</div>
+        </div>
+        <h1 class="profile-name">Ari Christian</h1>
+        <div class="profile-handle">
+          <span>@arichrst</span>
+          <span class="dot">·</span>
+          <span>Joined Jan 2026</span>
+        </div>
+
+        <div class="profile-quick-stats">
+          <div class="pqs-item">
+            <div class="pqs-value">740</div>
+            <div class="pqs-label">Points</div>
+          </div>
+          <div class="pqs-item">
+            <div class="pqs-value">58%</div>
+            <div class="pqs-label">Win Rate</div>
+          </div>
+          <div class="pqs-item">
+            <div class="pqs-value">47</div>
+            <div class="pqs-label">Match</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TIER PROGRESS -->
+      <section>
+        <div class="section-head">
+          <h3>Tier Journey</h3>
+          <a href="#" class="section-link" onclick="event.preventDefault(); showToast('Tier history — segera dibuat')">History</a>
+        </div>
+        <div class="tier-progress-card">
+          <div class="tpc-head">
+            <div class="tpc-current">
+              <span class="tier-emoji">🥈</span>
+              <div class="tpc-tier-info">
+                <div class="tier-now">Intermediate</div>
+                <div class="tier-pts">740 pts · 47 match</div>
+              </div>
+            </div>
+            <div class="tpc-next">
+              <div>Next: <span class="tier-emoji-sm">🏅</span> Advanced</div>
+              <div style="margin-top:2px;">260 pts · 53 match</div>
+            </div>
+          </div>
+          <div class="tpc-bar">
+            <div class="tpc-bar-fill" style="width: 74%"></div>
+          </div>
+          <div class="tpc-checkpoints">
+            <div class="tpc-cp done"><div class="tpc-cp-icon">✓</div><div class="tpc-cp-label">Rookie</div></div>
+            <div class="tpc-cp current"><div class="tpc-cp-icon">🥈</div><div class="tpc-cp-label">Inter</div></div>
+            <div class="tpc-cp"><div class="tpc-cp-icon">🏅</div><div class="tpc-cp-label">Adv</div></div>
+            <div class="tpc-cp"><div class="tpc-cp-icon">👑</div><div class="tpc-cp-label">Pro</div></div>
+            <div class="tpc-cp"><div class="tpc-cp-icon">💎</div><div class="tpc-cp-label">Elite</div></div>
+            <div class="tpc-cp"><div class="tpc-cp-icon">🏆</div><div class="tpc-cp-label">Master</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STATS GRID -->
+      <section>
+        <div class="section-head">
+          <h3>Stats Lengkap</h3>
+        </div>
+        <div class="profile-stats-grid">
+          <div class="stat-card teal">
+            <div class="stat-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <div class="stat-value">47</div>
+            <div class="stat-label">Match Played</div>
+          </div>
+          <div class="stat-card coral">
+            <div class="stat-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg>
+            </div>
+            <div class="stat-value">58<span style="font-size:14px;color:var(--text-500);">%</span></div>
+            <div class="stat-label">Win Rate</div>
+          </div>
+          <div class="stat-card yellow">
+            <div class="stat-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div class="stat-value">5<span style="font-size:14px;color:var(--text-500);">W</span></div>
+            <div class="stat-label">Best Streak</div>
+          </div>
+          <div class="stat-card teal">
+            <div class="stat-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="stat-value">8</div>
+            <div class="stat-label">Hosted</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ACHIEVEMENTS -->
+      <section>
+        <div class="section-head">
+          <h3>Achievements <span style="color:var(--text-500); font-size:12px; font-weight:700;">3 / 12</span></h3>
+          <a href="achievements.html" class="section-link">View All</a>
+        </div>
+        <div class="achievement-grid">
+          <div class="achievement-badge unlocked" onclick="showToast('🏆 First Win - Earned Jan 12, 2026')">
+            <div class="achievement-icon">🏆</div>
+            <div class="achievement-name">First Win</div>
+          </div>
+          <div class="achievement-badge unlocked" onclick="showToast('🥈 Tier Up: Intermediate - Earned Mar 4, 2026')">
+            <div class="achievement-icon">🥈</div>
+            <div class="achievement-name">Tier Up</div>
+          </div>
+          <div class="achievement-badge unlocked" onclick="showToast('🔥 5 Win Streak - Earned Apr 18, 2026')">
+            <div class="achievement-icon">🔥</div>
+            <div class="achievement-name">Streak 5</div>
+          </div>
+          <div class="achievement-badge locked" onclick="showToast('🔒 50 Matches - Need 3 more matches')">
+            <div class="achievement-icon">🎯</div>
+            <div class="achievement-name">50 Match</div>
+          </div>
+          <div class="achievement-badge locked" onclick="showToast('🔒 Tier Up: Advanced - Need 260 more pts')">
+            <div class="achievement-icon">🏅</div>
+            <div class="achievement-name">Advanced</div>
+          </div>
+          <div class="achievement-badge locked" onclick="showToast('🔒 Hosted 10 Sessions - Need 2 more')">
+            <div class="achievement-icon">👑</div>
+            <div class="achievement-name">Top Host</div>
+          </div>
+          <div class="achievement-badge locked" onclick="showToast('🔒 Tournament Champion - Available v1.5')">
+            <div class="achievement-icon">🏟️</div>
+            <div class="achievement-name">Champion</div>
+          </div>
+          <div class="achievement-badge locked" onclick="showToast('🔒 Win 100 Matches - 53 more to go')">
+            <div class="achievement-icon">💯</div>
+            <div class="achievement-name">100 Win</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RECENT MATCHES -->
+      <section>
+        <div class="section-head">
+          <h3>Recent Matches</h3>
+          <a href="match-history.html" class="section-link">View All</a>
+        </div>
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="activity-icon win">🏆</div>
+            <div class="activity-info">
+              <div class="activity-title">Rabu Malam Padel · GBK</div>
+              <div class="activity-meta">Menang 5/7 · 2 hari lalu</div>
+            </div>
+            <div class="activity-points win">+18</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon win">🏆</div>
+            <div class="activity-info">
+              <div class="activity-title">Mini Tournament Senayan</div>
+              <div class="activity-meta">Menang 4/6 · 5 hari lalu</div>
+            </div>
+            <div class="activity-points win">+14</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon loss">⚡</div>
+            <div class="activity-info">
+              <div class="activity-title">Selasa Pagi Casual</div>
+              <div class="activity-meta">3/6 menang · 1 minggu lalu</div>
+            </div>
+            <div class="activity-points loss">+9</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ACTION CARDS -->
+      <section style="display:flex; flex-direction:column; gap:var(--s-3);">
+        <button class="action-card" onclick="showToast('Generate share card preview...')">
+          <div class="action-card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>
+          </div>
+          <div class="action-card-info">
+            <div class="action-card-title">Share My Profile</div>
+            <div class="action-card-sub">Generate image card untuk WA / IG Story</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-400);"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+
+        <button class="action-card coral" onclick="copyReferralLink()">
+          <div class="action-card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11l-3-3M19 8l3-3M19 11h-3"/></svg>
+          </div>
+          <div class="action-card-info">
+            <div class="action-card-title">Invite Friends to Carsel Club</div>
+            <div class="action-card-sub">Bagi referral link via WhatsApp</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-400);"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </section>
+
+      <!-- SETTINGS -->
+      <section>
+        <div class="section-head">
+          <h3>Settings</h3>
+        </div>
+        <div class="settings-list">
+          <button class="settings-item" onclick="showToast('Edit Profile — segera dibuat')">
+            <div class="settings-item-icon teal">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </div>
+            <div class="settings-item-text">Edit Profile<small>Nama, avatar, bio</small></div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="settings-item-arrow"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+
+          <button class="settings-item" onclick="window.location.href='friends.html'">
+            <div class="settings-item-icon teal">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><circle cx="17" cy="7" r="3"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg>
+            </div>
+            <div class="settings-item-text">Friends<small>12 friends · 3 requests</small></div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="settings-item-arrow"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+
+          <button class="settings-item" onclick="window.location.href='notification-settings.html'">
+            <div class="settings-item-icon coral">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            </div>
+            <div class="settings-item-text">Notifications<small>WhatsApp, push, email</small></div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="settings-item-arrow"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+
+          <button class="settings-item" onclick="window.location.href='privacy-settings.html'">
+            <div class="settings-item-icon purple">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div class="settings-item-text">Privacy<small>Siapa bisa lihat profile</small></div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="settings-item-arrow"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+
+          <button class="settings-item" onclick="window.location.href='help-support.html'">
+            <div class="settings-item-icon gray">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+            </div>
+            <div class="settings-item-text">Help & Support<small>FAQ, contact us</small></div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="settings-item-arrow"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+
+          <button class="settings-item danger" onclick="if(confirm('Logout dari Carsel Club?')) window.location.href='login.html'">
+            <div class="settings-item-icon danger">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
+            </div>
+            <div class="settings-item-text">Logout<small>Sign out dari akun</small></div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="settings-item-arrow"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- VERSION -->
+      <section style="text-align:center; padding-top:var(--s-2);">
+        <div style="font-size:11px; font-weight:700; color:var(--text-400); letter-spacing:0.04em;">
+          Carsel Club · v1.0 (Closed Beta)
+        </div>
+      </section>
+
+    </main>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+      <a href="index.html" class="nav-item">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3l9 9"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></svg>
+        <span>Home</span>
+      </a>
+      <a href="sessions.html" class="nav-item">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <span>Sessions</span>
+      </a>
+      <a href="create-session.html" class="nav-item fab-wrap">
+        <div class="nav-fab">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        </div>
+        <span>Create</span>
+      </a>
+      <a href="leaderboard.html" class="nav-item">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5A2.5 2.5 0 0 1 2 6.5V6h4M18 9h1.5A2.5 2.5 0 0 0 22 6.5V6h-4"/><path d="M6 22h12M9 22V12.5M15 22V12.5"/><path d="M6 6V2h12v8a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V6z"/></svg>
+        <span>Leaderboard</span>
+      </a>
+      <a href="profile.html" class="nav-item active">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+        <span>Profile</span>
+      </a>
+    </nav>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+  </div>
+
+  <script>
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._tt);
+      window._tt = setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    function copyReferralLink() {
+      const link = 'https://carsel.club/r/arichrst';
+      navigator.clipboard?.writeText(link);
+      showToast('Referral link di-copy: ' + link);
+    }
+  </script>
+</body>
+</html>

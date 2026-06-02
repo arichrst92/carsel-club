@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Setup Profile — Carsel Club</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="subscreen-header">
+      <button class="back-btn" id="backBtn" onclick="handleBack()" aria-label="Back">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <h2 class="subscreen-title">Setup Profile</h2>
+      <button class="subscreen-action" onclick="if(confirm('Lewati onboarding? Kamu bisa setup nanti di Profile.')) window.location.href='index.html'">Skip</button>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="app-content subscreen with-footer">
+
+      <!-- WIZARD PROGRESS -->
+      <section class="wizard-progress">
+        <div class="wizard-progress-meta">
+          <span class="wizard-step-label">Step <span id="stepNum">1</span> of 3</span>
+          <span class="wizard-step-label" style="color:var(--primary-700);" id="stepPercent">33%</span>
+        </div>
+        <div class="wizard-progress-track">
+          <div class="wizard-progress-segment current"></div>
+          <div class="wizard-progress-segment"></div>
+          <div class="wizard-progress-segment"></div>
+        </div>
+      </section>
+
+      <!-- STEP 1: NAME & AVATAR -->
+      <div class="wizard-step active" data-step="1">
+        <h2 class="wizard-step-title">Halo! Siapa namamu?</h2>
+        <p style="color:var(--text-500); font-weight:600; font-size:13px; margin-top:-12px; margin-bottom: var(--s-4);">Ini akan jadi identitas kamu di Carsel Club. Bisa nama asli atau nickname.</p>
+
+        <!-- Avatar -->
+        <div class="onboarding-avatar-picker">
+          <div class="avatar-preview" id="avatarPreview">
+            <span id="avatarInitial">A</span>
+            <button class="upload-pill" onclick="showToast('Upload foto — segera dibuat')">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              <span>Upload</span>
+            </button>
+          </div>
+          <div class="avatar-color-picker" id="colorPicker">
+            <button class="color-swatch selected" data-c="coral" style="background: linear-gradient(135deg, #FB7185, #F43F5E);" onclick="selectColor('coral', this)"></button>
+            <button class="color-swatch" data-c="teal" style="background: linear-gradient(135deg, #14B8A6, #0F766E);" onclick="selectColor('teal', this)"></button>
+            <button class="color-swatch" data-c="blue" style="background: linear-gradient(135deg, #06B6D4, #0EA5E9);" onclick="selectColor('blue', this)"></button>
+            <button class="color-swatch" data-c="purple" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);" onclick="selectColor('purple', this)"></button>
+            <button class="color-swatch" data-c="lime" style="background: linear-gradient(135deg, #84CC16, #65A30D);" onclick="selectColor('lime', this)"></button>
+            <button class="color-swatch" data-c="amber" style="background: linear-gradient(135deg, #FACC15, #F59E0B);" onclick="selectColor('amber', this)"></button>
+          </div>
+        </div>
+
+        <section class="form-section">
+          <div class="form-group">
+            <label class="form-label">Nama Display <span class="req">*</span></label>
+            <input type="text" id="displayName" class="form-input" placeholder="Contoh: Ari Christian" value="Ari" oninput="updateAvatar()">
+            <p class="form-help">Maksimum 30 karakter. Bisa diubah nanti.</p>
+          </div>
+        </section>
+      </div>
+
+      <!-- STEP 2: CITY & BIO -->
+      <div class="wizard-step" data-step="2">
+        <h2 class="wizard-step-title">Di mana kamu main?</h2>
+        <p style="color:var(--text-500); font-weight:600; font-size:13px; margin-top:-12px; margin-bottom: var(--s-4);">Pilih kota domisili — penting untuk Find Session di v2 nanti.</p>
+
+        <section class="form-section">
+          <div class="form-group">
+            <label class="form-label">Kota</label>
+            <div class="city-grid" id="cityGrid">
+              <button type="button" class="city-option selected" data-city="jakarta" onclick="selectCity('jakarta', this)">
+                <span class="city-emoji">🏙️</span>
+                <div class="city-info">
+                  <div class="city-name">Jakarta</div>
+                  <div class="city-meta">5,820 pemain</div>
+                </div>
+              </button>
+              <button type="button" class="city-option" data-city="bandung" onclick="selectCity('bandung', this)">
+                <span class="city-emoji">⛰️</span>
+                <div class="city-info">
+                  <div class="city-name">Bandung</div>
+                  <div class="city-meta">1,420 pemain</div>
+                </div>
+              </button>
+              <button type="button" class="city-option" data-city="surabaya" onclick="selectCity('surabaya', this)">
+                <span class="city-emoji">🛳️</span>
+                <div class="city-info">
+                  <div class="city-name">Surabaya</div>
+                  <div class="city-meta">980 pemain</div>
+                </div>
+              </button>
+              <button type="button" class="city-option" data-city="bali" onclick="selectCity('bali', this)">
+                <span class="city-emoji">🌴</span>
+                <div class="city-info">
+                  <div class="city-name">Bali</div>
+                  <div class="city-meta">760 pemain</div>
+                </div>
+              </button>
+              <button type="button" class="city-option" data-city="yogya" onclick="selectCity('yogya', this)">
+                <span class="city-emoji">🏛️</span>
+                <div class="city-info">
+                  <div class="city-name">Yogyakarta</div>
+                  <div class="city-meta">420 pemain</div>
+                </div>
+              </button>
+              <button type="button" class="city-option" data-city="medan" onclick="selectCity('medan', this)">
+                <span class="city-emoji">🌴</span>
+                <div class="city-info">
+                  <div class="city-name">Medan</div>
+                  <div class="city-meta">280 pemain</div>
+                </div>
+              </button>
+            </div>
+            <div class="form-group" style="margin-top: var(--s-3);">
+              <button type="button" style="background:var(--bg-soft); border:1.5px dashed var(--border); border-radius:var(--r-md); padding:12px; font-family:var(--font-display); font-weight:700; font-size:13px; color:var(--text-700); width:100%;" onclick="showToast('Search kota lain — segera dibuat')">
+                <span style="margin-right:6px;">🔍</span>
+                <span>Cari kota lain...</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="form-group">
+            <label class="form-label">Bio (Optional)</label>
+            <input type="text" id="bio" class="form-input" placeholder="Contoh: Padel addict, ngabuburit at GBK" maxlength="80">
+            <p class="form-help">Maksimum 80 karakter. Muncul di profile yang di-share.</p>
+          </div>
+        </section>
+      </div>
+
+      <!-- STEP 3: WELCOME / DONE -->
+      <div class="wizard-step" data-step="3">
+        <div class="celebration-hero">
+          <div class="celebration-emoji">🎉</div>
+          <div class="celebration-title">Selamat datang, <span id="welcomeName">Ari</span>!</div>
+          <div class="celebration-sub">Profile kamu siap. Yuk mulai padel journey-mu di Carsel Club.</div>
+
+          <div class="welcome-card-set">
+            <div class="welcome-card">
+              <span class="welcome-card-emoji">⚪</span>
+              <div class="welcome-card-info">
+                <div class="welcome-card-title">Tier Awal: Rookie</div>
+                <div class="welcome-card-sub">Main 30 match + 300 pts → naik ke Intermediate</div>
+              </div>
+            </div>
+            <div class="welcome-card">
+              <span class="welcome-card-emoji">🎁</span>
+              <div class="welcome-card-info">
+                <div class="welcome-card-title">Welcome Achievement</div>
+                <div class="welcome-card-sub">Sign up via WhatsApp · Earned!</div>
+              </div>
+            </div>
+            <div class="welcome-card">
+              <span class="welcome-card-emoji">📱</span>
+              <div class="welcome-card-info">
+                <div class="welcome-card-title">Add to Home Screen</div>
+                <div class="welcome-card-sub">Akses cepat seperti app native</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <section style="margin-top: var(--s-4);">
+          <h3 style="font-size:16px; margin-bottom: var(--s-3);">First Steps</h3>
+          <div class="checklist-card" style="background:var(--bg); border:1px solid var(--border-light);">
+            <div class="checklist-items">
+              <button class="checklist-item" onclick="window.location.href='create-session.html'">
+                <div class="checklist-check"></div>
+                <div class="checklist-text">Bikin session pertamamu</div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="checklist-arrow"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+              <button class="checklist-item" onclick="showToast('Invite friends...')">
+                <div class="checklist-check"></div>
+                <div class="checklist-text">Undang 3 teman ke Carsel Club</div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="checklist-arrow"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+              <button class="checklist-item" onclick="window.location.href='leaderboard.html'">
+                <div class="checklist-check"></div>
+                <div class="checklist-text">Cek leaderboard global</div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="checklist-arrow"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </main>
+
+    <!-- STICKY FOOTER -->
+    <div class="sticky-footer dual" id="wizardFooter">
+      <button class="btn-secondary-lg" id="btnPrev" onclick="prevStep()" style="display:none;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span>Back</span>
+      </button>
+      <button class="btn-primary-lg" id="btnNext" onclick="nextStep()">
+        <span id="btnNextText">Lanjut</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+  </div>
+
+  <script>
+    let currentStep = 1;
+    const totalSteps = 3;
+    const colorMap = {
+      coral: 'linear-gradient(135deg, #FB7185, #F43F5E)',
+      teal: 'linear-gradient(135deg, #14B8A6, #0F766E)',
+      blue: 'linear-gradient(135deg, #06B6D4, #0EA5E9)',
+      purple: 'linear-gradient(135deg, #8B5CF6, #6366F1)',
+      lime: 'linear-gradient(135deg, #84CC16, #65A30D)',
+      amber: 'linear-gradient(135deg, #FACC15, #F59E0B)'
+    };
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._tt);
+      window._tt = setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    function updateProgress() {
+      document.getElementById('stepNum').textContent = currentStep;
+      document.getElementById('stepPercent').textContent = Math.round((currentStep / totalSteps) * 100) + '%';
+      const segs = document.querySelectorAll('.wizard-progress-segment');
+      segs.forEach((s, i) => {
+        s.classList.remove('done', 'current');
+        if (i + 1 < currentStep) s.classList.add('done');
+        else if (i + 1 === currentStep) s.classList.add('current');
+      });
+    }
+
+    function showStep(step) {
+      document.querySelectorAll('.wizard-step').forEach(el => el.classList.remove('active'));
+      document.querySelector(`.wizard-step[data-step="${step}"]`).classList.add('active');
+
+      document.getElementById('btnPrev').style.display = step === 1 ? 'none' : 'flex';
+
+      const nextText = document.getElementById('btnNextText');
+      if (step === totalSteps) nextText.textContent = 'Mulai Main Padel!';
+      else nextText.textContent = 'Lanjut';
+
+      currentStep = step;
+      updateProgress();
+
+      // If step 3, update welcome name
+      if (step === 3) {
+        const name = document.getElementById('displayName').value.trim() || 'Ari';
+        document.getElementById('welcomeName').textContent = name.split(' ')[0];
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function nextStep() {
+      if (currentStep === totalSteps) {
+        const btn = document.getElementById('btnNext');
+        btn.classList.add('loading');
+        document.getElementById('btnNextText').textContent = 'Loading...';
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 700);
+        return;
+      }
+      // Validation
+      if (currentStep === 1) {
+        const name = document.getElementById('displayName').value.trim();
+        if (!name) {
+          showToast('Masukkan nama display dulu');
+          return;
+        }
+      }
+      showStep(currentStep + 1);
+    }
+
+    function prevStep() {
+      if (currentStep > 1) showStep(currentStep - 1);
+    }
+
+    function handleBack() {
+      if (currentStep === 1) {
+        if (confirm('Kembali ke login? Progress akan hilang.')) window.location.href = 'login.html';
+      } else {
+        prevStep();
+      }
+    }
+
+    function updateAvatar() {
+      const name = document.getElementById('displayName').value.trim();
+      const initial = (name.charAt(0) || 'A').toUpperCase();
+      document.getElementById('avatarInitial').textContent = initial;
+    }
+
+    function selectColor(color, btn) {
+      document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('avatarPreview').style.background = colorMap[color];
+    }
+
+    function selectCity(city, btn) {
+      document.querySelectorAll('.city-option').forEach(s => s.classList.remove('selected'));
+      btn.classList.add('selected');
+    }
+
+    updateProgress();
+    updateAvatar();
+  </script>
+</body>
+</html>

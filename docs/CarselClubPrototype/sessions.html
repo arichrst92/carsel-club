@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Sessions — Carsel Club</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="logo">
+        <div class="logo-mark">CC</div>
+        <span class="logo-text">Sessions</span>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="showToast('Search session — segera dibuat')" aria-label="Search">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        </button>
+        <button class="icon-btn" onclick="showToast('Filter & sort — segera dibuat')" aria-label="Filter">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="app-content">
+
+      <!-- TABS -->
+      <section class="list-tabs">
+        <button class="list-tab active" data-tab="upcoming" onclick="switchTab('upcoming')">
+          <span>Upcoming</span>
+          <span class="tab-count">3</span>
+        </button>
+        <button class="list-tab" data-tab="live" onclick="switchTab('live')">
+          <span>🔴 Live</span>
+          <span class="tab-count">1</span>
+        </button>
+        <button class="list-tab" data-tab="past" onclick="switchTab('past')">
+          <span>Past</span>
+          <span class="tab-count">12</span>
+        </button>
+      </section>
+
+      <!-- UPCOMING -->
+      <section class="tab-content active" data-content="upcoming">
+        <div class="session-list">
+
+          <a href="session-detail.html" class="session-list-item">
+            <div class="session-date-block">
+              <div class="sd-day">SAT</div>
+              <div class="sd-num">16</div>
+              <div class="sd-month">MEI</div>
+            </div>
+            <div class="session-info">
+              <div class="session-info-head">
+                <div class="session-info-title">Sabtu Sore Padel</div>
+                <span class="session-status-pill upcoming">5 hari</span>
+              </div>
+              <div class="session-info-row">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                <span>16:00 – 18:30</span>
+              </div>
+              <div class="session-info-row">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>GBK Padel Court</span>
+              </div>
+              <div class="session-tags-row">
+                <span class="format-chip-sm">Americano</span>
+                <span class="format-chip-sm gray">2 court</span>
+                <span class="format-chip-sm coral">HOST</span>
+              </div>
+              <div class="session-foot">
+                <div class="session-players-mini">
+                  <div class="player-avatar p1">A</div>
+                  <div class="player-avatar p2">D</div>
+                  <div class="player-avatar p3">M</div>
+                  <div class="player-avatar more">+3</div>
+                  <span class="session-players-mini-count">6 pemain</span>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-400);"><path d="M9 18l6-6-6-6"/></svg>
+              </div>
+            </div>
+          </a>
+
+          <a href="session-detail.html" class="session-list-item">
+            <div class="session-date-block">
+              <div class="sd-day">SUN</div>
+              <div class="sd-num">17</div>
+              <div class="sd-month">MEI</div>
+            </div>
+            <div class="session-info">
+              <div class="session-info-head">
+                <div class="session-info-title">Mini Tournament Senayan</div>
+                <span class="session-status-pill upcoming">6 hari</span>
+              </div>
+              <div class="session-info-row">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                <span>18:00 – 22:00</span>
+              </div>
+              <div class="session-info-row">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>Senayan Padel Center</span>
+              </div>
+              <div class="session-tags-row">
+                <span class="format-chip-sm">Americano</span>
+                <span class="format-chip-sm gray">4 court</span>
+                <span class="format-chip-sm gray">PLAYER</span>
+              </div>
+              <div class="session-foot">
+                <div class="session-players-mini">
+                  <div class="player-avatar p3">R</div>
+                  <div class="player-avatar p4">D</div>
+                  <div class="player-avatar p1">L</div>
+                  <div class="player-avatar more">+9</div>
+                  <span class="session-players-mini-count">12 pemain</span>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-400);"><path d="M9 18l6-6-6-6"/></svg>
+              </div>
+            </div>
+          </a>
+
+          <a href="session-detail.html" class="session-list-item">
+            <div class="session-date-block">
+              <div class="sd-day">WED</div>
+              <div class="sd-num">20</div>
+              <div class="sd-month">MEI</div>
+            </div>
+            <div class="session-info">
+              <div class="session-info-head">
+                <div class="session-info-title">Rabu Casual Padel</div>
+                <span class="session-status-pill upcoming">9 hari</span>
+              </div>
+              <div class="session-info-row">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                <span>19:00 – 21:00</span>
+              </div>
+              <div class="session-info-row">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>Padel Hub Tebet</span>
+              </div>
+              <div class="session-tags-row">
+                <span class="format-chip-sm">Americano</span>
+                <span class="format-chip-sm gray">1 court</span>
+                <span class="format-chip-sm" style="background:#EDE9FE; color:#6D28D9;">CO-HOST</span>
+              </div>
+              <div class="session-foot">
+                <div class="session-players-mini">
+                  <div class="player-avatar p2">B</div>
+                  <div class="player-avatar p3">S</div>
+                  <div class="player-avatar p4">M</div>
+                  <span class="session-players-mini-count">4 pemain</span>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-400);"><path d="M9 18l6-6-6-6"/></svg>
+              </div>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- LIVE -->
+      <section class="tab-content" data-content="live">
+        <div class="session-list">
+
+          <a href="match-scoring.html" class="session-list-item live">
+            <div class="session-date-block">
+              <div class="sd-day">NOW</div>
+              <div class="sd-num">⚡</div>
+              <div class="sd-month">LIVE</div>
+            </div>
+            <div class="session-info">
+              <div class="session-info-head">
+                <div class="session-info-title">Friday Night Round Robin</div>
+                <span class="session-status-pill live">
+                  <span class="live-dot"></span>
+                  <span>LIVE</span>
+                </span>
+              </div>
+              <div class="session-info-row">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                <span>Started 28 menit lalu · Round 4 of 7</span>
+              </div>
+              <div class="session-info-row">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>Pondok Indah Padel</span>
+              </div>
+              <div class="session-tags-row">
+                <span class="format-chip-sm">Americano</span>
+                <span class="format-chip-sm gray">2 court</span>
+                <span class="format-chip-sm gray">PLAYER</span>
+              </div>
+              <div class="session-foot">
+                <div class="session-players-mini">
+                  <div class="player-avatar p1">F</div>
+                  <div class="player-avatar p2">R</div>
+                  <div class="player-avatar p3">A</div>
+                  <div class="player-avatar more">+5</div>
+                  <span class="session-players-mini-count">8 pemain</span>
+                </div>
+                <span class="session-points-tag" style="background: var(--accent); color:white;">▶ Resume</span>
+              </div>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- PAST -->
+      <section class="tab-content" data-content="past">
+        <div class="session-list">
+
+          <a href="session-detail.html" class="session-list-item past">
+            <div class="session-date-block">
+              <div class="sd-day">THU</div>
+              <div class="sd-num">07</div>
+              <div class="sd-month">MEI</div>
+            </div>
+            <div class="session-info">
+              <div class="session-info-head">
+                <div class="session-info-title">Rabu Malam Padel · GBK</div>
+                <span class="session-status-pill completed">2h lalu</span>
+              </div>
+              <div class="session-info-row">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>GBK Padel Court · 19:00–21:30</span>
+              </div>
+              <div class="session-tags-row">
+                <span class="format-chip-sm">Americano</span>
+                <span class="format-chip-sm coral">HOST</span>
+                <span class="format-chip-sm gray">8 pemain · 7 round</span>
+              </div>
+              <div class="session-foot">
+                <div class="session-result win">
+                  <span>🏆</span>
+                  <span>Menang 5/7</span>
+                </div>
+                <span class="session-points-tag win">+18 pts</span>
+              </div>
+            </div>
+          </a>
+
+          <a href="session-detail.html" class="session-list-item past">
+            <div class="session-date-block">
+              <div class="sd-day">SUN</div>
+              <div class="sd-num">04</div>
+              <div class="sd-month">MEI</div>
+            </div>
+            <div class="session-info">
+              <div class="session-info-head">
+                <div class="session-info-title">Mini Tournament Senayan</div>
+                <span class="session-status-pill completed">5h lalu</span>
+              </div>
+              <div class="session-info-row">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>Senayan Padel · 18:00–22:00</span>
+              </div>
+              <div class="session-tags-row">
+                <span class="format-chip-sm">Americano</span>
+                <span class="format-chip-sm gray">PLAYER</span>
+                <span class="format-chip-sm gray">16 pemain · 6 round</span>
+              </div>
+              <div class="session-foot">
+                <div class="session-result win">
+                  <span>🏆</span>
+                  <span>Menang 4/6</span>
+                </div>
+                <span class="session-points-tag win">+14 pts</span>
+              </div>
+            </div>
+          </a>
+
+          <a href="session-detail.html" class="session-list-item past">
+            <div class="session-date-block">
+              <div class="sd-day">TUE</div>
+              <div class="sd-num">29</div>
+              <div class="sd-month">APR</div>
+            </div>
+            <div class="session-info">
+              <div class="session-info-head">
+                <div class="session-info-title">Selasa Pagi Casual</div>
+                <span class="session-status-pill completed">1mg lalu</span>
+              </div>
+              <div class="session-info-row">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>Padel Hub Tebet · 06:00–08:00</span>
+              </div>
+              <div class="session-tags-row">
+                <span class="format-chip-sm">Americano</span>
+                <span class="format-chip-sm gray">PLAYER</span>
+                <span class="format-chip-sm gray">6 pemain · 5 round</span>
+              </div>
+              <div class="session-foot">
+                <div class="session-result loss">
+                  <span>⚡</span>
+                  <span>3/6 menang</span>
+                </div>
+                <span class="session-points-tag" style="background:var(--bg-canvas); color:var(--text-600);">+9 pts</span>
+              </div>
+            </div>
+          </a>
+
+          <a href="session-detail.html" class="session-list-item past">
+            <div class="session-date-block">
+              <div class="sd-day">FRI</div>
+              <div class="sd-num">25</div>
+              <div class="sd-month">APR</div>
+            </div>
+            <div class="session-info">
+              <div class="session-info-head">
+                <div class="session-info-title">Jumat Sore Padel · Pondok Indah</div>
+                <span class="session-status-pill completed">2mg lalu</span>
+              </div>
+              <div class="session-info-row">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>Pondok Indah Padel · 16:00–18:30</span>
+              </div>
+              <div class="session-tags-row">
+                <span class="format-chip-sm">Americano</span>
+                <span class="format-chip-sm coral">HOST</span>
+                <span class="format-chip-sm gray">8 pemain · 7 round</span>
+              </div>
+              <div class="session-foot">
+                <div class="session-result win">
+                  <span>🏆</span>
+                  <span>Menang 4/7</span>
+                </div>
+                <span class="session-points-tag win">+15 pts</span>
+              </div>
+            </div>
+          </a>
+
+          <!-- Show more -->
+          <button style="background:var(--bg-soft); border:1.5px dashed var(--border); border-radius:var(--r-lg); padding:14px; font-family:var(--font-display); font-weight:700; font-size:13px; color:var(--text-700); margin-top:8px;" onclick="showToast('Load 8 session lagi...')">
+            Lihat 8 session lainnya
+          </button>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+      <a href="index.html" class="nav-item">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3l9 9"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></svg>
+        <span>Home</span>
+      </a>
+      <a href="sessions.html" class="nav-item active">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <span>Sessions</span>
+      </a>
+      <a href="create-session.html" class="nav-item fab-wrap">
+        <div class="nav-fab">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        </div>
+        <span>Create</span>
+      </a>
+      <a href="leaderboard.html" class="nav-item">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5A2.5 2.5 0 0 1 2 6.5V6h4M18 9h1.5A2.5 2.5 0 0 0 22 6.5V6h-4"/><path d="M6 22h12M9 22V12.5M15 22V12.5"/><path d="M6 6V2h12v8a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V6z"/></svg>
+        <span>Leaderboard</span>
+      </a>
+      <a href="profile.html" class="nav-item">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+        <span>Profile</span>
+      </a>
+    </nav>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+  </div>
+
+  <script>
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._tt);
+      window._tt = setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.list-tab').forEach(t => t.classList.remove('active'));
+      document.querySelector(`.list-tab[data-tab="${tabName}"]`).classList.add('active');
+
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector(`.tab-content[data-content="${tabName}"]`).classList.add('active');
+    }
+  </script>
+</body>
+</html>

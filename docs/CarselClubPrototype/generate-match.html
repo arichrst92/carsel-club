@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Generate Match — Carsel Club</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    /* Inline tweaks for player toggle row */
+    .pt-list { display: flex; flex-direction: column; gap: 8px; }
+    .pt-item {
+      background: var(--bg);
+      border: 1px solid var(--border-light);
+      border-radius: var(--r-md);
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.15s;
+    }
+    .pt-item.off { opacity: 0.55; background: var(--bg-soft); }
+    .pt-avatar {
+      width: 36px; height: 36px;
+      border-radius: var(--r-full);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .pt-info { flex: 1; min-width: 0; }
+    .pt-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text-900);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 1px;
+    }
+    .pt-meta {
+      font-size: 11px;
+      color: var(--text-500);
+      font-weight: 700;
+    }
+    .pt-subhead {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 11px;
+      color: var(--text-500);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+      padding: 0 4px;
+    }
+    .session-chip-banner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--primary-50);
+      border: 1px solid var(--primary-100);
+      border-radius: var(--r-md);
+      padding: 10px 12px;
+    }
+    .session-chip-banner .scb-icon {
+      width: 32px; height: 32px;
+      border-radius: var(--r-md);
+      background: var(--primary);
+      color: white;
+      display: grid; place-items: center;
+      flex-shrink: 0;
+    }
+    .session-chip-banner .scb-info { flex: 1; }
+    .session-chip-banner .scb-label {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--primary-700);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .session-chip-banner .scb-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text-900);
+    }
+    .summary-card {
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+      color: white;
+      border-radius: var(--r-xl);
+      padding: var(--s-4);
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+    }
+    .summary-card::before {
+      content: '';
+      position: absolute;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(20,184,166,0.18), transparent 70%);
+      top: -60px; right: -50px;
+    }
+    .summary-card > * { position: relative; z-index: 1; }
+    .summary-head {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: var(--s-3);
+    }
+    .summary-head-emoji { font-size: 22px; }
+    .summary-head-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 16px;
+    }
+    .summary-grid-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .summary-grid-label {
+      font-size: 10px;
+      font-weight: 800;
+      opacity: 0.7;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .summary-grid-value {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="subscreen-header">
+      <button class="back-btn" onclick="window.location.href='session-detail.html'" aria-label="Back">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <h2 class="subscreen-title">Generate Match</h2>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="app-content subscreen with-footer">
+
+      <!-- Session Context Banner -->
+      <section class="session-chip-banner">
+        <div class="scb-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        </div>
+        <div class="scb-info">
+          <div class="scb-label">Round Set #1</div>
+          <div class="scb-name">Sabtu Sore Padel · 2 courts</div>
+        </div>
+      </section>
+
+      <!-- MODE -->
+      <section class="form-section">
+        <div class="form-section-head">
+          <div class="sec-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6M12 18v4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M18 12h4"/></svg>
+          </div>
+          <h3>Mode Generate</h3>
+        </div>
+        <div class="segmented" id="seg-mode">
+          <button type="button" class="segmented-option active" data-val="auto">
+            <span>⚡ Auto</span>
+            <span class="seg-sub">Random + smart</span>
+          </button>
+          <button type="button" class="segmented-option" data-val="manual" onclick="showToast('Manual drag-drop akan tersedia di v1.5')">
+            <span>✋ Manual <span class="badge soon">Soon</span></span>
+            <span class="seg-sub">Drag & drop</span>
+          </button>
+        </div>
+        <p class="form-help" id="mode-help">Algoritma random + hindari partner berulang dalam round set ini.</p>
+      </section>
+
+      <!-- ROUND COUNT -->
+      <section class="form-section">
+        <div class="form-section-head">
+          <div class="sec-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+          </div>
+          <h3>Jumlah Round</h3>
+        </div>
+        <div class="segmented" id="seg-round">
+          <button type="button" class="segmented-option active" data-val="auto">
+            <span>Auto</span>
+            <span class="seg-sub">Smart default</span>
+          </button>
+          <button type="button" class="segmented-option" data-val="manual">
+            <span>Manual</span>
+            <span class="seg-sub">Set sendiri</span>
+          </button>
+        </div>
+        <div id="round-manual" style="display:none; margin-top:8px;">
+          <div class="stepper">
+            <button type="button" class="stepper-btn" onclick="adjustStep('roundCount', -1, 1, 30)">−</button>
+            <div class="stepper-value" id="roundCount">7</div>
+            <button type="button" class="stepper-btn" onclick="adjustStep('roundCount', 1, 1, 30)">+</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- WHO'S PLAYING -->
+      <section class="form-section">
+        <div class="form-section-head">
+          <div class="sec-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><circle cx="17" cy="7" r="3"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg>
+          </div>
+          <h3>Siapa Yang Main? <span style="font-size:11px; color:var(--text-500); font-weight:700;"><span id="activeCount">8</span> / 8 aktif</span></h3>
+        </div>
+        <p class="form-help">Toggle off pemain yang tidak ikut main round set ini (misal: host hanya organize, atau pemain istirahat).</p>
+
+        <!-- Host & Co-Host -->
+        <div>
+          <div class="pt-subhead">Host & Co-Host</div>
+          <div class="pt-list">
+            <div class="pt-item" data-id="ari">
+              <div class="pt-avatar" style="background: linear-gradient(135deg, #FB7185, #F43F5E);">A</div>
+              <div class="pt-info">
+                <div class="pt-name">
+                  <span>Ari Christian</span>
+                  <span class="role-badge host">Host</span>
+                </div>
+                <div class="pt-meta">🥈 Intermediate · 740 pts</div>
+              </div>
+              <button class="toggle on" onclick="togglePlayer('ari', this)"></button>
+            </div>
+            <div class="pt-item" data-id="dimas">
+              <div class="pt-avatar" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);">D</div>
+              <div class="pt-info">
+                <div class="pt-name">
+                  <span>Dimas Aryo</span>
+                  <span class="role-badge cohost">Co-host</span>
+                </div>
+                <div class="pt-meta">🏅 Advanced · 1,420 pts</div>
+              </div>
+              <button class="toggle on" onclick="togglePlayer('dimas', this)"></button>
+            </div>
+            <div class="pt-item" data-id="rizki">
+              <div class="pt-avatar" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);">R</div>
+              <div class="pt-info">
+                <div class="pt-name">
+                  <span>Rizki Pratama</span>
+                  <span class="role-badge cohost">Co-host</span>
+                </div>
+                <div class="pt-meta">🥈 Intermediate · 510 pts</div>
+              </div>
+              <button class="toggle on" onclick="togglePlayer('rizki', this)"></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Members & Guest -->
+        <div style="margin-top: var(--s-3);">
+          <div class="pt-subhead">Members & Guest</div>
+          <div class="pt-list">
+            <div class="pt-item" data-id="maya">
+              <div class="pt-avatar" style="background: linear-gradient(135deg, #06B6D4, #0EA5E9);">M</div>
+              <div class="pt-info">
+                <div class="pt-name"><span>Maya Sari</span></div>
+                <div class="pt-meta">🏅 Advanced · 1,150 pts</div>
+              </div>
+              <button class="toggle on" onclick="togglePlayer('maya', this)"></button>
+            </div>
+            <div class="pt-item" data-id="budi">
+              <div class="pt-avatar" style="background: linear-gradient(135deg, #FACC15, #F59E0B);">B</div>
+              <div class="pt-info">
+                <div class="pt-name"><span>Budi Santoso</span></div>
+                <div class="pt-meta">⚪ Rookie · 180 pts</div>
+              </div>
+              <button class="toggle on" onclick="togglePlayer('budi', this)"></button>
+            </div>
+            <div class="pt-item" data-id="sari">
+              <div class="pt-avatar" style="background: linear-gradient(135deg, #84CC16, #65A30D);">S</div>
+              <div class="pt-info">
+                <div class="pt-name"><span>Sari Wulan</span></div>
+                <div class="pt-meta">🥈 Intermediate · 320 pts</div>
+              </div>
+              <button class="toggle on" onclick="togglePlayer('sari', this)"></button>
+            </div>
+            <div class="pt-item" data-id="rio">
+              <div class="pt-avatar" style="background: linear-gradient(135deg, #06B6D4, #0EA5E9);">R</div>
+              <div class="pt-info">
+                <div class="pt-name"><span>Rio Hartono</span></div>
+                <div class="pt-meta">👑 Pro · 3,250 pts</div>
+              </div>
+              <button class="toggle on" onclick="togglePlayer('rio', this)"></button>
+            </div>
+            <div class="pt-item" data-id="ekosari">
+              <div class="pt-avatar" style="background: var(--bg-canvas); color: var(--text-500); border: 2px dashed var(--text-300); width:32px; height:32px;">P</div>
+              <div class="pt-info">
+                <div class="pt-name">
+                  <span>Pak Eko</span>
+                  <span class="role-badge guest">Guest</span>
+                </div>
+                <div class="pt-meta">No tier · session-only</div>
+              </div>
+              <button class="toggle on" onclick="togglePlayer('ekosari', this)"></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div style="display:flex; gap:8px; margin-top: var(--s-3);">
+          <button type="button" style="flex:1; padding:10px; background:var(--bg-soft); border:1.5px solid var(--border); border-radius:var(--r-md); font-family:var(--font-display); font-weight:700; font-size:12px; color:var(--text-700);" onclick="toggleAll(true)">Semua ON</button>
+          <button type="button" style="flex:1; padding:10px; background:var(--bg-soft); border:1.5px solid var(--border); border-radius:var(--r-md); font-family:var(--font-display); font-weight:700; font-size:12px; color:var(--text-700);" onclick="toggleHostOff()">Host & Co-host OFF</button>
+        </div>
+      </section>
+
+      <!-- SUMMARY -->
+      <section class="summary-card">
+        <div class="summary-head">
+          <span class="summary-head-emoji">⚡</span>
+          <span class="summary-head-title">Preview Match Round Set</span>
+        </div>
+        <div class="summary-grid">
+          <div class="summary-grid-item">
+            <div>
+              <div class="summary-grid-label">Mode</div>
+              <div class="summary-grid-value" id="sm-mode">Auto Generate</div>
+            </div>
+          </div>
+          <div class="summary-grid-item">
+            <div>
+              <div class="summary-grid-label">Round</div>
+              <div class="summary-grid-value" id="sm-round">7 round (auto)</div>
+            </div>
+          </div>
+          <div class="summary-grid-item">
+            <div>
+              <div class="summary-grid-label">Pemain Main</div>
+              <div class="summary-grid-value" id="sm-players">8 dari 8</div>
+            </div>
+          </div>
+          <div class="summary-grid-item">
+            <div>
+              <div class="summary-grid-label">Court Distribusi</div>
+              <div class="summary-grid-value" id="sm-distribution">2 court · 8 main · 0 sit-out</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- STICKY FOOTER -->
+    <div class="sticky-footer dual">
+      <button class="btn-secondary-lg" onclick="window.location.href='session-detail.html'">
+        <span>Cancel</span>
+      </button>
+      <button class="btn-primary-lg" onclick="generateMatch()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        <span>Generate</span>
+      </button>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+  </div>
+
+  <script>
+    const totalPlayers = 8;
+    let activeCount = 8;
+    let courts = 2;
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._tt);
+      window._tt = setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    function updateActiveCount() {
+      activeCount = document.querySelectorAll('.pt-item .toggle.on').length;
+      document.getElementById('activeCount').textContent = activeCount;
+      updateSummary();
+    }
+
+    function togglePlayer(id, btn) {
+      btn.classList.toggle('on');
+      const item = btn.closest('.pt-item');
+      item.classList.toggle('off');
+      updateActiveCount();
+    }
+
+    function toggleAll(on) {
+      document.querySelectorAll('.pt-item').forEach(item => {
+        const t = item.querySelector('.toggle');
+        if (on) {
+          t.classList.add('on');
+          item.classList.remove('off');
+        } else {
+          t.classList.remove('on');
+          item.classList.add('off');
+        }
+      });
+      updateActiveCount();
+    }
+
+    function toggleHostOff() {
+      ['ari', 'dimas', 'rizki'].forEach(id => {
+        const item = document.querySelector(`.pt-item[data-id="${id}"]`);
+        const t = item.querySelector('.toggle');
+        t.classList.remove('on');
+        item.classList.add('off');
+      });
+      ['maya','budi','sari','rio','ekosari'].forEach(id => {
+        const item = document.querySelector(`.pt-item[data-id="${id}"]`);
+        const t = item.querySelector('.toggle');
+        t.classList.add('on');
+        item.classList.remove('off');
+      });
+      updateActiveCount();
+    }
+
+    function adjustStep(id, delta, min, max) {
+      const el = document.getElementById(id);
+      let v = parseInt(el.textContent, 10) + delta;
+      if (v < min) v = min;
+      if (v > max) v = max;
+      el.textContent = v;
+      updateSummary();
+    }
+
+    function getMode() {
+      return document.querySelector('#seg-mode .segmented-option.active').dataset.val;
+    }
+    function getRoundMode() {
+      return document.querySelector('#seg-round .segmented-option.active').dataset.val;
+    }
+
+    function updateSummary() {
+      const mode = getMode();
+      const roundMode = getRoundMode();
+      const roundCount = roundMode === 'auto' ? Math.max(activeCount - 1, 1) : parseInt(document.getElementById('roundCount').textContent, 10);
+
+      document.getElementById('sm-mode').textContent = mode === 'auto' ? 'Auto Generate' : 'Manual Drag-Drop';
+      document.getElementById('sm-round').textContent = roundMode === 'auto'
+        ? `${roundCount} round (auto)`
+        : `${roundCount} round (manual)`;
+      document.getElementById('sm-players').textContent = `${activeCount} dari ${totalPlayers}`;
+
+      const playPerRound = Math.min(activeCount, courts * 4);
+      const sitOut = Math.max(0, activeCount - playPerRound);
+      document.getElementById('sm-distribution').textContent = `${courts} court · ${playPerRound} main · ${sitOut} sit-out per round`;
+    }
+
+    // Segmented controls
+    document.querySelectorAll('.segmented').forEach(group => {
+      group.querySelectorAll('.segmented-option:not(.disabled)').forEach(btn => {
+        btn.addEventListener('click', () => {
+          group.querySelectorAll('.segmented-option').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          if (group.id === 'seg-round') {
+            const isManual = btn.dataset.val === 'manual';
+            document.getElementById('round-manual').style.display = isManual ? 'flex' : 'none';
+          }
+          if (group.id === 'seg-mode') {
+            const isAuto = btn.dataset.val === 'auto';
+            document.getElementById('mode-help').textContent = isAuto
+              ? 'Algoritma random + hindari partner berulang dalam round set ini.'
+              : 'Susun pasangan & lawan secara manual via drag-drop.';
+          }
+          updateSummary();
+        });
+      });
+    });
+
+    function generateMatch() {
+      if (activeCount < 4) {
+        showToast('Minimal 4 pemain harus aktif untuk generate match');
+        return;
+      }
+      const btn = document.querySelectorAll('.btn-primary-lg')[0];
+      btn.classList.add('loading');
+      btn.querySelector('span').textContent = 'Generating...';
+      setTimeout(() => {
+        window.location.href = 'match-list.html';
+      }, 900);
+    }
+
+    // Init
+    updateSummary();
+  </script>
+</body>
+</html>

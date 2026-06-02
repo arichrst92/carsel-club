@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Help & Support — Carsel Club</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="subscreen-header">
+      <button class="back-btn" onclick="window.location.href='profile.html'" aria-label="Back">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <h2 class="subscreen-title">Help & Support</h2>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="app-content subscreen">
+
+      <!-- Search FAQ -->
+      <section>
+        <div class="form-group">
+          <div class="input-with-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" id="faqSearch" class="form-input" placeholder="Cari pertanyaan..." oninput="filterFAQ()">
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact Quick Access -->
+      <section>
+        <div class="section-head">
+          <h3>Hubungi Kami</h3>
+        </div>
+        <div class="contact-row">
+          <a href="#" class="contact-card" onclick="event.preventDefault(); showToast('Membuka WhatsApp ke 0811-xxxx-xxxx')">
+            <div class="contact-card-icon whatsapp">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
+            </div>
+            <div class="contact-card-info">
+              <div class="contact-card-title">Chat WhatsApp</div>
+              <div class="contact-card-sub">Senin–Jumat · 09:00–17:00 WIB · Response 30 menit</div>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-400);"><path d="M9 18l6-6-6-6"/></svg>
+          </a>
+          <a href="#" class="contact-card" onclick="event.preventDefault(); showToast('Membuka email ke support@carsel.club')">
+            <div class="contact-card-icon email">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <div class="contact-card-info">
+              <div class="contact-card-title">Email Support</div>
+              <div class="contact-card-sub">support@carsel.club · Response 1 hari kerja</div>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-400);"><path d="M9 18l6-6-6-6"/></svg>
+          </a>
+          <a href="#" class="contact-card" onclick="event.preventDefault(); showToast('Form feedback — segera dibuat')">
+            <div class="contact-card-icon feedback">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="contact-card-info">
+              <div class="contact-card-title">Send Feedback</div>
+              <div class="contact-card-sub">Saran, bug report, fitur request</div>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-400);"><path d="M9 18l6-6-6-6"/></svg>
+          </a>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section>
+        <div class="section-head">
+          <h3>Frequently Asked Questions</h3>
+          <span style="color:var(--text-500); font-size:11px; font-weight:700;">14 pertanyaan</span>
+        </div>
+        <div class="faq-list" id="faqList">
+          <!-- Rendered via JS -->
+        </div>
+      </section>
+
+      <!-- Legal -->
+      <section>
+        <div class="section-head">
+          <h3>Legal</h3>
+        </div>
+        <div class="settings-list">
+          <button class="settings-item" onclick="showToast('Terms of Service')">
+            <div class="settings-item-icon gray">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="settings-item-text">Terms of Service</div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="settings-item-arrow"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="settings-item" onclick="showToast('Privacy Policy')">
+            <div class="settings-item-icon gray">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div class="settings-item-text">Privacy Policy</div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="settings-item-arrow"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="settings-item" onclick="showToast('Community Guidelines')">
+            <div class="settings-item-icon gray">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            </div>
+            <div class="settings-item-text">Community Guidelines</div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="settings-item-arrow"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- Version -->
+      <section style="text-align:center; padding:var(--s-3); margin-top:var(--s-2);">
+        <div style="font-size:11px; font-weight:700; color:var(--text-400); letter-spacing:0.04em; line-height:1.6;">
+          Carsel Club · v1.0 (Closed Beta)<br>
+          Build 2026.05.10 · made with 🎾 in Indonesia
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+  </div>
+
+  <script>
+    const faqs = [
+      { q: 'Bagaimana cara bikin session?', a: 'Klik tombol + (Create) di bottom navigation, isi info session (mode, lokasi, waktu), invite pemain via WhatsApp.', cat: 'session' },
+      { q: 'Bedanya Americano vs Mexicano apa?', a: 'Americano: partner & lawan rotate setiap round (semua main bareng/lawan semua). Mexicano: pairing per round berdasarkan ranking saat itu — top vs bottom (lebih kompetitif). Mexicano akan tersedia di v1.5.', cat: 'format' },
+      { q: 'Apa itu Match Round Set?', a: 'Match Round Set adalah batch matches yang di-generate dalam 1 kali "Generate Match". Kamu bisa bikin extra Match Round Set kapan saja saat session jalan kalau pemain mau lanjut.', cat: 'format' },
+      { q: 'Bagaimana point dihitung?', a: 'Setiap match: Menang +3 pts, Kalah +1 pt, Draw +2 pts. Point akumulasi seumur hidup, tidak ada Elo. Match end di-trigger manual oleh host/co-host.', cat: 'point' },
+      { q: 'Berapa tier yang tersedia?', a: '6 tier: Rookie → Intermediate → Advanced → Pro → Elite → Master. Naik tier butuh point + match minimum. Tidak ada relegation.', cat: 'tier' },
+      { q: 'Bisa main tanpa daftar akun?', a: 'Bisa, sebagai Guest. Host bisa add Guest by name saja. Point Guest hanya muncul di session itu, tidak masuk ke profile. Untuk leaderboard global, butuh sign up.', cat: 'akun' },
+      { q: 'Bagaimana cara invite teman?', a: 'Di Session Detail, klik "Invite via WhatsApp" — sistem generate link untuk dibagikan. Yang klik link bisa join session (kalau private invite-only, atau auto-join kalau public).', cat: 'session' },
+      { q: 'Co-host bisa apa?', a: 'Co-host punya permission sama persis dengan Host (bisa input score, edit pemain, manage match). Penting karena host sering ikut main, jadi co-host bisa handle scoring saat host main.', cat: 'session' },
+      { q: 'Match boleh di-pause atau dimulai ulang?', a: 'Bisa pause via tombol Pause di Match Scoring. Untuk reset score, host/co-host bisa undo per point atau set score manual.', cat: 'match' },
+      { q: 'Bagaimana share live link?', a: 'Di Match Scoring atau Match List, klik menu (3 dots) → Share Live Link. Link bisa dibagi via WhatsApp dan viewer bisa lihat live score tanpa login.', cat: 'sharing' },
+      { q: 'Cara delete akun?', a: 'Profile → Privacy → Delete Account. Note: data permanent dihapus dan tidak bisa dipulihkan.', cat: 'akun' },
+      { q: 'Apakah Carsel Club berbayar?', a: 'Saat ini Free untuk circle padel sendiri (closed beta). Public open di v2 nanti masih free dengan fitur premium opsional.', cat: 'akun' },
+      { q: 'Bisa pake di iOS/Android?', a: 'Saat ini web-based mobile responsive (PWA). Native iOS/Android app akan dirilis nanti setelah validasi MVP.', cat: 'umum' },
+      { q: 'Data privacy bagaimana?', a: 'Kami tidak share data kamu ke pihak ketiga. Detail lengkap di Privacy Policy. Kamu bisa download semua data atau request delete kapan saja di Profile → Privacy.', cat: 'akun' }
+    ];
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._tt);
+      window._tt = setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    function renderFAQ(filter = '') {
+      const f = filter.toLowerCase();
+      const filtered = filter ? faqs.filter(x => x.q.toLowerCase().includes(f) || x.a.toLowerCase().includes(f)) : faqs;
+      const list = document.getElementById('faqList');
+      if (filtered.length === 0) {
+        list.innerHTML = `<div style="text-align:center; padding:var(--s-5) var(--s-3); color:var(--text-400); font-size:13px; font-weight:600;">Tidak ada FAQ yang cocok dengan "${filter}"</div>`;
+        return;
+      }
+      list.innerHTML = filtered.map((x, i) => `
+        <div class="faq-item" data-idx="${i}">
+          <button class="faq-question" onclick="toggleFAQ(${i})">
+            <div class="faq-q-icon">?</div>
+            <div class="faq-q-text">${x.q}</div>
+            <svg class="faq-toggle" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="faq-answer">${x.a}</div>
+        </div>
+      `).join('');
+    }
+
+    function toggleFAQ(idx) {
+      document.querySelectorAll('.faq-item').forEach(item => {
+        if (item.dataset.idx === idx.toString()) {
+          item.classList.toggle('open');
+        } else {
+          item.classList.remove('open');
+        }
+      });
+    }
+
+    function filterFAQ() {
+      const v = document.getElementById('faqSearch').value;
+      renderFAQ(v);
+    }
+
+    renderFAQ();
+  </script>
+</body>
+</html>

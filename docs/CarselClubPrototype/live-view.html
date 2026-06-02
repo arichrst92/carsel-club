@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>LIVE — Sabtu Sore Padel · Carsel Club</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- PUBLIC HEADER (branded for marketing) -->
+    <header class="public-header">
+      <div class="logo">
+        <div class="logo-mark">CC</div>
+        <span class="logo-text">Carsel Club</span>
+      </div>
+      <button class="btn-pill" onclick="showToast('Install app — coming soon!')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+        <span>Get the App</span>
+      </button>
+    </header>
+
+    <!-- CONTENT (no bottom nav, no padding-bottom for nav) -->
+    <main class="app-content" style="padding-bottom: var(--s-6);">
+
+      <!-- LIVE HERO -->
+      <section class="live-hero">
+        <div class="live-hero-status">
+          <span class="live-pill" style="background:rgba(255,255,255,0.22); color:white;">
+            <span class="live-dot" style="background:#FACC15;"></span>
+            <span>LIVE</span>
+          </span>
+          <span style="font-size:11px; font-weight:800; opacity:0.9; letter-spacing:0.06em; text-transform:uppercase;">Auto-refresh setiap 5 detik</span>
+        </div>
+        <div class="live-hero-title">Sabtu Sore Padel</div>
+        <div class="live-hero-meta">
+          <div class="live-hero-meta-row">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <span>Round 3 of 7 · 20 min played</span>
+          </div>
+          <div class="live-hero-meta-row">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>GBK Padel Court · 2 lapangan</span>
+          </div>
+          <div class="live-hero-meta-row">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            <span>Hosted by Ari Christian · 8 pemain</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- COURT 1 -->
+      <section>
+        <div class="live-court-card">
+          <div class="live-court-head">
+            <div class="live-court-head-left">
+              <span style="display:inline-flex; align-items:center; gap:5px;">
+                <span class="live-dot" style="width:7px; height:7px; background:var(--accent); border-radius:50%; animation:pulse 1.2s ease-in-out infinite;"></span>
+                <span>Court 1 · Match #5</span>
+              </span>
+            </div>
+            <div class="live-court-head-time">8 min</div>
+          </div>
+          <div class="live-court-body">
+            <div class="padel-court mini">
+              <div class="court-score-overlay top">14</div>
+
+              <div class="court-team top">
+                <div class="court-team-positions">
+                  <div class="court-player team-1">
+                    <div class="cp-avatar">A</div>
+                    <div class="cp-name">Ari</div>
+                    <div class="cp-tier">INT</div>
+                  </div>
+                  <div class="court-player team-1">
+                    <div class="cp-avatar">D</div>
+                    <div class="cp-name">Dimas</div>
+                    <div class="cp-tier">ADV</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="court-net">
+                <span class="court-net-label">NET</span>
+              </div>
+
+              <div class="court-team bottom">
+                <div class="court-team-positions">
+                  <div class="court-player team-2">
+                    <div class="cp-avatar">M</div>
+                    <div class="cp-name">Maya</div>
+                    <div class="cp-tier">ADV</div>
+                  </div>
+                  <div class="court-player team-2">
+                    <div class="cp-avatar">R</div>
+                    <div class="cp-name">Rizki</div>
+                    <div class="cp-tier">INT</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="court-score-overlay bottom">11</div>
+            </div>
+
+            <div class="live-team-strip">
+              <div class="lts-team">
+                <span class="lts-name">Ari · Dimas</span>
+              </div>
+              <div class="lts-vs">vs</div>
+              <div class="lts-team right">
+                <span class="lts-name">Maya · Rizki</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- COURT 2 -->
+      <section>
+        <div class="live-court-card">
+          <div class="live-court-head">
+            <div class="live-court-head-left">
+              <span style="display:inline-flex; align-items:center; gap:5px;">
+                <span class="live-dot" style="width:7px; height:7px; background:var(--accent); border-radius:50%; animation:pulse 1.2s ease-in-out infinite;"></span>
+                <span>Court 2 · Match #6</span>
+              </span>
+            </div>
+            <div class="live-court-head-time">6 min</div>
+          </div>
+          <div class="live-court-body">
+            <div class="padel-court mini">
+              <div class="court-score-overlay top">9</div>
+
+              <div class="court-team top">
+                <div class="court-team-positions">
+                  <div class="court-player team-1">
+                    <div class="cp-avatar">B</div>
+                    <div class="cp-name">Budi</div>
+                    <div class="cp-tier">ROOK</div>
+                  </div>
+                  <div class="court-player team-1">
+                    <div class="cp-avatar">P</div>
+                    <div class="cp-name">Pak Eko</div>
+                    <div class="cp-tier">GST</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="court-net">
+                <span class="court-net-label">NET</span>
+              </div>
+
+              <div class="court-team bottom">
+                <div class="court-team-positions">
+                  <div class="court-player team-2">
+                    <div class="cp-avatar">R</div>
+                    <div class="cp-name">Rio</div>
+                    <div class="cp-tier">PRO</div>
+                  </div>
+                  <div class="court-player team-2">
+                    <div class="cp-avatar">S</div>
+                    <div class="cp-name">Sari</div>
+                    <div class="cp-tier">INT</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="court-score-overlay bottom">12</div>
+            </div>
+
+            <div class="live-team-strip">
+              <div class="lts-team">
+                <span class="lts-name">Budi · Pak Eko</span>
+              </div>
+              <div class="lts-vs">vs</div>
+              <div class="lts-team right">
+                <span class="lts-name">Rio · Sari</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TOP 3 LEADERBOARD PREVIEW -->
+      <section>
+        <div class="section-head">
+          <h3>🏆 Top 3 Pemimpin</h3>
+          <span style="color:var(--text-500); font-size:12px; font-weight:700;">After Round 3</span>
+        </div>
+        <div class="top3-preview">
+          <div class="top3-item">
+            <div class="top3-rank">🥇</div>
+            <div class="top3-avatar" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);">D</div>
+            <div class="top3-info">
+              <div class="top3-name">Dimas Aryo</div>
+              <div class="top3-tier">🏅 Advanced · 3W 1L</div>
+            </div>
+            <div class="top3-points">32 pts</div>
+          </div>
+          <div class="top3-item">
+            <div class="top3-rank">🥈</div>
+            <div class="top3-avatar" style="background: linear-gradient(135deg, #06B6D4, #0EA5E9);">M</div>
+            <div class="top3-info">
+              <div class="top3-name">Maya Sari</div>
+              <div class="top3-tier">🏅 Advanced · 2W 2L</div>
+            </div>
+            <div class="top3-points">28 pts</div>
+          </div>
+          <div class="top3-item">
+            <div class="top3-rank">🥉</div>
+            <div class="top3-avatar" style="background: linear-gradient(135deg, #FB7185, #F43F5E);">A</div>
+            <div class="top3-info">
+              <div class="top3-name">Ari Christian</div>
+              <div class="top3-tier">🥈 Intermediate · 2W 2L</div>
+            </div>
+            <div class="top3-points">24 pts</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- INSTALL CTA BANNER -->
+      <section>
+        <div class="install-banner">
+          <div class="install-banner-emoji">🎾</div>
+          <div class="install-banner-title">Mau bikin session padelmu sendiri?</div>
+          <div class="install-banner-sub">Carsel Club — atur session, scoring, dan share match ke komunitasmu. Gratis untuk circle padel.</div>
+          <button class="install-banner-cta" onclick="showToast('Install Carsel Club — coming soon!')">
+            <span>Get Carsel Club</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <section class="public-footer">
+        <div>Powered by Carsel Club</div>
+        <div style="margin-top:4px; opacity:0.7;">carsel.club/live/x7k2</div>
+      </section>
+
+    </main>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+  </div>
+
+  <script>
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._tt);
+      window._tt = setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    // Simulasi auto-refresh: tick the time every 5s
+    let ticks = 0;
+    setInterval(() => {
+      ticks++;
+      // Simulate score changing occasionally for demo realism
+      if (ticks % 4 === 0) {
+        const scores = document.querySelectorAll('.court-score-overlay');
+        const idx = Math.floor(Math.random() * scores.length);
+        const cur = parseInt(scores[idx].textContent, 10);
+        scores[idx].textContent = cur + 1;
+        scores[idx].style.transition = 'transform 0.18s';
+        scores[idx].style.transform = 'translateX(-50%) scale(1.2)';
+        setTimeout(() => {
+          scores[idx].style.transform = 'translateX(-50%) scale(1)';
+        }, 200);
+      }
+    }, 5000);
+  </script>
+</body>
+</html>

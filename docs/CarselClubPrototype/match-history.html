@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Match History — Carsel Club</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="subscreen-header">
+      <button class="back-btn" onclick="window.location.href='profile.html'" aria-label="Back">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <h2 class="subscreen-title">Match History</h2>
+      <button class="menu-btn" onclick="showToast('Filter & sort lanjutan — segera dibuat')" aria-label="Filter">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
+      </button>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="app-content subscreen">
+
+      <!-- INSIGHTS -->
+      <section>
+        <div class="section-head">
+          <h3>Insights</h3>
+          <span style="color:var(--text-500); font-size:12px; font-weight:700;">Last 30 days</span>
+        </div>
+        <div class="history-insights">
+          <!-- Featured: Win Rate -->
+          <div class="insight-card featured">
+            <div class="insight-icon">📈</div>
+            <div class="insight-label">Win Rate · 30 hari terakhir</div>
+            <div class="insight-value">62%</div>
+            <div class="insight-value-sub">15 menang dari 24 match</div>
+            <div class="insight-trend">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/></svg>
+              <span>+4% dari bulan lalu</span>
+            </div>
+          </div>
+
+          <div class="insight-card">
+            <div class="insight-icon">🤝</div>
+            <div class="insight-label">Best Partner</div>
+            <div class="insight-value-sub" style="font-size:14px; margin-top:0;">Dimas Aryo</div>
+            <div style="font-family: var(--font-display); font-weight:800; font-size:18px; color:var(--success); margin-top:4px;">8W 2L</div>
+            <div style="font-size:10px; color:var(--text-500); font-weight:700; margin-top:2px;">80% bareng dia</div>
+          </div>
+
+          <div class="insight-card">
+            <div class="insight-icon">⚔️</div>
+            <div class="insight-label">Most Played vs</div>
+            <div class="insight-value-sub" style="font-size:14px; margin-top:0;">Maya Sari</div>
+            <div style="font-family: var(--font-display); font-weight:800; font-size:18px; color:var(--text-900); margin-top:4px;">6W 4L</div>
+            <div style="font-size:10px; color:var(--text-500); font-weight:700; margin-top:2px;">10 head-to-head</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FILTER TABS -->
+      <section class="list-tabs">
+        <button class="list-tab active" data-tab="all" onclick="filterMatches('all')">
+          <span>Semua</span>
+          <span class="tab-count">47</span>
+        </button>
+        <button class="list-tab" data-tab="win" onclick="filterMatches('win')">
+          <span>🏆 Menang</span>
+          <span class="tab-count">27</span>
+        </button>
+        <button class="list-tab" data-tab="loss" onclick="filterMatches('loss')">
+          <span>⚡ Kalah</span>
+          <span class="tab-count">20</span>
+        </button>
+      </section>
+
+      <!-- MATCH LIST -->
+      <div id="matchListContainer">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- LOAD MORE -->
+      <section style="margin-top:var(--s-2);">
+        <button style="background:var(--bg-soft); border:1.5px dashed var(--border); border-radius:var(--r-lg); padding:14px; font-family:var(--font-display); font-weight:700; font-size:13px; color:var(--text-700); width:100%;" onclick="showToast('Load 10 match berikutnya...')">
+          Lihat Match Berikutnya
+        </button>
+      </section>
+
+    </main>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+  </div>
+
+  <script>
+    const matches = [
+      // Today
+      { id: 1, date: 'today', label: 'Hari Ini · 14:30', session: 'Sabtu Sore Padel', round: 3, court: 1, partner: 'Dimas (Adv)', opp: 'Maya (Adv) · Rizki (Int)', s1: 21, s2: 18, points: 18, dur: 12, role: 'host' },
+      { id: 2, date: 'today', label: 'Hari Ini · 13:50', session: 'Sabtu Sore Padel', round: 2, court: 2, partner: 'Sari (Int)', opp: 'Budi (Rookie) · Pak Eko (Guest)', s1: 18, s2: 15, points: 14, dur: 10, role: 'host' },
+      { id: 3, date: 'today', label: 'Hari Ini · 13:10', session: 'Sabtu Sore Padel', round: 1, court: 1, partner: 'Rizki (Int)', opp: 'Dimas (Adv) · Rio (Pro)', s1: 14, s2: 21, points: 6, dur: 15, role: 'host' },
+      // Yesterday
+      { id: 4, date: 'yesterday', label: 'Kemarin · 19:45', session: 'Rabu Malam Padel', round: 5, court: 1, partner: 'Maya (Adv)', opp: 'Rio (Pro) · Dimas (Adv)', s1: 17, s2: 21, points: 6, dur: 15, role: 'player' },
+      { id: 5, date: 'yesterday', label: 'Kemarin · 19:00', session: 'Rabu Malam Padel', round: 3, court: 2, partner: 'Pak Eko (Guest)', opp: 'Sari (Int) · Lia (Int)', s1: 21, s2: 14, points: 18, dur: 11, role: 'player' },
+      // 5 days ago
+      { id: 6, date: 'week', label: '5 hari lalu', session: 'Mini Tournament Senayan', round: 6, court: 3, partner: 'Rizki (Int)', opp: 'Dimas (Adv) · Sari (Int)', s1: 21, s2: 19, points: 12, dur: 14, role: 'player' },
+      { id: 7, date: 'week', label: '6 hari lalu', session: 'Mini Tournament Senayan', round: 4, court: 1, partner: 'Lia (Int)', opp: 'Bagus (Adv) · Eka (Int)', s1: 16, s2: 21, points: 6, dur: 13, role: 'player' },
+      // 1-2 weeks ago
+      { id: 8, date: 'recent', label: '1 minggu lalu', session: 'Selasa Pagi Casual', round: 4, court: 1, partner: 'Pak Eko (Guest)', opp: 'Maya (Adv) · Sari (Int)', s1: 14, s2: 21, points: 6, dur: 11, role: 'player' },
+      { id: 9, date: 'recent', label: '2 minggu lalu', session: 'Jumat Sore Padel', round: 7, court: 2, partner: 'Dimas (Adv)', opp: 'Rio (Pro) · Lia (Int)', s1: 21, s2: 16, points: 18, dur: 13, role: 'host' },
+      { id: 10, date: 'recent', label: '2 minggu lalu', session: 'Jumat Sore Padel', round: 5, court: 1, partner: 'Maya (Adv)', opp: 'Sari (Int) · Budi (Rookie)', s1: 21, s2: 12, points: 18, dur: 9, role: 'host' }
+    ];
+
+    let currentFilter = 'all';
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._tt);
+      window._tt = setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    function filterMatches(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.list-tab').forEach(t => t.classList.remove('active'));
+      document.querySelector(`.list-tab[data-tab="${filter}"]`).classList.add('active');
+      render();
+    }
+
+    function isWin(m) { return m.s1 > m.s2; }
+
+    function renderMatch(m) {
+      const win = isWin(m);
+      const result = win ? 'W' : 'L';
+      const resultClass = win ? 'win' : 'loss';
+      const roleTag = m.role === 'host' ? '<span class="hi-tag" style="background:var(--accent-100); color:var(--accent-600);">HOST</span>' : '';
+      return `
+        <a href="match-detail.html" class="history-item">
+          <div class="result-badge ${resultClass}">
+            <div class="rb-result">${result}</div>
+            <div class="rb-points">+${m.points}</div>
+          </div>
+          <div class="hi-info">
+            <div class="hi-head">
+              <div class="hi-session">${m.session}</div>
+              <div class="hi-score">${m.s1} – ${m.s2}</div>
+            </div>
+            <div class="hi-meta-row">
+              <span>${m.label}</span>
+              <span>·</span>
+              <span>Round ${m.round} · Court ${m.court}</span>
+            </div>
+            <div class="hi-teams">
+              <div class="hi-team-row you">
+                <span class="hi-team-emoji">🎾</span>
+                <span>You · ${m.partner}</span>
+              </div>
+              <div class="hi-team-row vs">
+                <span class="hi-team-emoji">vs</span>
+                <span>${m.opp}</span>
+              </div>
+            </div>
+            <div class="hi-foot">
+              <div class="hi-foot-tags">
+                ${roleTag}
+                <span class="hi-tag">${m.dur} min</span>
+              </div>
+              <span style="color:var(--text-400);">→</span>
+            </div>
+          </div>
+        </a>
+      `;
+    }
+
+    function render() {
+      let filtered = matches;
+      if (currentFilter === 'win') filtered = matches.filter(isWin);
+      else if (currentFilter === 'loss') filtered = matches.filter(m => !isWin(m));
+
+      // Group by date bucket
+      const groups = {
+        today: { label: '🟢 Hari Ini', matches: [] },
+        yesterday: { label: 'Kemarin', matches: [] },
+        week: { label: 'Minggu Ini', matches: [] },
+        recent: { label: 'Bulan Ini', matches: [] }
+      };
+      filtered.forEach(m => groups[m.date]?.matches.push(m));
+
+      let html = '';
+      Object.entries(groups).forEach(([key, group]) => {
+        if (group.matches.length === 0) return;
+        html += `
+          <div class="date-group">
+            <div class="date-group-header">
+              <span class="date-group-title">${group.label}</span>
+              <span class="date-group-count">${group.matches.length} match</span>
+            </div>
+            <div class="match-history-list">
+              ${group.matches.map(renderMatch).join('')}
+            </div>
+          </div>
+        `;
+      });
+
+      if (filtered.length === 0) {
+        html = `<div style="text-align:center; padding: var(--s-6) var(--s-3); color:var(--text-400); font-size:13px; font-weight:600;">Tidak ada match dengan filter ini</div>`;
+      }
+
+      document.getElementById('matchListContainer').innerHTML = html;
+    }
+
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Friends — Carsel Club</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="subscreen-header">
+      <button class="back-btn" onclick="window.location.href='profile.html'" aria-label="Back">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <h2 class="subscreen-title">Friends</h2>
+      <button class="menu-btn" onclick="showToast('Add friend by code/QR — segera dibuat')" aria-label="Add Friend">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11l-3-3M19 8l3-3M19 11h-3"/></svg>
+      </button>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="app-content subscreen with-footer">
+
+      <!-- Stats Bar -->
+      <section class="friend-stats-bar">
+        <div class="friend-stat">
+          <div class="friend-stat-value">12</div>
+          <div class="friend-stat-label">Friends</div>
+        </div>
+        <div class="friend-stat">
+          <div class="friend-stat-value" style="color:var(--accent-600);">3</div>
+          <div class="friend-stat-label">Requests</div>
+        </div>
+        <div class="friend-stat">
+          <div class="friend-stat-value">42</div>
+          <div class="friend-stat-label">Sessions Bareng</div>
+        </div>
+      </section>
+
+      <!-- Tabs -->
+      <section class="list-tabs">
+        <button class="list-tab active" data-tab="friends" onclick="switchTab('friends')">
+          <span>Friends</span>
+          <span class="tab-count">12</span>
+        </button>
+        <button class="list-tab" data-tab="requests" onclick="switchTab('requests')">
+          <span>🔴 Requests</span>
+          <span class="tab-count">3</span>
+        </button>
+        <button class="list-tab" data-tab="discover" onclick="switchTab('discover')">
+          <span>✨ Discover</span>
+          <span class="tab-count">8</span>
+        </button>
+      </section>
+
+      <!-- Search -->
+      <section>
+        <div class="form-group">
+          <div class="input-with-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" id="searchInput" class="form-input" placeholder="Cari nama atau tier..." oninput="render()">
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB CONTENT -->
+      <div id="tabContent">
+        <!-- Rendered via JS -->
+      </div>
+
+    </main>
+
+    <!-- STICKY FOOTER -->
+    <div class="sticky-footer">
+      <button class="btn-primary-lg" onclick="showToast('Add friend modal: by username, by phone, atau scan QR')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11l-3-3M19 8l3-3M19 11h-3"/></svg>
+        <span>Tambah Friend</span>
+      </button>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+  </div>
+
+  <script>
+    const friendsData = {
+      friends: [
+        { name: 'Dimas Aryo', avatar: 'cohost', initial: 'D', tier: '🏅 Adv', city: 'Jakarta', meta: '12 sessions bareng · last 2 hari lalu' },
+        { name: 'Maya Sari', avatar: 'member-1', initial: 'M', tier: '🏅 Adv', city: 'Jakarta', meta: '8 sessions bareng · last 3 hari lalu' },
+        { name: 'Hadi Pranata', avatar: 'cohost', initial: 'H', tier: '🏅 Adv', city: 'Jakarta', meta: '12 sessions bareng · 1 minggu lalu' },
+        { name: 'Kira Anjani', avatar: 'member-3', initial: 'K', tier: '👑 Pro', city: 'Surabaya', meta: '8 sessions bareng' },
+        { name: 'Lia Karnia', avatar: 'member-1', initial: 'L', tier: '🥈 Int', city: 'Bali', meta: '5 sessions bareng' },
+        { name: 'Rizki Pratama', avatar: 'cohost', initial: 'R', tier: '🥈 Int', city: 'Jakarta', meta: '6 sessions bareng' },
+        { name: 'Citra Dewi', avatar: 'host', initial: 'C', tier: '🏅 Adv', city: 'Bandung', meta: '4 sessions bareng' },
+        { name: 'Roby Sutrisno', avatar: 'member-2', initial: 'R', tier: '🏅 Adv', city: 'Jakarta', meta: '3 sessions bareng' }
+      ],
+      requests: [
+        { name: 'Aldo Wijaya', avatar: 'member-1', initial: 'A', tier: '👑 Pro', city: 'Jakarta', meta: 'Mutual: 3 friend · 2 jam lalu', isRequest: true },
+        { name: 'Eka Putri', avatar: 'host', initial: 'E', tier: '🥈 Int', city: 'Yogya', meta: 'Mutual: 1 friend · kemarin', isRequest: true },
+        { name: 'Juan Kusuma', avatar: 'member-2', initial: 'J', tier: '⚪ Rookie', city: 'Jakarta', meta: 'Pemain baru · 3 hari lalu', isRequest: true }
+      ],
+      discover: [
+        { name: 'Nina Permata', avatar: 'member-3', initial: 'N', tier: '🏅 Adv', city: 'Bandung', meta: 'Mutual: 2 friend' },
+        { name: 'Bagus Setiawan', avatar: 'cohost', initial: 'B', tier: '🏅 Adv', city: 'Yogya', meta: 'Same tier · same city near' },
+        { name: 'Dewi Anggraini', avatar: 'host', initial: 'D', tier: '🏅 Adv', city: 'Medan', meta: 'Mutual: 1 friend' },
+        { name: 'Rio Hartono', avatar: 'member-1', initial: 'R', tier: '👑 Pro', city: 'Jakarta', meta: 'Top 50 in Jakarta' },
+        { name: 'Sari Wulan', avatar: 'member-2', initial: 'S', tier: '🥈 Int', city: 'Jakarta', meta: 'Same city' },
+        { name: 'Vina Lestari', avatar: 'member-3', initial: 'V', tier: '🥈 Int', city: 'Jakarta', meta: 'Top in your tier' }
+      ]
+    };
+
+    let currentTab = 'friends';
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._tt);
+      window._tt = setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.list-tab').forEach(t => t.classList.remove('active'));
+      document.querySelector(`.list-tab[data-tab="${tab}"]`).classList.add('active');
+      render();
+    }
+
+    function renderItem(p, type) {
+      let actions = '';
+      if (type === 'friends') {
+        actions = `
+          <button class="friend-row-action outline" onclick="event.stopPropagation(); event.preventDefault(); showToast('Invite ${p.name} ke session...')">Invite</button>
+        `;
+      } else if (type === 'requests') {
+        actions = `
+          <div style="display:flex; gap:6px; flex-shrink:0;">
+            <button class="friend-row-action coral" onclick="event.stopPropagation(); event.preventDefault(); showToast('Friend request dari ${p.name} di-decline')">✕</button>
+            <button class="friend-row-action" onclick="event.stopPropagation(); event.preventDefault(); showToast('Sekarang berteman dengan ${p.name}')">Accept</button>
+          </div>
+        `;
+      } else if (type === 'discover') {
+        actions = `
+          <button class="friend-row-action" onclick="event.stopPropagation(); event.preventDefault(); showToast('Friend request dikirim ke ${p.name}')">+ Add</button>
+        `;
+      }
+
+      return `
+        <div class="player-list-item">
+          <div class="player-avatar-lg ${p.avatar}">${p.initial}</div>
+          <div class="player-info">
+            <div class="player-name">
+              <span>${p.name}</span>
+              <span class="tier-badge" style="background: var(--bg-canvas); color: var(--text-700); font-size:10px;">${p.tier}</span>
+            </div>
+            <div class="player-meta-row">
+              <span style="font-size:10px;">📍 ${p.city}</span>
+              <span style="font-size:11px; color:var(--text-500);">· ${p.meta}</span>
+            </div>
+          </div>
+          ${actions}
+        </div>
+      `;
+    }
+
+    function render() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      let data = friendsData[currentTab];
+      if (search) {
+        data = data.filter(p =>
+          p.name.toLowerCase().includes(search) ||
+          p.tier.toLowerCase().includes(search) ||
+          p.city.toLowerCase().includes(search)
+        );
+      }
+
+      const container = document.getElementById('tabContent');
+      if (data.length === 0) {
+        container.innerHTML = `<div class="empty-hero">
+          <div class="empty-illustration" style="width:80px; height:80px; font-size:36px;">👥</div>
+          <div class="empty-title" style="font-size:16px;">Tidak ada hasil</div>
+          <div class="empty-desc" style="font-size:13px;">Coba search dengan keyword lain.</div>
+        </div>`;
+        return;
+      }
+
+      let header = '';
+      if (currentTab === 'friends') header = `<div class="sp-section-label">${data.length} Friends</div>`;
+      else if (currentTab === 'requests') header = `<div class="sp-section-label">${data.length} Friend Requests</div>`;
+      else if (currentTab === 'discover') header = `<div class="sp-section-label">Pemain yang Mungkin Kamu Kenal</div>`;
+
+      container.innerHTML = `${header}<div class="player-list">${data.map(p => renderItem(p, currentTab)).join('')}</div>`;
+    }
+
+    render();
+  </script>
+</body>
+</html>

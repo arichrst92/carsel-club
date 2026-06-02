@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Tambah Pemain — Carsel Club</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="modal-header">
+      <button class="modal-close" onclick="window.location.href='session-detail.html'" aria-label="Close">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M6 18L18 6"/></svg>
+      </button>
+      <h2 class="modal-title">Tambah Pemain</h2>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="app-content subscreen with-footer">
+
+      <!-- Tabs -->
+      <section class="list-tabs">
+        <button class="list-tab active" data-tab="member" onclick="switchTab('member')">
+          <span>👤 Member</span>
+          <span class="tab-count" id="memberCount">0</span>
+        </button>
+        <button class="list-tab" data-tab="guest" onclick="switchTab('guest')">
+          <span>👥 Guest</span>
+          <span class="tab-count" id="guestCount">0</span>
+        </button>
+      </section>
+
+      <!-- MEMBER TAB -->
+      <section class="tab-content active" data-content="member">
+        <!-- Search -->
+        <div class="form-group">
+          <div class="input-with-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" id="searchMember" class="form-input" placeholder="Cari nama, tier, atau kota..." oninput="filterMembers()">
+          </div>
+        </div>
+
+        <!-- Recent / Friends -->
+        <div id="memberSections">
+          <!-- Rendered via JS -->
+        </div>
+      </section>
+
+      <!-- GUEST TAB -->
+      <section class="tab-content" data-content="guest">
+        <p class="form-help" style="margin-bottom: var(--s-3);">
+          Tambah pemain tanpa akun (nama saja). Point guest hanya muncul di session ini, tidak masuk ke profil.
+        </p>
+
+        <!-- Guest input -->
+        <div class="form-group">
+          <label class="form-label">Nama Guest</label>
+          <div class="guest-input-row">
+            <input type="text" id="guestName" class="form-input" placeholder="Contoh: Pak Budi" onkeypress="if(event.key==='Enter') addGuest()">
+            <button class="btn-add-guest" onclick="addGuest()" id="addGuestBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              <span>Tambah</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Guest list -->
+        <div>
+          <div class="sp-section-label">Guest yang Akan Ditambahkan</div>
+          <div class="guest-list" id="guestList">
+            <div class="empty-guest" id="emptyGuest">
+              Belum ada guest. Ketik nama dan klik Tambah.
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- STICKY FOOTER -->
+    <div class="sticky-footer dual">
+      <button class="btn-secondary-lg" onclick="window.location.href='session-detail.html'">
+        <span>Batal</span>
+      </button>
+      <button class="btn-primary-lg" id="addBtn" onclick="addToSession()">
+        <span id="addBtnText">Tambah ke Session</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+  </div>
+
+  <script>
+    // Mock member data (people not yet in session)
+    const allMembers = [
+      // Recent (last sessions)
+      { id: 'aldo', name: 'Aldo Wijaya', initial: 'A', avatar: 'background: linear-gradient(135deg, #06B6D4, #0EA5E9);', tier: '👑 Pro', city: 'Jakarta', section: 'recent', meta: 'Main bareng 2 hari lalu' },
+      { id: 'citra', name: 'Citra Dewi', initial: 'C', avatar: 'background: linear-gradient(135deg, #FB7185, #F43F5E);', tier: '🏅 Advanced', city: 'Bandung', section: 'recent', meta: 'Main bareng 5 hari lalu' },
+      { id: 'roby', name: 'Roby Sutrisno', initial: 'R', avatar: 'background: linear-gradient(135deg, #FACC15, #F59E0B);', tier: '🏅 Advanced', city: 'Jakarta', section: 'recent', meta: 'Main bareng 1 minggu lalu' },
+
+      // Friends
+      { id: 'hadi', name: 'Hadi Pranata', initial: 'H', avatar: 'background: linear-gradient(135deg, #8B5CF6, #6366F1);', tier: '🏅 Advanced', city: 'Jakarta', section: 'friends', meta: '⭐ Friend · 12 sessions bareng' },
+      { id: 'kira', name: 'Kira Anjani', initial: 'K', avatar: 'background: linear-gradient(135deg, #84CC16, #65A30D);', tier: '👑 Pro', city: 'Surabaya', section: 'friends', meta: '⭐ Friend · 8 sessions bareng' },
+      { id: 'lia', name: 'Lia Karnia', initial: 'L', avatar: 'background: linear-gradient(135deg, #06B6D4, #0EA5E9);', tier: '🥈 Intermediate', city: 'Bali', section: 'friends', meta: '⭐ Friend · 5 sessions bareng' },
+
+      // All members (search results)
+      { id: 'eka', name: 'Eka Putri', initial: 'E', avatar: 'background: linear-gradient(135deg, #FB7185, #F43F5E);', tier: '🥈 Intermediate', city: 'Yogya', section: 'all', meta: '180 pts · 22 match' },
+      { id: 'juan', name: 'Juan Kusuma', initial: 'J', avatar: 'background: linear-gradient(135deg, #FACC15, #F59E0B);', tier: '⚪ Rookie', city: 'Jakarta', section: 'all', meta: '60 pts · 8 match · NEW' },
+      { id: 'nina', name: 'Nina Permata', initial: 'N', avatar: 'background: linear-gradient(135deg, #84CC16, #65A30D);', tier: '🏅 Advanced', city: 'Bandung', section: 'all', meta: '1,250 pts · 95 match' }
+    ];
+
+    const selectedMembers = new Set();
+    const guestList = [];
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._tt);
+      window._tt = setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.list-tab').forEach(t => t.classList.remove('active'));
+      document.querySelector(`.list-tab[data-tab="${tabName}"]`).classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector(`.tab-content[data-content="${tabName}"]`).classList.add('active');
+    }
+
+    function toggleMember(id) {
+      if (selectedMembers.has(id)) selectedMembers.delete(id);
+      else selectedMembers.add(id);
+      updateUI();
+    }
+
+    function renderMember(m) {
+      const isSelected = selectedMembers.has(m.id);
+      return `
+        <div class="selectable-item ${isSelected ? 'selected' : ''}" onclick="toggleMember('${m.id}')" data-id="${m.id}">
+          <div class="checkbox-circle">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="sp-avatar" style="${m.avatar}">${m.initial}</div>
+          <div class="sp-info">
+            <div class="sp-name">
+              <span>${m.name}</span>
+              <span style="font-size:10px; color:var(--text-500); font-weight:700;">${m.tier}</span>
+            </div>
+            <div class="sp-meta">
+              <span>${m.meta}</span>
+              <span>·</span>
+              <span>📍 ${m.city}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMemberSections(filterStr = '') {
+      const filter = filterStr.toLowerCase();
+      const sections = [
+        { key: 'recent', label: '🕒 Recent · Main bareng terakhir' },
+        { key: 'friends', label: '⭐ Friends · Daftar friend kamu' },
+        { key: 'all', label: '🌎 All Members · Hasil pencarian' }
+      ];
+
+      let html = '';
+      sections.forEach(sec => {
+        const filtered = allMembers.filter(m =>
+          m.section === sec.key &&
+          (filter === '' || m.name.toLowerCase().includes(filter) || m.tier.toLowerCase().includes(filter) || m.city.toLowerCase().includes(filter))
+        );
+        if (filtered.length === 0) return;
+        html += `<div style="margin-bottom: var(--s-4);">
+          <div class="sp-section-label">${sec.label}</div>
+          <div class="selectable-list">${filtered.map(renderMember).join('')}</div>
+        </div>`;
+      });
+
+      if (html === '') {
+        html = `<div style="text-align:center; padding: var(--s-6) var(--s-3); color:var(--text-400); font-size:13px; font-weight:600;">Tidak ditemukan member yang cocok dengan "${filterStr}"</div>`;
+      }
+
+      document.getElementById('memberSections').innerHTML = html;
+    }
+
+    function filterMembers() {
+      const q = document.getElementById('searchMember').value;
+      renderMemberSections(q);
+    }
+
+    function addGuest() {
+      const input = document.getElementById('guestName');
+      const name = input.value.trim();
+      if (!name) {
+        showToast('Masukkan nama guest dulu');
+        return;
+      }
+      if (guestList.includes(name)) {
+        showToast('Guest dengan nama itu sudah ada');
+        return;
+      }
+      guestList.push(name);
+      input.value = '';
+      input.focus();
+      renderGuestList();
+      updateUI();
+    }
+
+    function removeGuest(name) {
+      const idx = guestList.indexOf(name);
+      if (idx > -1) guestList.splice(idx, 1);
+      renderGuestList();
+      updateUI();
+    }
+
+    function renderGuestList() {
+      const container = document.getElementById('guestList');
+      const empty = document.getElementById('emptyGuest');
+      if (guestList.length === 0) {
+        container.innerHTML = `<div class="empty-guest" id="emptyGuest">Belum ada guest. Ketik nama dan klik Tambah.</div>`;
+        return;
+      }
+      container.innerHTML = guestList.map(name => {
+        const initial = name.charAt(0).toUpperCase();
+        return `
+          <div class="guest-item">
+            <div class="sp-avatar">${initial}</div>
+            <div class="guest-item-name">${name}</div>
+            <button class="guest-item-remove" onclick="removeGuest('${name.replace(/'/g, "\\'")}')" aria-label="Hapus">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M6 18L18 6"/></svg>
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateUI() {
+      // Update selected indicators on member items
+      document.querySelectorAll('.selectable-item').forEach(item => {
+        const id = item.dataset.id;
+        if (selectedMembers.has(id)) item.classList.add('selected');
+        else item.classList.remove('selected');
+      });
+
+      // Update tab counts
+      document.getElementById('memberCount').textContent = selectedMembers.size;
+      document.getElementById('guestCount').textContent = guestList.length;
+
+      // Update CTA
+      const total = selectedMembers.size + guestList.length;
+      const btn = document.getElementById('addBtnText');
+      if (total === 0) {
+        btn.textContent = 'Pilih Pemain';
+        document.getElementById('addBtn').classList.add('disabled');
+      } else {
+        btn.textContent = `Tambah ${total} Pemain`;
+        document.getElementById('addBtn').classList.remove('disabled');
+      }
+    }
+
+    function addToSession() {
+      const total = selectedMembers.size + guestList.length;
+      if (total === 0) {
+        showToast('Pilih minimal 1 pemain');
+        return;
+      }
+      const btn = document.getElementById('addBtn');
+      btn.classList.add('loading');
+      document.getElementById('addBtnText').textContent = 'Menambahkan...';
+
+      setTimeout(() => {
+        showToast(`✓ ${total} pemain ditambahkan ke session`);
+        setTimeout(() => {
+          window.location.href = 'session-detail.html';
+        }, 800);
+      }, 600);
+    }
+
+    // Init
+    renderMemberSections();
+    updateUI();
+  </script>
+</body>
+</html>

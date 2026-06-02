@@ -259,11 +259,13 @@ function Podium({
   top3,
   sort,
 }: {
-  top3: ReturnType<typeof Object.assign>[] & { length: 3 };
+  top3: ReturnType<typeof getLeaderboard> extends Promise<infer R>
+    ? R
+    : never;
   sort: LeaderboardSort;
 }) {
   // Order: 2 (left), 1 (center, raised), 3 (right)
-  const [first, second, third] = top3 as any;
+  const [first, second, third] = top3;
   const SLOTS = [
     { player: second, medal: "🥈", rank: 2 },
     { player: first, medal: "🥇", rank: 1 },

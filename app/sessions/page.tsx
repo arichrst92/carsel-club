@@ -56,7 +56,7 @@ export default async function SessionsPage() {
         ) : (
           <>
             {active.length > 0 && (
-              <Section title="Aktif">
+              <Section title="Aktif" count={active.length}>
                 {active.map((s) => (
                   <SessionCard key={s.id} session={s} />
                 ))}
@@ -64,7 +64,7 @@ export default async function SessionsPage() {
             )}
 
             {done.length > 0 && (
-              <Section title="Selesai">
+              <Section title="Selesai" count={done.length}>
                 {done.map((s) => (
                   <SessionCard key={s.id} session={s} />
                 ))}
@@ -81,15 +81,31 @@ export default async function SessionsPage() {
 
 function Section({
   title,
+  count,
   children,
 }: {
   title: string;
+  count?: number;
   children: React.ReactNode;
 }) {
   return (
     <section>
       <div className="section-head">
-        <h3>{title}</h3>
+        <h3>
+          {title}
+          {count !== undefined && (
+            <span
+              style={{
+                marginLeft: 8,
+                fontSize: 12,
+                fontWeight: 700,
+                color: "var(--text-500)",
+              }}
+            >
+              ({count})
+            </span>
+          )}
+        </h3>
       </div>
       <div
         style={{

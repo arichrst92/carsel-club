@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Sitemap — Carsel Club Prototype</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .sm-section { margin-bottom: var(--s-5); }
+    .sm-section-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: var(--s-3);
+    }
+    .sm-section-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--text-900);
+    }
+    .sm-section-count {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-500);
+      background: var(--bg-canvas);
+      padding: 2px 9px;
+      border-radius: var(--r-full);
+    }
+    .sm-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .sm-card {
+      background: var(--bg);
+      border: 1px solid var(--border-light);
+      border-radius: var(--r-md);
+      padding: 12px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.15s;
+    }
+    .sm-card:hover {
+      border-color: var(--primary-200);
+      box-shadow: var(--shadow-xs);
+      transform: translateY(-1px);
+    }
+    .sm-card-emoji {
+      font-size: 22px;
+      margin-bottom: 2px;
+    }
+    .sm-card-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 12px;
+      color: var(--text-900);
+      line-height: 1.2;
+    }
+    .sm-card-file {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--text-400);
+      font-family: 'SF Mono', Menlo, monospace;
+    }
+    .sm-card-desc {
+      font-size: 11px;
+      color: var(--text-500);
+      font-weight: 600;
+      line-height: 1.3;
+      margin-top: 2px;
+    }
+    .sm-color-teal { background: linear-gradient(135deg, var(--primary-50), var(--bg)); border-color: var(--primary-100); }
+    .sm-color-coral { background: linear-gradient(135deg, var(--accent-50), var(--bg)); border-color: var(--accent-100); }
+    .sm-color-yellow { background: linear-gradient(135deg, var(--yellow-50), var(--bg)); border-color: #FDE68A; }
+    .sm-color-purple { background: linear-gradient(135deg, #EDE9FE, var(--bg)); border-color: #DDD6FE; }
+    .sm-color-gray { background: var(--bg-soft); border-color: var(--border); }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="logo">
+        <div class="logo-mark">CC</div>
+        <span class="logo-text">Sitemap</span>
+      </div>
+      <button class="icon-btn" onclick="window.location.href='index.html'" aria-label="Home">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3l9 9"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></svg>
+      </button>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="app-content">
+
+      <!-- Hero -->
+      <section class="hero-session" style="margin-bottom: var(--s-5);">
+        <div class="hero-title" style="font-size:22px;">Carsel Club Prototype</div>
+        <div class="hero-meta">
+          <div class="hero-meta-row">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 12h18M12 3v18"/></svg>
+            <span>28 screen lengkap · Click to navigate</span>
+          </div>
+          <div class="hero-meta-row">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg>
+            <span>MVP v1 ready · High-fidelity</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- AUTH & ONBOARDING -->
+      <div class="sm-section">
+        <div class="sm-section-head">
+          <span class="sm-section-title">🔐 Auth & Onboarding</span>
+          <span class="sm-section-count">5 screens</span>
+        </div>
+        <div class="sm-grid">
+          <a href="login.html" class="sm-card sm-color-teal">
+            <span class="sm-card-emoji">👋</span>
+            <div class="sm-card-title">Login Welcome</div>
+            <div class="sm-card-file">login.html</div>
+          </a>
+          <a href="otp-verify.html" class="sm-card sm-color-teal">
+            <span class="sm-card-emoji">🔢</span>
+            <div class="sm-card-title">OTP Verify</div>
+            <div class="sm-card-file">otp-verify.html</div>
+          </a>
+          <a href="onboarding.html" class="sm-card sm-color-teal">
+            <span class="sm-card-emoji">⚙️</span>
+            <div class="sm-card-title">Onboarding Setup</div>
+            <div class="sm-card-file">onboarding.html</div>
+          </a>
+          <a href="invite-landing.html" class="sm-card sm-color-teal">
+            <span class="sm-card-emoji">📩</span>
+            <div class="sm-card-title">Invite Landing (WA)</div>
+            <div class="sm-card-file">invite-landing.html</div>
+          </a>
+          <a href="guest-join.html" class="sm-card sm-color-teal">
+            <span class="sm-card-emoji">👥</span>
+            <div class="sm-card-title">Guest Join</div>
+            <div class="sm-card-file">guest-join.html</div>
+          </a>
+        </div>
+      </div>
+
+      <!-- MAIN TABS -->
+      <div class="sm-section">
+        <div class="sm-section-head">
+          <span class="sm-section-title">🏠 Main Tabs (Bottom Nav)</span>
+          <span class="sm-section-count">5 screens</span>
+        </div>
+        <div class="sm-grid">
+          <a href="index.html" class="sm-card sm-color-coral">
+            <span class="sm-card-emoji">🏠</span>
+            <div class="sm-card-title">Home</div>
+            <div class="sm-card-file">index.html</div>
+            <div class="sm-card-desc">Tier hero, quick actions, incoming session</div>
+          </a>
+          <a href="sessions.html" class="sm-card sm-color-coral">
+            <span class="sm-card-emoji">📅</span>
+            <div class="sm-card-title">Sessions</div>
+            <div class="sm-card-file">sessions.html</div>
+            <div class="sm-card-desc">Upcoming/Live/Past tabs</div>
+          </a>
+          <a href="create-session.html" class="sm-card sm-color-coral">
+            <span class="sm-card-emoji">➕</span>
+            <div class="sm-card-title">Create Session</div>
+            <div class="sm-card-file">create-session.html</div>
+            <div class="sm-card-desc">5-step wizard</div>
+          </a>
+          <a href="leaderboard.html" class="sm-card sm-color-coral">
+            <span class="sm-card-emoji">🏆</span>
+            <div class="sm-card-title">Global Leaderboard</div>
+            <div class="sm-card-file">leaderboard.html</div>
+            <div class="sm-card-desc">Top 3 podium, your position</div>
+          </a>
+          <a href="profile.html" class="sm-card sm-color-coral">
+            <span class="sm-card-emoji">👤</span>
+            <div class="sm-card-title">Profile</div>
+            <div class="sm-card-file">profile.html</div>
+            <div class="sm-card-desc">Tier ring, stats, settings</div>
+          </a>
+        </div>
+      </div>
+
+      <!-- SESSION FLOW -->
+      <div class="sm-section">
+        <div class="sm-section-head">
+          <span class="sm-section-title">🎾 Session & Match Flow</span>
+          <span class="sm-section-count">4 screens</span>
+        </div>
+        <div class="sm-grid">
+          <a href="session-detail.html" class="sm-card sm-color-yellow">
+            <span class="sm-card-emoji">📋</span>
+            <div class="sm-card-title">Session Detail</div>
+            <div class="sm-card-file">session-detail.html</div>
+            <div class="sm-card-desc">Pre-match lobby, players, settings</div>
+          </a>
+          <a href="generate-match.html" class="sm-card sm-color-yellow">
+            <span class="sm-card-emoji">⚡</span>
+            <div class="sm-card-title">Generate Match</div>
+            <div class="sm-card-file">generate-match.html</div>
+            <div class="sm-card-desc">Mode, round, who plays, summary</div>
+          </a>
+          <a href="match-list.html" class="sm-card sm-color-yellow">
+            <span class="sm-card-emoji">🎯</span>
+            <div class="sm-card-title">Match List</div>
+            <div class="sm-card-file">match-list.html</div>
+            <div class="sm-card-desc">Battle list per round</div>
+          </a>
+          <a href="match-scoring.html?status=pending" class="sm-card sm-color-yellow">
+            <span class="sm-card-emoji">🎮</span>
+            <div class="sm-card-title">Match Scoring</div>
+            <div class="sm-card-file">match-scoring.html</div>
+            <div class="sm-card-desc">3 states · denah lapangan</div>
+          </a>
+        </div>
+      </div>
+
+      <!-- MATCH SCORING STATES -->
+      <div class="sm-section">
+        <div class="sm-section-head">
+          <span class="sm-section-title">🎮 Match Scoring States</span>
+          <span class="sm-section-count">3 variants</span>
+        </div>
+        <div class="sm-grid">
+          <a href="match-scoring.html?status=pending" class="sm-card">
+            <span class="sm-card-emoji">⏳</span>
+            <div class="sm-card-title">State: Pending</div>
+            <div class="sm-card-desc">Pre-match · Start Game button</div>
+          </a>
+          <a href="match-scoring.html?status=live" class="sm-card">
+            <span class="sm-card-emoji">🔴</span>
+            <div class="sm-card-title">State: Live</div>
+            <div class="sm-card-desc">Timer running · scoring active</div>
+          </a>
+          <a href="match-scoring.html?status=done" class="sm-card">
+            <span class="sm-card-emoji">✅</span>
+            <div class="sm-card-title">State: Done</div>
+            <div class="sm-card-desc">Final banner · winner</div>
+          </a>
+        </div>
+      </div>
+
+      <!-- MATCH-RELATED -->
+      <div class="sm-section">
+        <div class="sm-section-head">
+          <span class="sm-section-title">📊 Match Related</span>
+          <span class="sm-section-count">3 screens</span>
+        </div>
+        <div class="sm-grid">
+          <a href="session-leaderboard.html" class="sm-card sm-color-purple">
+            <span class="sm-card-emoji">📈</span>
+            <div class="sm-card-title">Session Leaderboard</div>
+            <div class="sm-card-file">session-leaderboard.html</div>
+            <div class="sm-card-desc">Live ranking saat session</div>
+          </a>
+          <a href="match-history.html" class="sm-card sm-color-purple">
+            <span class="sm-card-emoji">📜</span>
+            <div class="sm-card-title">Match History</div>
+            <div class="sm-card-file">match-history.html</div>
+            <div class="sm-card-desc">Per-match dengan insights</div>
+          </a>
+          <a href="match-detail.html" class="sm-card sm-color-purple">
+            <span class="sm-card-emoji">🔍</span>
+            <div class="sm-card-title">Match Detail</div>
+            <div class="sm-card-file">match-detail.html</div>
+            <div class="sm-card-desc">Deep dive 1 match</div>
+          </a>
+        </div>
+      </div>
+
+      <!-- SHARING / PUBLIC -->
+      <div class="sm-section">
+        <div class="sm-section-head">
+          <span class="sm-section-title">📡 Sharing / Public</span>
+          <span class="sm-section-count">1 screen</span>
+        </div>
+        <div class="sm-grid">
+          <a href="live-view.html" class="sm-card sm-color-teal">
+            <span class="sm-card-emoji">📺</span>
+            <div class="sm-card-title">Live View Public</div>
+            <div class="sm-card-file">live-view.html</div>
+            <div class="sm-card-desc">Branded · no auth · 2 courts</div>
+          </a>
+        </div>
+      </div>
+
+      <!-- PROFILE & SETTINGS -->
+      <div class="sm-section">
+        <div class="sm-section-head">
+          <span class="sm-section-title">⚙️ Profile Settings</span>
+          <span class="sm-section-count">5 screens</span>
+        </div>
+        <div class="sm-grid">
+          <a href="friends.html" class="sm-card sm-color-purple">
+            <span class="sm-card-emoji">🤝</span>
+            <div class="sm-card-title">Friends</div>
+            <div class="sm-card-file">friends.html</div>
+            <div class="sm-card-desc">Friends/Requests/Discover</div>
+          </a>
+          <a href="achievements.html" class="sm-card sm-color-purple">
+            <span class="sm-card-emoji">🏆</span>
+            <div class="sm-card-title">Achievements</div>
+            <div class="sm-card-file">achievements.html</div>
+            <div class="sm-card-desc">18 badges · 7 categories</div>
+          </a>
+          <a href="notification-settings.html" class="sm-card sm-color-purple">
+            <span class="sm-card-emoji">🔔</span>
+            <div class="sm-card-title">Notification Settings</div>
+            <div class="sm-card-file">notification-settings.html</div>
+            <div class="sm-card-desc">Channels + types + quiet hours</div>
+          </a>
+          <a href="privacy-settings.html" class="sm-card sm-color-purple">
+            <span class="sm-card-emoji">🔒</span>
+            <div class="sm-card-title">Privacy Settings</div>
+            <div class="sm-card-file">privacy-settings.html</div>
+            <div class="sm-card-desc">Visibility, data, friend req</div>
+          </a>
+          <a href="help-support.html" class="sm-card sm-color-purple">
+            <span class="sm-card-emoji">❓</span>
+            <div class="sm-card-title">Help & Support</div>
+            <div class="sm-card-file">help-support.html</div>
+            <div class="sm-card-desc">FAQ + Contact + Legal</div>
+          </a>
+        </div>
+      </div>
+
+      <!-- AUXILIARY -->
+      <div class="sm-section">
+        <div class="sm-section-head">
+          <span class="sm-section-title">🪟 Modals & Auxiliary</span>
+          <span class="sm-section-count">3 screens</span>
+        </div>
+        <div class="sm-grid">
+          <a href="add-player.html" class="sm-card sm-color-gray">
+            <span class="sm-card-emoji">➕</span>
+            <div class="sm-card-title">Add Player Modal</div>
+            <div class="sm-card-file">add-player.html</div>
+            <div class="sm-card-desc">Member multi-select + Guest batch</div>
+          </a>
+          <a href="notifications.html" class="sm-card sm-color-gray">
+            <span class="sm-card-emoji">🔔</span>
+            <div class="sm-card-title">Notification Center</div>
+            <div class="sm-card-file">notifications.html</div>
+            <div class="sm-card-desc">12 notif · 3 filter tabs</div>
+          </a>
+          <a href="empty-states.html" class="sm-card sm-color-gray">
+            <span class="sm-card-emoji">🪹</span>
+            <div class="sm-card-title">Empty States Showcase</div>
+            <div class="sm-card-file">empty-states.html</div>
+            <div class="sm-card-desc">Home/Sessions/Match/LB</div>
+          </a>
+        </div>
+      </div>
+
+      <!-- DOCS -->
+      <div class="sm-section">
+        <div class="sm-section-head">
+          <span class="sm-section-title">📄 Documentation</span>
+          <span class="sm-section-count">3 docs</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--bg); border:1px solid var(--border-light); border-radius:var(--r-md);">
+            <span style="font-size:22px;">📋</span>
+            <div style="flex:1;">
+              <div style="font-family:var(--font-display); font-weight:800; font-size:13px;">PADEL_APP_KONSEP.md</div>
+              <div style="font-size:10px; color:var(--text-500); font-weight:600;">Concept document — fondasi konsep produk</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--bg); border:1px solid var(--border-light); border-radius:var(--r-md);">
+            <span style="font-size:22px;">🗺️</span>
+            <div style="flex:1;">
+              <div style="font-family:var(--font-display); font-weight:800; font-size:13px;">PADEL_APP_MVP_SCOPING.md</div>
+              <div style="font-size:10px; color:var(--text-500); font-weight:600;">MVP v1/v1.5/v2 phased roadmap</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--bg); border:1px solid var(--border-light); border-radius:var(--r-md);">
+            <span style="font-size:22px;">🎨</span>
+            <div style="flex:1;">
+              <div style="font-family:var(--font-display); font-weight:800; font-size:13px;">PADEL_APP_PROTOTYPE_SUMMARY.md</div>
+              <div style="font-size:10px; color:var(--text-500); font-weight:600;">Prototype wrap-up + gap analysis + tech recommendations</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <section style="text-align:center; padding:var(--s-3); margin-top:var(--s-2);">
+        <div style="font-size:11px; font-weight:700; color:var(--text-400); letter-spacing:0.04em; line-height:1.6;">
+          Carsel Club Prototype · v1.0<br>
+          High-fi mobile prototype · 28 screens<br>
+          Made with 🎾 in Indonesia
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+</body>
+</html>

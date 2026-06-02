@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Toast } from "@/components/ui/Toast";
 
 type Props = {
   userId: string;
@@ -14,6 +15,7 @@ function getAppUrl(): string {
 
 export function ReferralShare({ userId, displayName }: Props) {
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const inviteUrl = `${getAppUrl()}/invite/${userId}`;
   const inviteText = `🎾 Hey! Yuk join Carsel Club — komunitas padel Indonesia.
@@ -50,12 +52,13 @@ ${inviteUrl}
       setTimeout(() => setCopied(false), 2000);
     } catch (e) {
       console.error("Copy failed:", e);
-      alert("Gagal copy link.");
+      setError("Gagal copy link.");
     }
   }
 
   return (
     <section>
+      <Toast message={error} onDismiss={() => setError(null)} />
       <div className="section-head">
         <h3>Invite Friends</h3>
       </div>

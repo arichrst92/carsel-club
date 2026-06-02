@@ -1,11 +1,12 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import {
   removeParticipantAction,
   toggleCohostAction,
   togglePlayingAction,
 } from "@/app/actions/participants";
+import { Toast } from "@/components/ui/Toast";
 
 type Props = {
   participantId: string;
@@ -25,11 +26,13 @@ export function ParticipantActions({
   displayName,
 }: Props) {
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
   function runAction(fn: () => Promise<{ error?: string } | null>) {
+    setError(null);
     startTransition(async () => {
       const result = await fn();
-      if (result?.error) alert(result.error);
+      if (result?.error) setError(result.error);
     });
   }
 
@@ -38,6 +41,8 @@ export function ParticipantActions({
   const canRemove = role !== "host";
 
   return (
+    <>
+    <Toast message={error} onDismiss={() => setError(null)} />
     <div
       style={{
         display: "flex",
@@ -91,6 +96,7 @@ export function ParticipantActions({
         </IconBtn>
       )}
     </div>
+    </>
   );
 }
 

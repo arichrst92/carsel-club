@@ -1,8 +1,9 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { joinPublicSessionAction } from "@/app/actions/find-sessions";
+import { Toast } from "@/components/ui/Toast";
 
 export function JoinPublicSessionButton({
   sessionId,
@@ -13,12 +14,14 @@ export function JoinPublicSessionButton({
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
   function handleClick() {
+    setError(null);
     startTransition(async () => {
       const result = await joinPublicSessionAction(sessionId);
       if (result?.error) {
-        alert(result.error);
+        setError(result.error);
       } else if (navigateAfter) {
         router.push(navigateAfter);
         router.refresh();
@@ -29,6 +32,8 @@ export function JoinPublicSessionButton({
   }
 
   return (
+    <>
+    <Toast message={error} onDismiss={() => setError(null)} />
     <button
       type="button"
       onClick={handleClick}
@@ -52,5 +57,6 @@ export function JoinPublicSessionButton({
         </svg>
       )}
     </button>
+    </>
   );
 }

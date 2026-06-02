@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Empty States Showcase — Carsel Club</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="logo">
+        <div class="logo-mark">CC</div>
+        <span class="logo-text">Empty States</span>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="showToast('Showcase: empty state untuk new user')" aria-label="Info">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="app-content">
+
+      <!-- Showcase selector -->
+      <div class="showcase-selector">
+        <button class="showcase-tab active" data-show="home" onclick="showState('home')">🏠 Home</button>
+        <button class="showcase-tab" data-show="sessions" onclick="showState('sessions')">📅 Sessions</button>
+        <button class="showcase-tab" data-show="match" onclick="showState('match')">🎾 Match</button>
+        <button class="showcase-tab" data-show="leaderboard" onclick="showState('leaderboard')">🏆 LB</button>
+      </div>
+
+      <!-- HOME EMPTY STATE -->
+      <div class="state-content active" data-state="home">
+        <!-- Tier Card (Rookie, 0 pts) -->
+        <section class="tier-card" style="margin-bottom:var(--s-5);">
+          <div class="tier-card-top">
+            <div>
+              <div class="tier-greet">Selamat datang,</div>
+              <div class="tier-greet-name">Ari!</div>
+            </div>
+            <div class="tier-emoji">🎾</div>
+          </div>
+          <div class="tier-badge-row">
+            <div class="tier-icon">⚪</div>
+            <div class="tier-info">
+              <div class="tier-label">Tier Saat Ini</div>
+              <div class="tier-name">Rookie</div>
+            </div>
+            <div>
+              <div class="tier-points">0</div>
+              <div class="tier-points-label">Points</div>
+            </div>
+          </div>
+          <div class="tier-progress">
+            <div class="tier-progress-meta">
+              <span>Main pertamamu yuk!</span>
+              <span>0 / 300</span>
+            </div>
+            <div class="tier-progress-bar">
+              <div class="tier-progress-fill" style="width: 1%"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Get Started Checklist -->
+        <section style="margin-bottom: var(--s-5);">
+          <div class="section-head">
+            <h3>Mulai Padel Journey-mu</h3>
+          </div>
+          <div class="checklist-card">
+            <div class="checklist-head">
+              <span class="checklist-head-emoji">🚀</span>
+              <div class="checklist-head-info">
+                <div class="checklist-head-title">Get Started Checklist</div>
+                <div class="checklist-head-progress">1 dari 4 selesai</div>
+              </div>
+            </div>
+            <div class="checklist-bar">
+              <div class="checklist-bar-fill" style="width: 25%"></div>
+            </div>
+            <div class="checklist-items">
+              <button class="checklist-item done">
+                <div class="checklist-check">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="checklist-text">Sign up via WhatsApp</div>
+              </button>
+              <button class="checklist-item" onclick="showToast('Edit Profile flow')">
+                <div class="checklist-check"></div>
+                <div class="checklist-text">Lengkapi profile (avatar, kota)</div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="checklist-arrow"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+              <button class="checklist-item" onclick="window.location.href='create-session.html'">
+                <div class="checklist-check"></div>
+                <div class="checklist-text">Bikin session pertamamu</div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="checklist-arrow"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+              <button class="checklist-item" onclick="showToast('Invite via WA')">
+                <div class="checklist-check"></div>
+                <div class="checklist-text">Undang 3 teman ke Carsel Club</div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="checklist-arrow"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Quick actions -->
+        <section style="margin-bottom: var(--s-5);">
+          <div class="section-head">
+            <h3>Quick Actions</h3>
+          </div>
+          <div class="quick-actions">
+            <button class="qa-btn primary" onclick="window.location.href='create-session.html'">
+              <div class="qa-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              </div>
+              <div class="qa-title">Create Session</div>
+              <div class="qa-sub">Mulai session baru</div>
+            </button>
+            <button class="qa-btn" onclick="showToast('Join via Code')">
+              <div class="qa-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
+              </div>
+              <div class="qa-title">Join via Code</div>
+              <div class="qa-sub">Masuk session</div>
+            </button>
+          </div>
+        </section>
+
+        <!-- Empty: incoming session -->
+        <section style="margin-bottom: var(--s-5);">
+          <div class="section-head">
+            <h3>Session Berikutnya</h3>
+          </div>
+          <div class="empty-hero" style="padding: var(--s-5) var(--s-4);">
+            <div class="empty-illustration" style="width:80px; height:80px; font-size:36px;">📅</div>
+            <div class="empty-title" style="font-size:16px;">Belum ada session</div>
+            <div class="empty-desc" style="font-size:13px;">Bikin session padel pertamamu atau gabung lewat invite link dari teman.</div>
+          </div>
+        </section>
+
+        <!-- Empty stats -->
+        <section>
+          <div class="section-head">
+            <h3>Stats Kamu</h3>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-card empty">
+              <div class="stat-value">0</div>
+              <div class="stat-label">Match</div>
+            </div>
+            <div class="stat-card empty">
+              <div class="stat-value">—</div>
+              <div class="stat-label">Win Rate</div>
+            </div>
+            <div class="stat-card empty">
+              <div class="stat-value">—</div>
+              <div class="stat-label">Streak</div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- SESSIONS EMPTY STATE -->
+      <div class="state-content" data-state="sessions" style="display:none;">
+        <!-- Sub-tabs to show 3 empty states -->
+        <section class="list-tabs" style="margin-bottom: var(--s-4);">
+          <button class="list-tab active" data-subtab="upcoming" onclick="switchSubTab('upcoming')">
+            <span>Upcoming</span>
+            <span class="tab-count">0</span>
+          </button>
+          <button class="list-tab" data-subtab="live" onclick="switchSubTab('live')">
+            <span>🔴 Live</span>
+            <span class="tab-count">0</span>
+          </button>
+          <button class="list-tab" data-subtab="past" onclick="switchSubTab('past')">
+            <span>Past</span>
+            <span class="tab-count">0</span>
+          </button>
+        </section>
+
+        <!-- Upcoming Empty -->
+        <div class="subtab-content active" data-subcontent="upcoming">
+          <div class="empty-hero">
+            <div class="empty-illustration">📅</div>
+            <div class="empty-title">Belum ada session yang akan datang</div>
+            <div class="empty-desc">Bikin session baru sebagai host, atau gabung session dari teman lewat invite link.</div>
+            <div class="empty-actions">
+              <button class="btn-primary-lg" onclick="window.location.href='create-session.html'">
+                <span>Bikin Session</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <button class="btn-secondary-lg" onclick="showToast('Join via Code')">
+                <span>Join via Code</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Empty -->
+        <div class="subtab-content" data-subcontent="live" style="display:none;">
+          <div class="empty-hero">
+            <div class="empty-illustration">⚡</div>
+            <div class="empty-title">Tidak ada session live</div>
+            <div class="empty-desc">Saat session sedang berjalan, kamu bisa lihat live score & resume scoring di sini.</div>
+          </div>
+        </div>
+
+        <!-- Past Empty -->
+        <div class="subtab-content" data-subcontent="past" style="display:none;">
+          <div class="empty-hero">
+            <div class="empty-illustration">🏆</div>
+            <div class="empty-title">Belum ada riwayat session</div>
+            <div class="empty-desc">Setelah kamu main session pertama, history akan muncul di sini lengkap dengan hasil & points.</div>
+            <div class="empty-actions">
+              <button class="btn-primary-lg" onclick="window.location.href='create-session.html'">
+                <span>Mulai Session Pertama</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MATCH HISTORY EMPTY -->
+      <div class="state-content" data-state="match" style="display:none;">
+        <div class="empty-hero">
+          <div class="empty-illustration">🎾</div>
+          <div class="empty-title">Belum ada match</div>
+          <div class="empty-desc">Setelah kamu main session, semua match akan tersimpan di sini lengkap dengan partner, opponent, score, dan points yang kamu dapat.</div>
+          <div class="empty-actions">
+            <button class="btn-primary-lg" onclick="window.location.href='create-session.html'">
+              <span>Bikin Session Pertama</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+            <button class="btn-secondary-lg" onclick="showToast('Find Session — v2')">
+              <span>Cari Public Session</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Hint: what they'll see -->
+        <section style="margin-top: var(--s-5);">
+          <div style="background: var(--primary-50); border: 1px solid var(--primary-100); border-radius: var(--r-lg); padding: var(--s-4);">
+            <div style="font-family: var(--font-display); font-weight: 800; font-size: 13px; color: var(--primary-700); margin-bottom: var(--s-2); display: flex; align-items: center; gap: 6px;">
+              <span>💡</span>
+              <span>Apa yang akan kamu lihat?</span>
+            </div>
+            <ul style="list-style: none; padding: 0; margin: 0; font-size: 12px; font-weight: 600; color: var(--text-700); line-height: 1.7;">
+              <li>📊 <strong>Win rate</strong> & insights performa kamu</li>
+              <li>🤝 <strong>Best partner</strong> berdasarkan win rate</li>
+              <li>⚔️ <strong>Head-to-head</strong> stats lawan tertentu</li>
+              <li>🏆 <strong>Filter</strong> Win/Loss + Period</li>
+            </ul>
+          </div>
+        </section>
+      </div>
+
+      <!-- LEADERBOARD EMPTY -->
+      <div class="state-content" data-state="leaderboard" style="display:none;">
+        <!-- Hero - Unranked -->
+        <section class="global-lb-hero" style="margin-bottom: var(--s-4);">
+          <div class="glb-trophy">🏆</div>
+          <div class="glb-title">Global Leaderboard</div>
+          <div class="glb-sub">Pemain padel Indonesia · 12,350 pemain aktif</div>
+
+          <div class="your-position">
+            <div class="your-position-rank" style="font-size:20px; opacity:0.85;">#—</div>
+            <div class="your-position-info">
+              <div class="your-position-label">Posisi Kamu</div>
+              <div class="your-position-name">Ari Christian · ⚪ Rookie</div>
+              <div class="your-position-meta">
+                <span>Belum tertanda · 0 pts</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Empty hint -->
+        <div class="empty-hero">
+          <div class="empty-illustration" style="width:80px; height:80px; font-size:36px;">📊</div>
+          <div class="empty-title" style="font-size:18px;">Mulai Main untuk Tertanda</div>
+          <div class="empty-desc" style="font-size:13px;">Setelah kamu menyelesaikan match pertama dan dapat point, posisi rank kamu akan muncul di sini.</div>
+          <div class="empty-actions">
+            <button class="btn-primary-lg" onclick="window.location.href='create-session.html'">
+              <span>Mulai Match Pertama</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Top 3 still showcased -->
+        <section style="margin-top: var(--s-5);">
+          <div class="section-head">
+            <h3>Top 3 Saat Ini</h3>
+            <span style="color:var(--text-500); font-size:11px; font-weight:700;">Aim untuk masuk top!</span>
+          </div>
+          <div class="podium">
+            <div class="podium-slot silver">
+              <div class="podium-medal">🥈</div>
+              <div class="podium-avatar" style="background: linear-gradient(135deg, #06B6D4, #0EA5E9);">S</div>
+              <div class="podium-name">Siti Aminah</div>
+              <div class="podium-meta">Pro · Bandung</div>
+              <div class="podium-points">7,210 pts</div>
+            </div>
+            <div class="podium-slot gold">
+              <div class="podium-medal">🥇</div>
+              <div class="podium-avatar" style="background: linear-gradient(135deg, #F59E0B, #DC2626);">R</div>
+              <div class="podium-name">Reza Pratama</div>
+              <div class="podium-meta">Pro · Jakarta</div>
+              <div class="podium-points">8,420 pts</div>
+            </div>
+            <div class="podium-slot bronze">
+              <div class="podium-medal">🥉</div>
+              <div class="podium-avatar" style="background: linear-gradient(135deg, #84CC16, #65A30D);">A</div>
+              <div class="podium-name">Andre W.</div>
+              <div class="podium-meta">Pro · Surabaya</div>
+              <div class="podium-points">6,950 pts</div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </main>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+  </div>
+
+  <script>
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._tt);
+      window._tt = setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    function showState(state) {
+      document.querySelectorAll('.showcase-tab').forEach(t => t.classList.remove('active'));
+      document.querySelector(`.showcase-tab[data-show="${state}"]`).classList.add('active');
+      document.querySelectorAll('.state-content').forEach(c => {
+        c.classList.remove('active');
+        c.style.display = 'none';
+      });
+      const target = document.querySelector(`.state-content[data-state="${state}"]`);
+      target.classList.add('active');
+      target.style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function switchSubTab(tab) {
+      document.querySelectorAll('.list-tab').forEach(t => t.classList.remove('active'));
+      document.querySelector(`.list-tab[data-subtab="${tab}"]`).classList.add('active');
+      document.querySelectorAll('.subtab-content').forEach(c => {
+        c.classList.remove('active');
+        c.style.display = 'none';
+      });
+      const target = document.querySelector(`.subtab-content[data-subcontent="${tab}"]`);
+      target.classList.add('active');
+      target.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

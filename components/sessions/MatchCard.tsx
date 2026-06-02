@@ -8,6 +8,7 @@ import {
   editCompletedMatchScoreAction,
 } from "@/app/actions/matches";
 import { ShareMatchButton } from "./ShareMatchButton";
+import { Toast } from "@/components/ui/Toast";
 
 type ParticipantLookup = Record<
   string,
@@ -52,6 +53,7 @@ export function MatchCard({
   const [t2, setT2] = useState(match.team2Score);
   const [editing, setEditing] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
   const isCompleted = match.status === "completed";
   const status = STATUS_STYLES[match.status];
@@ -87,7 +89,7 @@ export function MatchCard({
     startTransition(async () => {
       const result = await updateMatchScoreAction(match.id, newT1, newT2);
       if (result?.error) {
-        alert(result.error);
+        setError(result.error);
         setT1(match.team1Score);
         setT2(match.team2Score);
       }
@@ -96,17 +98,19 @@ export function MatchCard({
 
   function handleEnd() {
     if (!confirm(`End match dengan score ${t1} - ${t2}?`)) return;
+    setError(null);
     startTransition(async () => {
       const result = await endMatchAction(match.id, t1, t2);
-      if (result?.error) alert(result.error);
+      if (result?.error) setError(result.error);
     });
   }
 
   function handleSaveEdit() {
+    setError(null);
     startTransition(async () => {
       const result = await editCompletedMatchScoreAction(match.id, t1, t2);
       if (result?.error) {
-        alert(result.error);
+        setError(result.error);
       } else {
         setEditing(false);
       }
@@ -120,6 +124,8 @@ export function MatchCard({
   }
 
   return (
+    <>
+    <Toast message={error} onDismiss={() => setError(null)} />
     <div
       style={{
         background: "var(--bg)",
@@ -304,6 +310,7 @@ export function MatchCard({
         />
       )}
     </div>
+    </>
   );
 }
 

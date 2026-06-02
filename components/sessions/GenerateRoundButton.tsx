@@ -1,8 +1,9 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { generateRoundAction } from "@/app/actions/matches";
+import { Toast } from "@/components/ui/Toast";
 
 type Props = {
   sessionId: string;
@@ -21,15 +22,17 @@ export function GenerateRoundButton({
 }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
   const insufficient = activePlayerCount < 4;
   const isDisabled = insufficient || isPending;
 
   function handleClick() {
+    setError(null);
     startTransition(async () => {
       const result = await generateRoundAction(sessionId);
       if (result?.error) {
-        alert(result.error);
+        setError(result.error);
       } else if (redirectAfter) {
         router.push(redirectAfter);
         router.refresh();
@@ -45,6 +48,8 @@ export function GenerateRoundButton({
 
   if (variant === "footer") {
     return (
+      <>
+      <Toast message={error} onDismiss={() => setError(null)} />
       <div className="sticky-footer">
         <button
           type="button"
@@ -80,10 +85,13 @@ export function GenerateRoundButton({
           </p>
         )}
       </div>
+      </>
     );
   }
 
   return (
+    <>
+    <Toast message={error} onDismiss={() => setError(null)} />
     <div>
       <button
         type="button"
@@ -122,5 +130,6 @@ export function GenerateRoundButton({
         </p>
       )}
     </div>
+    </>
   );
 }

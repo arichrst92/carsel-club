@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Session Detail — Carsel Club</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="subscreen-header">
+      <button class="back-btn" onclick="window.location.href='index.html'" aria-label="Back">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <h2 class="subscreen-title">Session Detail</h2>
+      <button class="menu-btn" onclick="showToast('Menu: Edit, Share, End Session...')" aria-label="Menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+      </button>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="app-content subscreen with-footer">
+
+      <!-- HERO SESSION -->
+      <section class="hero-session">
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          <span>📅 Upcoming · 5 hari lagi</span>
+        </div>
+        <div class="hero-title">Sabtu Sore Padel</div>
+        <div class="hero-meta">
+          <div class="hero-meta-row">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <span>Sabtu, 16 Mei 2026 · 16:00 – 18:30</span>
+          </div>
+          <div class="hero-meta-row">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>GBK Padel Court · <a href="#" onclick="event.preventDefault(); showToast('Membuka Google Maps...')">Maps</a></span>
+          </div>
+          <div class="hero-meta-row">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Host: Ari (kamu)</span>
+          </div>
+        </div>
+        <div class="hero-format-chips">
+          <span class="format-chip">Americano</span>
+          <span class="format-chip">Freeplay</span>
+          <span class="format-chip">2 Courts</span>
+          <span class="format-chip">21 pts</span>
+          <span class="format-chip">🔒 Private</span>
+        </div>
+      </section>
+
+      <!-- QUICK ACTIONS -->
+      <section>
+        <div class="quick-actions">
+          <button class="qa-btn primary" onclick="showToast('Opening WhatsApp dengan invite link...')">
+            <div class="qa-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            </div>
+            <div class="qa-title">Invite via WhatsApp</div>
+            <div class="qa-sub">Share link ke teman</div>
+          </button>
+          <button class="qa-btn" onclick="copyInviteLink()">
+            <div class="qa-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </div>
+            <div class="qa-title">Copy Invite Link</div>
+            <div class="qa-sub">carsel.club/s/x7k2</div>
+          </button>
+        </div>
+      </section>
+
+      <!-- PLAYERS -->
+      <section>
+        <div class="section-head">
+          <h3>Pemain (6)</h3>
+          <a href="#" class="section-link" onclick="event.preventDefault(); showToast('Sort/filter pemain — segera dibuat')">Filter</a>
+        </div>
+        <div class="player-list">
+
+          <!-- Host -->
+          <div class="player-list-item">
+            <div class="player-avatar-lg host">A</div>
+            <div class="player-info">
+              <div class="player-name">
+                <span>Ari Christian</span>
+                <span class="role-badge host">Host</span>
+              </div>
+              <div class="player-meta-row">
+                <span class="tier-badge intermediate">🥈 Intermediate</span>
+                <span>· 740 pts · ikut main</span>
+              </div>
+            </div>
+            <button class="player-action" onclick="showToast('Menu pemain — segera dibuat')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+            </button>
+          </div>
+
+          <!-- Co-host 1 -->
+          <div class="player-list-item">
+            <div class="player-avatar-lg cohost">D</div>
+            <div class="player-info">
+              <div class="player-name">
+                <span>Dimas Aryo</span>
+                <span class="role-badge cohost">Co-host</span>
+              </div>
+              <div class="player-meta-row">
+                <span class="tier-badge advanced">🏅 Advanced</span>
+                <span>· 1,420 pts · ikut main</span>
+              </div>
+            </div>
+            <button class="player-action" onclick="showToast('Menu pemain — segera dibuat')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+            </button>
+          </div>
+
+          <!-- Co-host 2 -->
+          <div class="player-list-item">
+            <div class="player-avatar-lg cohost">R</div>
+            <div class="player-info">
+              <div class="player-name">
+                <span>Rizki Pratama</span>
+                <span class="role-badge cohost">Co-host</span>
+              </div>
+              <div class="player-meta-row">
+                <span class="tier-badge intermediate">🥈 Intermediate</span>
+                <span>· 510 pts</span>
+              </div>
+            </div>
+            <button class="player-action" onclick="showToast('Menu pemain — segera dibuat')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+            </button>
+          </div>
+
+          <!-- Member -->
+          <div class="player-list-item">
+            <div class="player-avatar-lg member-1">M</div>
+            <div class="player-info">
+              <div class="player-name">
+                <span>Maya Sari</span>
+              </div>
+              <div class="player-meta-row">
+                <span class="tier-badge advanced">🏅 Advanced</span>
+                <span>· 1,150 pts</span>
+              </div>
+            </div>
+            <button class="player-action" onclick="showToast('Menu pemain — segera dibuat')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+            </button>
+          </div>
+
+          <!-- Member -->
+          <div class="player-list-item">
+            <div class="player-avatar-lg member-2">B</div>
+            <div class="player-info">
+              <div class="player-name">
+                <span>Budi Santoso</span>
+              </div>
+              <div class="player-meta-row">
+                <span class="tier-badge rookie">⚪ Rookie</span>
+                <span>· 180 pts</span>
+              </div>
+            </div>
+            <button class="player-action" onclick="showToast('Menu pemain — segera dibuat')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+            </button>
+          </div>
+
+          <!-- Guest -->
+          <div class="player-list-item">
+            <div class="player-avatar-lg guest">P</div>
+            <div class="player-info">
+              <div class="player-name">
+                <span>Pak Eko</span>
+                <span class="role-badge guest">Guest</span>
+              </div>
+              <div class="player-meta-row">
+                <span style="font-size:12px; color:var(--text-500);">No tier · point hanya internal session</span>
+              </div>
+            </div>
+            <button class="player-action" onclick="showToast('Menu pemain — segera dibuat')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+            </button>
+          </div>
+
+          <!-- Add Player -->
+          <button class="add-player-btn" onclick="window.location.href='add-player.html'">
+            <div class="plus-circle">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </div>
+            <div class="plus-text">
+              <div>Tambah Pemain</div>
+              <div style="font-size:12px; color:var(--text-500); font-weight:600;">Member atau Guest · tanpa batas</div>
+            </div>
+          </button>
+
+        </div>
+      </section>
+
+      <!-- MATCH SETTINGS RECAP -->
+      <section>
+        <div class="section-head">
+          <h3>Match Settings</h3>
+          <a href="#" class="section-link" onclick="event.preventDefault(); window.location.href='create-session.html'">Edit</a>
+        </div>
+        <div class="info-row-list">
+          <div class="info-row">
+            <div class="ir-icon teal">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 12h18M12 3v18"/></svg>
+            </div>
+            <div class="ir-info">
+              <div class="ir-label">Court</div>
+              <div class="ir-value">2 Courts (paralel)</div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="ir-icon coral">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <div class="ir-info">
+              <div class="ir-label">Match End</div>
+              <div class="ir-value">Manual oleh host/co-host</div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="ir-icon yellow">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+            </div>
+            <div class="ir-info">
+              <div class="ir-label">Round</div>
+              <div class="ir-value">Auto count</div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="ir-icon purple">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><circle cx="17" cy="7" r="3"/></svg>
+            </div>
+            <div class="ir-info">
+              <div class="ir-label">Co-Host</div>
+              <div class="ir-value">2 co-host (Dimas, Rizki)</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MATCH STATUS -->
+      <section>
+        <div class="section-head">
+          <h3>Match Round Set</h3>
+        </div>
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <div class="empty-state-title">Belum ada match yang dibuat</div>
+          <div class="empty-state-text">Klik "Generate Match" di bawah saat semua pemain sudah datang. Kamu bisa buat extra match kapan saja saat session berjalan.</div>
+        </div>
+      </section>
+
+      <!-- DANGER ZONE -->
+      <section style="margin-top:var(--s-2);">
+        <button class="danger-link" onclick="if(confirm('Cancel session ini?')) showToast('Session di-cancel')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+          <span>Cancel Session</span>
+        </button>
+      </section>
+
+    </main>
+
+    <!-- STICKY FOOTER -->
+    <div class="sticky-footer">
+      <button class="btn-primary-lg" onclick="generateMatch()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6M12 18v4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M18 12h4"/></svg>
+        <span>Generate Match</span>
+      </button>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+  </div>
+
+  <script>
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._tt);
+      window._tt = setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    function copyInviteLink() {
+      const link = 'https://carsel.club/s/x7k2';
+      navigator.clipboard?.writeText(link);
+      showToast('Link berhasil di-copy: ' + link);
+    }
+
+    function generateMatch() {
+      window.location.href = 'generate-match.html';
+    }
+  </script>
+</body>
+</html>

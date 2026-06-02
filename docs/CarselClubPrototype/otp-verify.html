@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Verifikasi WhatsApp — Carsel Club</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="subscreen-header">
+      <button class="back-btn" id="backBtn" onclick="handleBack()" aria-label="Back">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <h2 class="subscreen-title" id="title">Verifikasi WhatsApp</h2>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="app-content subscreen with-footer">
+
+      <!-- STEP 1: Phone Input -->
+      <div class="auth-step" id="step-phone">
+        <div class="auth-icon-hero">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+          </svg>
+        </div>
+        <h2 class="auth-step-title">Masukkan Nomor WhatsApp</h2>
+        <p class="auth-step-sub">Kami akan kirim 6-digit kode OTP via WhatsApp untuk verifikasi nomor kamu.</p>
+
+        <div class="form-group" style="max-width:340px; margin:0 auto;">
+          <label class="form-label">Nomor WhatsApp</label>
+          <div class="phone-input-row">
+            <button class="country-pill" onclick="showToast('Country code picker — segera dibuat')">
+              <span class="flag">🇮🇩</span>
+              <span>+62</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <input type="tel" id="phoneInput" class="form-input" placeholder="81234567890" oninput="validatePhone()">
+          </div>
+          <p class="form-help">Nomor harus aktif WhatsApp untuk terima OTP.</p>
+        </div>
+      </div>
+
+      <!-- STEP 2: OTP Input -->
+      <div class="auth-step" id="step-otp" style="display:none;">
+        <div class="auth-icon-hero" style="background: linear-gradient(135deg, var(--primary), var(--primary-600)); box-shadow: 0 12px 28px rgba(20,184,166,0.4);">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M9 10h.01M13 10h.01M17 10h.01"/></svg>
+        </div>
+        <h2 class="auth-step-title">Cek WhatsApp Kamu</h2>
+        <p class="auth-step-sub">Kami baru saja kirim 6-digit kode ke <strong id="phoneDisplay">+62 81234567890</strong>. <a href="#" onclick="event.preventDefault(); editPhone();" style="color:var(--primary-700); font-weight:800; text-decoration:underline;">Ganti nomor</a></p>
+
+        <div class="otp-input-row" id="otpRow">
+          <input type="tel" inputmode="numeric" maxlength="1" class="otp-box" data-idx="0">
+          <input type="tel" inputmode="numeric" maxlength="1" class="otp-box" data-idx="1">
+          <input type="tel" inputmode="numeric" maxlength="1" class="otp-box" data-idx="2">
+          <input type="tel" inputmode="numeric" maxlength="1" class="otp-box" data-idx="3">
+          <input type="tel" inputmode="numeric" maxlength="1" class="otp-box" data-idx="4">
+          <input type="tel" inputmode="numeric" maxlength="1" class="otp-box" data-idx="5">
+        </div>
+
+        <div class="resend-row">
+          <p>Belum dapat kode? <span id="resendArea"><span class="timer">Kirim ulang dalam 0:<span id="timer">59</span></span></span></p>
+        </div>
+
+        <!-- Demo helper -->
+        <div style="background: var(--yellow-50); border: 1px solid #FDE68A; border-radius: var(--r-md); padding: 10px 12px; margin: var(--s-3) auto 0; max-width: 340px; display: flex; align-items: flex-start; gap: 8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:#B45309; flex-shrink:0; margin-top:1px;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+          <div style="font-size:11px; font-weight:700; color:#B45309; line-height:1.4;">
+            <strong>Demo:</strong> ketik 6 digit apa saja untuk verifikasi (auto-submit).
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- STICKY FOOTER -->
+    <div class="sticky-footer" id="footer">
+      <button class="btn-primary-lg" id="actionBtn" onclick="handleAction()" disabled>
+        <span id="actionText">Kirim OTP</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+  </div>
+
+  <script>
+    let currentStep = 'phone';
+    let resendTimerInt = null;
+    let resendSecs = 59;
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._tt);
+      window._tt = setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    function handleBack() {
+      if (currentStep === 'otp') {
+        editPhone();
+      } else {
+        window.location.href = 'login.html';
+      }
+    }
+
+    function validatePhone() {
+      const v = document.getElementById('phoneInput').value;
+      const btn = document.getElementById('actionBtn');
+      btn.disabled = v.length < 9;
+    }
+
+    function handleAction() {
+      if (currentStep === 'phone') {
+        sendOtp();
+      } else {
+        verifyOtp();
+      }
+    }
+
+    function sendOtp() {
+      const phone = document.getElementById('phoneInput').value;
+      if (!phone || phone.length < 9) {
+        showToast('Masukkan nomor WhatsApp yang valid');
+        return;
+      }
+      const btn = document.getElementById('actionBtn');
+      btn.classList.add('loading');
+      document.getElementById('actionText').textContent = 'Mengirim OTP...';
+
+      setTimeout(() => {
+        // Switch to OTP step
+        currentStep = 'otp';
+        document.getElementById('step-phone').style.display = 'none';
+        document.getElementById('step-otp').style.display = 'block';
+        document.getElementById('phoneDisplay').textContent = '+62 ' + phone;
+        document.getElementById('actionText').textContent = 'Verifikasi';
+        btn.classList.remove('loading');
+        btn.disabled = true;
+        document.getElementById('title').textContent = 'OTP Verification';
+        startResendTimer();
+        // Focus first OTP box
+        document.querySelector('.otp-box[data-idx="0"]').focus();
+      }, 800);
+    }
+
+    function editPhone() {
+      currentStep = 'phone';
+      document.getElementById('step-otp').style.display = 'none';
+      document.getElementById('step-phone').style.display = 'block';
+      document.getElementById('actionText').textContent = 'Kirim OTP';
+      document.getElementById('title').textContent = 'Verifikasi WhatsApp';
+      validatePhone();
+      stopResendTimer();
+    }
+
+    function startResendTimer() {
+      resendSecs = 59;
+      stopResendTimer();
+      resendTimerInt = setInterval(() => {
+        resendSecs--;
+        if (resendSecs <= 0) {
+          stopResendTimer();
+          document.getElementById('resendArea').innerHTML = '<a href="#" onclick="event.preventDefault(); resendOtp();">Kirim ulang OTP</a>';
+        } else {
+          const t = document.getElementById('timer');
+          if (t) t.textContent = resendSecs.toString().padStart(2, '0');
+        }
+      }, 1000);
+    }
+    function stopResendTimer() {
+      if (resendTimerInt) {
+        clearInterval(resendTimerInt);
+        resendTimerInt = null;
+      }
+    }
+
+    function resendOtp() {
+      showToast('OTP baru dikirim ke WhatsApp');
+      document.getElementById('resendArea').innerHTML = '<span class="timer">Kirim ulang dalam 0:<span id="timer">59</span></span>';
+      startResendTimer();
+    }
+
+    function verifyOtp() {
+      const otp = Array.from(document.querySelectorAll('.otp-box')).map(b => b.value).join('');
+      if (otp.length < 6) {
+        showToast('Masukkan 6-digit kode');
+        return;
+      }
+      const btn = document.getElementById('actionBtn');
+      btn.classList.add('loading');
+      document.getElementById('actionText').textContent = 'Memverifikasi...';
+      setTimeout(() => {
+        // For demo: assume new user → onboarding
+        window.location.href = 'onboarding.html';
+      }, 800);
+    }
+
+    // OTP boxes auto-advance
+    document.querySelectorAll('.otp-box').forEach((box, idx, all) => {
+      box.addEventListener('input', e => {
+        const v = e.target.value.replace(/[^0-9]/g, '');
+        e.target.value = v;
+        if (v) {
+          e.target.classList.add('filled');
+          if (idx + 1 < all.length) all[idx + 1].focus();
+        } else {
+          e.target.classList.remove('filled');
+        }
+
+        // Check completion → enable verify button
+        const allFilled = Array.from(all).every(b => b.value);
+        document.getElementById('actionBtn').disabled = !allFilled;
+
+        // Auto-submit when all filled
+        if (allFilled) {
+          setTimeout(verifyOtp, 200);
+        }
+      });
+      box.addEventListener('keydown', e => {
+        if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+          all[idx - 1].focus();
+          all[idx - 1].value = '';
+          all[idx - 1].classList.remove('filled');
+        }
+      });
+    });
+
+    validatePhone();
+  </script>
+</body>
+</html>

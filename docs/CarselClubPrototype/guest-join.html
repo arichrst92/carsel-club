@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Join as Guest — Sabtu Sore Padel</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="public-header">
+      <button class="back-btn" onclick="window.location.href='invite-landing.html'" aria-label="Back">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px;">
+        <div class="logo-mark" style="width:28px; height:28px; font-size:12px;">CC</div>
+        <span style="font-family:var(--font-display); font-weight:700; font-size:14px;">Carsel Club</span>
+      </div>
+      <div style="width:40px;"></div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="app-content subscreen with-footer">
+
+      <!-- STEP 1: Form (default) -->
+      <div id="formStep">
+        <!-- Hero -->
+        <section style="text-align:center; padding: var(--s-4) 0 var(--s-3);">
+          <div style="width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg, var(--bg-canvas) 0%, var(--accent-50) 100%); border: 2px dashed var(--accent); display:grid; place-items:center; margin:0 auto var(--s-3); font-size:36px;">👥</div>
+          <h2 class="auth-step-title">Join as Guest</h2>
+          <p class="auth-step-sub">Tanpa perlu daftar akun. Cukup masukin nama untuk join session.</p>
+        </section>
+
+        <!-- Session Reminder -->
+        <section>
+          <div class="session-chip-banner" style="background:var(--primary-50);">
+            <div class="scb-icon">🎾</div>
+            <div class="scb-info">
+              <div class="scb-label">Joining Session</div>
+              <div class="scb-name">Sabtu Sore Padel · 16 Mei · 16:00</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Name input -->
+        <section class="form-section">
+          <div class="form-group">
+            <label class="form-label">Nama Kamu <span class="req">*</span></label>
+            <input type="text" id="guestName" class="form-input" placeholder="Contoh: Pak Eko / Bu Sari / Andi" oninput="updateAvatar()">
+            <p class="form-help">Nama ini akan muncul di lineup match & session leaderboard. Bisa nama panggilan.</p>
+          </div>
+
+          <!-- Avatar preview -->
+          <div style="display:flex; align-items:center; gap:12px; padding:12px; background:var(--bg-soft); border-radius:var(--r-md); border:1.5px dashed var(--text-300);">
+            <div id="guestAvatar" style="width:44px; height:44px; border-radius:50%; background:var(--bg-canvas); color:var(--text-500); border:2px dashed var(--text-300); display:grid; place-items:center; font-family:var(--font-display); font-weight:800; font-size:16px;">?</div>
+            <div style="flex:1;">
+              <div style="font-family:var(--font-display); font-weight:800; font-size:13px; color:var(--text-900);" id="previewName">Belum ada nama</div>
+              <div style="font-size:11px; color:var(--text-500); font-weight:700;">👥 Guest · Session-only</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Comparison -->
+        <section>
+          <div class="section-head">
+            <h3 style="font-size:14px;">Yang Kamu Dapat sebagai Guest</h3>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="display:flex; gap:10px; align-items:center; padding:10px 12px; background:#DCFCE7; border-radius:var(--r-md);">
+              <span style="font-size:18px; flex-shrink:0;">✓</span>
+              <div style="font-size:12px; color:var(--text-900); font-weight:700;">Main session ini lengkap (semua round)</div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center; padding:10px 12px; background:#DCFCE7; border-radius:var(--r-md);">
+              <span style="font-size:18px; flex-shrink:0;">✓</span>
+              <div style="font-size:12px; color:var(--text-900); font-weight:700;">Lihat live score & match list real-time</div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center; padding:10px 12px; background:#DCFCE7; border-radius:var(--r-md);">
+              <span style="font-size:18px; flex-shrink:0;">✓</span>
+              <div style="font-size:12px; color:var(--text-900); font-weight:700;">Muncul di session leaderboard</div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center; padding:10px 12px; background:var(--accent-50); border-radius:var(--r-md);">
+              <span style="font-size:18px; flex-shrink:0; color:var(--accent-600);">×</span>
+              <div style="font-size:12px; color:var(--text-700); font-weight:700;">Point cuma di session ini, tidak tersimpan</div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center; padding:10px 12px; background:var(--accent-50); border-radius:var(--r-md);">
+              <span style="font-size:18px; flex-shrink:0; color:var(--accent-600);">×</span>
+              <div style="font-size:12px; color:var(--text-700); font-weight:700;">Tidak ada match history persisten</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Upgrade hint -->
+        <section style="margin-top: var(--s-2);">
+          <div style="display:flex; align-items:flex-start; gap:10px; padding:12px 14px; background:var(--primary-50); border:1px solid var(--primary-100); border-radius:var(--r-md);">
+            <span style="font-size:18px; flex-shrink:0;">💡</span>
+            <div>
+              <div style="font-family:var(--font-display); font-weight:800; font-size:13px; color:var(--primary-700); margin-bottom:2px;">Bisa upgrade kapan saja</div>
+              <div style="font-size:11px; color:var(--text-700); font-weight:600; line-height:1.5;">Suka pakai? Daftar akun setelah session untuk save point ke profile dan akses semua fitur. Point session ini tetap hilang (bukan migrasi).</div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- STEP 2: Confirmation (after submit) -->
+      <div id="confirmStep" style="display:none;">
+        <!-- Hero -->
+        <section class="celebration-hero" style="margin-bottom: var(--s-4);">
+          <div class="celebration-emoji">🎉</div>
+          <div class="celebration-title">You're In!</div>
+          <div class="celebration-sub" style="font-size:14px;">Welcome <strong id="welcomeName">Guest</strong>! Kamu sudah jadi peserta session.</div>
+          <div style="background:rgba(255,255,255,0.18); backdrop-filter:blur(8px); border-radius:var(--r-md); padding:12px; display:inline-flex; align-items:center; gap:10px; border:1px solid rgba(255,255,255,0.25);">
+            <div id="welcomeAvatar" style="width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,0.85); color:var(--text-900); display:grid; place-items:center; font-family:var(--font-display); font-weight:800; font-size:15px;">?</div>
+            <div style="text-align:left;">
+              <div style="font-family:var(--font-display); font-weight:800; font-size:13px;" id="welcomePlayerName">Guest</div>
+              <div style="font-size:11px; font-weight:700; opacity:0.85;">👥 Guest · 7 dari 7 pemain</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Session Info -->
+        <section>
+          <div class="hero-session" style="text-align:left; padding: var(--s-4);">
+            <div class="hero-title" style="font-size:18px; margin-bottom:var(--s-2);">Sabtu Sore Padel</div>
+            <div class="hero-meta">
+              <div class="hero-meta-row">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                <span>Sabtu, 16 Mei · 16:00 – 18:30</span>
+              </div>
+              <div class="hero-meta-row">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>GBK Padel Court</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Next Steps -->
+        <section>
+          <div class="section-head">
+            <h3>Yang Berikutnya</h3>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; gap:10px; align-items:center; padding:12px; background:var(--bg); border:1px solid var(--border-light); border-radius:var(--r-md);">
+              <div style="width:32px; height:32px; border-radius:50%; background:var(--primary-50); color:var(--primary-700); display:grid; place-items:center; flex-shrink:0; font-size:14px; font-weight:800;">1</div>
+              <div style="flex:1;">
+                <div style="font-family:var(--font-display); font-weight:800; font-size:13px; color:var(--text-900);">Datang on-time ke lokasi</div>
+                <div style="font-size:11px; color:var(--text-500); font-weight:600;">Sabtu, 16 Mei · 16:00 di GBK Padel Court</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center; padding:12px; background:var(--bg); border:1px solid var(--border-light); border-radius:var(--r-md);">
+              <div style="width:32px; height:32px; border-radius:50%; background:var(--primary-50); color:var(--primary-700); display:grid; place-items:center; flex-shrink:0; font-size:14px; font-weight:800;">2</div>
+              <div style="flex:1;">
+                <div style="font-family:var(--font-display); font-weight:800; font-size:13px; color:var(--text-900);">Pantau live score via link ini</div>
+                <div style="font-size:11px; color:var(--text-500); font-weight:600;">Bookmark page ini atau save link via WA</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center; padding:12px; background:var(--bg); border:1px solid var(--border-light); border-radius:var(--r-md);">
+              <div style="width:32px; height:32px; border-radius:50%; background:var(--primary-50); color:var(--primary-700); display:grid; place-items:center; flex-shrink:0; font-size:14px; font-weight:800;">3</div>
+              <div style="flex:1;">
+                <div style="font-family:var(--font-display); font-weight:800; font-size:13px; color:var(--text-900);">Host akan input score saat match</div>
+                <div style="font-size:11px; color:var(--text-500); font-weight:600;">Kamu fokus main, scoring di-handle host/co-host</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Upgrade CTA after session -->
+        <section style="margin-top: var(--s-3);">
+          <div class="install-banner">
+            <div class="install-banner-emoji">⭐</div>
+            <div class="install-banner-title">Suka cara ini? Daftar akun!</div>
+            <div class="install-banner-sub">Kamu bisa daftar kapan saja — match selanjutnya akan dapat point yang masuk profil & tier journey.</div>
+            <button class="install-banner-cta" onclick="showToast('Lanjut ke pendaftaran akun')">
+              <span>Buat Akun (Free)</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </section>
+      </div>
+
+    </main>
+
+    <!-- STICKY FOOTER -->
+    <div class="sticky-footer" id="footer">
+      <button class="btn-primary-lg" id="joinBtn" onclick="joinAsGuest()" disabled>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11l-3-3M19 8l3-3M19 11h-3"/></svg>
+        <span id="joinBtnText">Join as Guest</span>
+      </button>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+  </div>
+
+  <script>
+    let currentStep = 'form';
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._tt);
+      window._tt = setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    function updateAvatar() {
+      const name = document.getElementById('guestName').value.trim();
+      const initial = name.charAt(0).toUpperCase() || '?';
+      const avatar = document.getElementById('guestAvatar');
+      const preview = document.getElementById('previewName');
+
+      avatar.textContent = initial;
+      preview.textContent = name || 'Belum ada nama';
+
+      if (name) {
+        avatar.style.background = 'linear-gradient(135deg, #FACC15, #F59E0B)';
+        avatar.style.color = 'white';
+        avatar.style.borderStyle = 'solid';
+        avatar.style.borderColor = 'transparent';
+      } else {
+        avatar.style.background = 'var(--bg-canvas)';
+        avatar.style.color = 'var(--text-500)';
+        avatar.style.borderStyle = 'dashed';
+        avatar.style.borderColor = 'var(--text-300)';
+      }
+
+      document.getElementById('joinBtn').disabled = !name;
+    }
+
+    function joinAsGuest() {
+      const name = document.getElementById('guestName').value.trim();
+      if (!name) {
+        showToast('Masukkan nama dulu');
+        return;
+      }
+      const btn = document.getElementById('joinBtn');
+      btn.classList.add('loading');
+      document.getElementById('joinBtnText').textContent = 'Joining...';
+
+      setTimeout(() => {
+        // Switch to confirmation step
+        currentStep = 'confirm';
+        document.getElementById('formStep').style.display = 'none';
+        document.getElementById('confirmStep').style.display = 'block';
+
+        document.getElementById('welcomeName').textContent = name.split(' ')[0];
+        document.getElementById('welcomePlayerName').textContent = name;
+        const initial = name.charAt(0).toUpperCase();
+        document.getElementById('welcomeAvatar').textContent = initial;
+
+        // Update footer to view live link
+        document.getElementById('footer').innerHTML = `
+          <button class="btn-primary-lg" onclick="window.location.href='live-view.html'">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/></svg>
+            <span>Lihat Live Session</span>
+          </button>
+        `;
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 700);
+    }
+
+    updateAvatar();
+  </script>
+</body>
+</html>

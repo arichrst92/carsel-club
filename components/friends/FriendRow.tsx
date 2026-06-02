@@ -1,7 +1,8 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { removeFriendAction } from "@/app/actions/friends";
+import { Toast } from "@/components/ui/Toast";
 
 const TIER_EMOJI: Record<string, string> = {
   Rookie: "🥚",
@@ -23,18 +24,22 @@ type Props = {
 
 export function FriendRow(props: Props) {
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
   const initial = (props.displayName.trim()[0] ?? "?").toUpperCase();
   const tier = props.tierName ?? "Rookie";
 
   function handleRemove() {
     if (!confirm(`Remove ${props.displayName} dari friends?`)) return;
+    setError(null);
     startTransition(async () => {
       const result = await removeFriendAction(props.friendId);
-      if (result?.error) alert(result.error);
+      if (result?.error) setError(result.error);
     });
   }
 
   return (
+    <>
+    <Toast message={error} onDismiss={() => setError(null)} />
     <div className="player-list-item">
       <div
         className="player-avatar-lg member-1"
@@ -86,5 +91,6 @@ export function FriendRow(props: Props) {
         🗑
       </button>
     </div>
+    </>
   );
 }

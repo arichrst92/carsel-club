@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { formatDate, formatTime } from "@/lib/utils";
+import { Toast } from "@/components/ui/Toast";
 
 type Props = {
   sessionId: string;
@@ -26,6 +27,7 @@ export function SessionShareActions({
   hostName,
 }: Props) {
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   function buildInviteText(): string {
     const baseUrl = getAppUrl();
@@ -57,7 +59,7 @@ export function SessionShareActions({
       setTimeout(() => setCopied(false), 2000);
     } catch (e) {
       console.error("Failed to copy:", e);
-      alert("Gagal copy link. Coba lagi.");
+      setError("Gagal copy link. Coba lagi.");
     }
   }
 
@@ -85,6 +87,8 @@ export function SessionShareActions({
   }
 
   return (
+    <>
+    <Toast message={error} onDismiss={() => setError(null)} />
     <div className="quick-actions">
       <button
         type="button"
@@ -143,5 +147,6 @@ export function SessionShareActions({
         <div className="qa-sub">Live view URL</div>
       </button>
     </div>
+    </>
   );
 }

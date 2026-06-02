@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Notifications — Carsel Club</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="subscreen-header">
+      <button class="back-btn" onclick="window.location.href='index.html'" aria-label="Back">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <h2 class="subscreen-title">Notifications</h2>
+      <button class="subscreen-action" onclick="markAllRead()">Mark all read</button>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="app-content subscreen">
+
+      <!-- TABS -->
+      <section class="list-tabs">
+        <button class="list-tab active" data-tab="all" onclick="filterNotifs('all')">
+          <span>Semua</span>
+          <span class="tab-count" id="countAll">12</span>
+        </button>
+        <button class="list-tab" data-tab="unread" onclick="filterNotifs('unread')">
+          <span>🔴 Unread</span>
+          <span class="tab-count" id="countUnread">5</span>
+        </button>
+        <button class="list-tab" data-tab="important" onclick="filterNotifs('important')">
+          <span>⭐ Important</span>
+          <span class="tab-count">3</span>
+        </button>
+      </section>
+
+      <!-- NOTIFICATION LIST -->
+      <div id="notifList">
+        <!-- Rendered via JS -->
+      </div>
+
+    </main>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+  </div>
+
+  <script>
+    let notifs = [
+      // Today
+      { id: 1, type: 'invite', icon: 'invite', emoji: '🎾', title: 'Dimas mengundang kamu ke session', desc: '"Sabtu Sore Padel" · Sabtu, 16 Mei · 16:00 di GBK Padel Court.', time: '5 menit lalu', date: 'today', unread: true, important: true, actionLabel: 'Join', actionType: 'primary' },
+      { id: 2, type: 'reminder', icon: 'reminder', emoji: '⏰', title: 'Session dimulai 1 jam lagi', desc: '"Friday Night Round Robin" · Pondok Indah Padel.', time: '1 jam lalu', date: 'today', unread: true, important: true, actionLabel: 'Lihat', actionType: 'outline' },
+      { id: 3, type: 'tier', icon: 'tier', emoji: '🥈', title: 'Hampir Naik Tier!', desc: 'Cuma 60 pts lagi untuk naik dari Intermediate ke Advanced. Yuk main session.', time: '3 jam lalu', date: 'today', unread: true, important: false },
+
+      // Yesterday
+      { id: 4, type: 'result-win', icon: 'result-win', emoji: '🏆', title: 'Match selesai · Kamu menang!', desc: 'Court 1 · 21–18 vs Maya & Rizki. Earned +18 pts.', time: 'Kemarin · 19:30', date: 'yesterday', unread: true, important: false, actionLabel: 'Detail', actionType: 'outline' },
+      { id: 5, type: 'achievement', icon: 'achievement', emoji: '🔥', title: 'Achievement Unlocked: Streak 5!', desc: '5 kemenangan beruntun. Lanjutin terus!', time: 'Kemarin · 20:15', date: 'yesterday', unread: true, important: true, actionLabel: 'Share', actionType: 'primary' },
+      { id: 6, type: 'friend', icon: 'friend', emoji: '👥', title: 'Maya Sari menerima friend request', desc: 'Sekarang kamu berteman di Carsel Club.', time: 'Kemarin · 14:20', date: 'yesterday', unread: false, important: false },
+      { id: 7, type: 'result-loss', icon: 'result-loss', emoji: '⚡', title: 'Match selesai · Kalah tipis', desc: 'Court 2 · 17–21 vs Rio & Dimas. Earned +6 pts.', time: 'Kemarin · 11:30', date: 'yesterday', unread: false, important: false, actionLabel: 'Detail', actionType: 'outline' },
+
+      // This week
+      { id: 8, type: 'invite', icon: 'invite', emoji: '🎾', title: 'Citra mengundang kamu ke Mini Tournament', desc: '"Mini Tournament Senayan" · Minggu, 17 Mei · 18:00.', time: '2 hari lalu', date: 'week', unread: false, important: false, actionLabel: 'Join', actionType: 'primary' },
+      { id: 9, type: 'friend', icon: 'friend', emoji: '🎉', title: 'Hadi Pranata join Carsel Club via referral kamu', desc: 'Dapat +5 pts bonus referral!', time: '3 hari lalu', date: 'week', unread: false, important: false },
+      { id: 10, type: 'tier', icon: 'tier', emoji: '🏅', title: 'Selamat! Naik tier ke Intermediate', desc: 'Sekarang badge tier kamu Intermediate. Achievement Earned.', time: '4 hari lalu', date: 'week', unread: false, important: true, actionLabel: 'Share', actionType: 'primary' },
+      { id: 11, type: 'achievement', icon: 'achievement', emoji: '🎯', title: 'Mendekati 50 match', desc: 'Cuma 3 match lagi untuk unlock badge "50 Matches".', time: '5 hari lalu', date: 'week', unread: false, important: false },
+      { id: 12, type: 'system', icon: 'system', emoji: '✨', title: 'Selamat datang di Carsel Club!', desc: 'Bikin session pertamamu untuk mulai journey padelmu.', time: '1 minggu lalu', date: 'week', unread: false, important: false }
+    ];
+
+    let currentFilter = 'all';
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._tt);
+      window._tt = setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    function filterNotifs(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.list-tab').forEach(t => t.classList.remove('active'));
+      document.querySelector(`.list-tab[data-tab="${filter}"]`).classList.add('active');
+      render();
+    }
+
+    function markAllRead() {
+      notifs.forEach(n => n.unread = false);
+      showToast('Semua notifikasi ditandai sudah dibaca');
+      render();
+      updateCounts();
+    }
+
+    function markRead(id) {
+      const n = notifs.find(n => n.id === id);
+      if (n) n.unread = false;
+      render();
+      updateCounts();
+    }
+
+    function updateCounts() {
+      document.getElementById('countAll').textContent = notifs.length;
+      document.getElementById('countUnread').textContent = notifs.filter(n => n.unread).length;
+    }
+
+    function renderNotif(n) {
+      const action = n.actionLabel
+        ? `<span class="notif-action ${n.actionType === 'outline' ? 'outline' : (n.type.includes('result-loss') ? 'coral' : '')}">${n.actionLabel}</span>`
+        : '';
+      return `
+        <div class="notif-item ${n.unread ? 'unread' : ''}" onclick="markRead(${n.id}); ${n.type === 'invite' || n.type === 'reminder' ? "window.location.href='session-detail.html'" : (n.type.includes('result') ? "window.location.href='match-detail.html'" : "showToast('Open " + n.type + "')")}">
+          <div class="notif-icon ${n.icon}">${n.emoji}</div>
+          <div class="notif-content">
+            <div class="notif-title">${n.title}</div>
+            <div class="notif-desc">${n.desc}</div>
+            <div class="notif-meta">
+              <span class="notif-time">${n.time}</span>
+              ${action}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function render() {
+      let filtered = notifs;
+      if (currentFilter === 'unread') filtered = notifs.filter(n => n.unread);
+      else if (currentFilter === 'important') filtered = notifs.filter(n => n.important);
+
+      const groups = {
+        today: { label: '🔥 Hari Ini', items: [] },
+        yesterday: { label: 'Kemarin', items: [] },
+        week: { label: 'Minggu Ini', items: [] }
+      };
+      filtered.forEach(n => groups[n.date]?.items.push(n));
+
+      let html = '';
+      Object.values(groups).forEach(g => {
+        if (g.items.length === 0) return;
+        html += `
+          <div class="date-group">
+            <div class="date-group-header">
+              <span class="date-group-title">${g.label}</span>
+              <span class="date-group-count">${g.items.length} notif</span>
+            </div>
+            <div class="notif-list">${g.items.map(renderNotif).join('')}</div>
+          </div>
+        `;
+      });
+
+      if (filtered.length === 0) {
+        html = `<div class="empty-hero" style="margin-top:var(--s-4);">
+          <div class="empty-illustration" style="width:80px; height:80px; font-size:36px;">🔔</div>
+          <div class="empty-title" style="font-size:16px;">Tidak ada notifikasi</div>
+          <div class="empty-desc" style="font-size:13px;">Semua notifikasi sudah dibaca atau tidak ada yang sesuai filter.</div>
+        </div>`;
+      }
+
+      document.getElementById('notifList').innerHTML = html;
+    }
+
+    render();
+    updateCounts();
+  </script>
+</body>
+</html>
