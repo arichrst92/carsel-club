@@ -13,95 +13,12 @@
 import { eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { matches, matchRoundSets, sessionParticipants, users } from "@/lib/db/schema";
-import { SCORING, TIERS } from "@/lib/constants";
-
-type Outcome = "win" | "loss" | "draw";
-
-type TeamImpact = {
-  points: number;
-  outcome: Outcome;
-};
-
-type StatsDelta = {
-  pointsDelta: number;
-  matchesDelta: number;
-  winsDelta: number;
-  lossesDelta: number;
-  drawsDelta: number;
-};
-
-function computeImpact(t1: number, t2: number): {
-  team1: TeamImpact;
-  team2: TeamImpact;
-} {
-  if (t1 > t2) {
-    return {
-      team1: { points: SCORING.WIN_POINTS, outcome: "win" },
-      team2: { points: SCORING.LOSS_POINTS, outcome: "loss" },
-    };
-  }
-  if (t2 > t1) {
-    return {
-      team1: { points: SCORING.LOSS_POINTS, outcome: "loss" },
-      team2: { points: SCORING.WIN_POINTS, outcome: "win" },
-    };
-  }
-  return {
-    team1: { points: SCORING.DRAW_POINTS, outcome: "draw" },
-    team2: { points: SCORING.DRAW_POINTS, outcome: "draw" },
-  };
-}
-
-function computeDelta(
-  oldImpact: TeamImpact | null,
-  newImpact: TeamImpact | null
-): StatsDelta {
-  const old = {
-    points: oldImpact?.points ?? 0,
-    counted: oldImpact !== null,
-    win: oldImpact?.outcome === "win" ? 1 : 0,
-    loss: oldImpact?.outcome === "loss" ? 1 : 0,
-    draw: oldImpact?.outcome === "draw" ? 1 : 0,
-  };
-  const next = {
-    points: newImpact?.points ?? 0,
-    counted: newImpact !== null,
-    win: newImpact?.outcome === "win" ? 1 : 0,
-    loss: newImpact?.outcome === "loss" ? 1 : 0,
-    draw: newImpact?.outcome === "draw" ? 1 : 0,
-  };
-  return {
-    pointsDelta: next.points - old.points,
-    matchesDelta: (next.counted ? 1 : 0) - (old.counted ? 1 : 0),
-    winsDelta: next.win - old.win,
-    lossesDelta: next.loss - old.loss,
-    drawsDelta: next.draw - old.draw,
-  };
-}
-
-function isZeroDelta(d: StatsDelta): boolean {
-  return (
-    d.pointsDelta === 0 &&
-    d.matchesDelta === 0 &&
-    d.winsDelta === 0 &&
-    d.lossesDelta === 0 &&
-    d.drawsDelta === 0
-  );
-}
-
-/**
- * Compute the user's tier from their lifetime stats.
- * Highest tier where user meets BOTH min_points AND min_matches.
- */
-function computeTierId(totalPoints: number, totalMatches: number): number {
-  let highest = TIERS[0].id; // Rookie fallback
-  for (const tier of TIERS) {
-    if (totalPoints >= tier.minPoints && totalMatches >= tier.minMatches) {
-      highest = tier.id;
-    }
-  }
-  return highest;
-}
+import {
+  computeImpact,
+  computeDelta,
+  isZeroDelta,
+  computeTierId,
+} from "./stats-helpers";
 
 /**
  * Main entry: change match score + status, sync stats atomically.

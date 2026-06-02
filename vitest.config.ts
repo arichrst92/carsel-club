@@ -1,0 +1,50 @@
+/**
+ * Vitest config — unit tests for pure logic.
+ *
+ * Coverage policy: 100% on files that are explicitly tested.
+ * Add new files ke `coverage.include` setiap sprint yang touch logic.
+ * UI components, server actions DB-heavy, dan route handlers di-test via
+ * integration nanti (sprint terkait), bukan disini.
+ */
+
+import { defineConfig } from "vitest/config";
+import path from "node:path";
+
+export default defineConfig({
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "."),
+    },
+  },
+  test: {
+    globals: false,
+    environment: "node",
+    include: ["tests/**/*.test.ts"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html", "lcov"],
+      // Include = files yang WAJIB 100% covered.
+      // Cumulative — setiap sprint nambah file, tidak pernah turun.
+      include: [
+        "lib/match/generator.ts",
+        "lib/match/stats-helpers.ts",
+        "lib/auth/otp.ts",
+        "lib/achievements.ts",
+        "lib/utils.ts",
+      ],
+      // Exclude: files yang belum sprint-nya untuk di-test.
+      exclude: [
+        "**/*.test.ts",
+        "**/*.d.ts",
+        "node_modules/**",
+        ".next/**",
+      ],
+      thresholds: {
+        statements: 100,
+        branches: 100,
+        functions: 100,
+        lines: 100,
+      },
+    },
+  },
+});
