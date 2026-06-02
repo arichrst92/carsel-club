@@ -31,6 +31,10 @@ export default defineConfig({
         "lib/auth/otp.ts",
         "lib/achievements.ts",
         "lib/utils.ts",
+        // Sprint 1 — storage foundation
+        "lib/storage/image.ts",
+        "lib/storage/local.ts",
+        "lib/storage/rate-limit.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

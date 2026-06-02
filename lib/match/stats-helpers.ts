@@ -109,7 +109,9 @@ export function computeTierId(
   totalPoints: number,
   totalMatches: number
 ): number {
-  let highest = TIERS[0].id;
+  // TIERS di-declare `as const` → TIERS[0].id literal type `1`. Annotate
+  // sebagai `number` supaya assignment dari tier.id (union literal) valid.
+  let highest: number = TIERS[0].id;
   for (const tier of TIERS) {
     if (totalPoints >= tier.minPoints && totalMatches >= tier.minMatches) {
       highest = tier.id;

@@ -13,6 +13,9 @@
 # testing
 /coverage
 
+# dev uploads dir (prod pakai UPLOAD_DIR env, prod path di-mount terpisah)
+/uploads
+
 # next.js
 /.next/
 /out/
