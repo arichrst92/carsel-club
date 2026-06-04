@@ -13,6 +13,10 @@ import { CancelSessionButton } from "@/components/sessions/CancelSessionButton";
 import { GenerateRoundButton } from "@/components/sessions/GenerateRoundButton";
 import { SessionShareActions } from "@/components/sessions/SessionShareActions";
 import { JoinPublicSessionButton } from "@/components/sessions/JoinPublicSessionButton";
+import { StartSessionButton } from "@/components/sessions/StartSessionButton";
+import { EndSessionButton } from "@/components/sessions/EndSessionButton";
+import { ReopenSessionButton } from "@/components/sessions/ReopenSessionButton";
+import { SessionStatusTimeline } from "@/components/sessions/SessionStatusTimeline";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -65,7 +69,9 @@ export default async function SessionDetailPage({ params }: PageProps) {
     0
   );
   const totalMatches = rounds.reduce((acc, r) => acc + r.matches.length, 0);
+  const pendingMatches = totalMatches - completedMatches;
   const nextRoundNumber = (rounds.at(-1)?.roundNumber ?? 0) + 1;
+  const hasRounds = rounds.length > 0;
 
   return (
     <div className="app-shell">
@@ -556,10 +562,42 @@ export default async function SessionDetailPage({ params }: PageProps) {
           )}
         </section>
 
-        {/* DANGER ZONE */}
-        {staff && !isTerminal && (
-          <section style={{ marginTop: "var(--s-2)" }}>
-            <CancelSessionButton sessionId={session.id} />
+        {/* LIFECYCLE ACTIONS — host/co-host only */}
+        {staff && (
+          <section
+            style={{
+              marginTop: "var(--s-2)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+            }}
+          >
+            <SessionStatusTimeline current={session.status} />
+
+            {session.status === "upcoming" && (
+              <>
+                <StartSessionButton sessionId={session.id} />
+                <CancelSessionButton sessionId={session.id} />
+              </>
+            )}
+
+            {session.status === "live" && (
+              <>
+                <EndSessionButton
+                  sessionId={session.id}
+                  completedMatches={completedMatches}
+                  pendingMatches={pendingMatches}
+                />
+                <CancelSessionButton sessionId={session.id} />
+              </>
+            )}
+
+            {isTerminal && (
+              <ReopenSessionButton
+                sessionId={session.id}
+                hasRounds={hasRounds}
+              />
+            )}
           </section>
         )}
       </main>

@@ -39,6 +39,8 @@ export default defineConfig({
         "lib/log/sanitize.ts",
         "lib/log/format.ts",
         "lib/log/filter.ts",
+        // Sprint 3 — session lifecycle
+        "lib/sessions/lifecycle.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

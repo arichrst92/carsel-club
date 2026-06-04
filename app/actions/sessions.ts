@@ -15,6 +15,14 @@ import { sessions, sessionParticipants } from "@/lib/db/schema";
 import { getCurrentUser } from "@/lib/auth/get-current-user";
 import { isSessionStaff } from "@/lib/db/queries/sessions";
 import { event } from "@/lib/log";
+import {
+  transitionForEnd,
+  transitionForStart,
+  transitionForCancel,
+  transitionForReopen,
+  type SessionStatus,
+} from "@/lib/sessions/lifecycle";
+import { matchRoundSets } from "@/lib/db/schema";
 
 export type SessionActionState = { error?: string } | null;
 
@@ -160,31 +168,68 @@ export async function createSessionAction(
 }
 
 // ============================================================
-// Cancel Session
+// Lifecycle helpers — load session + staff check
+// ============================================================
+
+async function loadSessionForLifecycle(
+  sessionId: string
+): Promise<
+  | { ok: true; current: SessionStatus }
+  | { ok: false; error: string }
+> {
+  const [row] = await db
+    .select({ status: sessions.status })
+    .from(sessions)
+    .where(eq(sessions.id, sessionId))
+    .limit(1);
+  if (!row) return { ok: false, error: "Session tidak ditemukan" };
+  return { ok: true, current: row.status as SessionStatus };
+}
+
+async function requireStaff(
+  sessionId: string
+): Promise<{ ok: true; userId: string } | { ok: false; error: string }> {
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect("/login");
+  }
+  const isStaff = await isSessionStaff(sessionId, user!.id);
+  if (!isStaff) {
+    return { ok: false, error: "Hanya host/co-host yang bisa aksi ini" };
+  }
+  return { ok: true, userId: user!.id };
+}
+
+function revalidateSessionPaths(sessionId: string) {
+  revalidatePath("/sessions");
+  revalidatePath(`/sessions/${sessionId}`);
+  revalidatePath(`/sessions/${sessionId}/matches`);
+  revalidatePath(`/sessions/${sessionId}/participants`);
+}
+
+// ============================================================
+// Cancel Session — upcoming/live → cancelled
 // ============================================================
 
 export async function cancelSessionAction(
   sessionId: string
 ): Promise<SessionActionState> {
-  const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  const auth = await requireStaff(sessionId);
+  if (!auth.ok) return { error: auth.error };
+  const loaded = await loadSessionForLifecycle(sessionId);
+  if (!loaded.ok) return { error: loaded.error };
 
-  const isStaff = await isSessionStaff(sessionId, user.id);
-  if (!isStaff) {
-    return { error: "Hanya host/co-host yang bisa cancel" };
+  let target: SessionStatus;
+  try {
+    target = transitionForCancel(loaded.current);
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Cancel tidak diperbolehkan" };
   }
-
-  // Capture prior status untuk event context
-  const [before] = await db
-    .select({ status: sessions.status })
-    .from(sessions)
-    .where(eq(sessions.id, sessionId))
-    .limit(1);
 
   try {
     await db
       .update(sessions)
-      .set({ status: "cancelled", updatedAt: new Date() })
+      .set({ status: target, updatedAt: new Date() })
       .where(eq(sessions.id, sessionId));
   } catch (e) {
     console.error("[cancelSessionAction] error:", e);
@@ -193,11 +238,133 @@ export async function cancelSessionAction(
 
   event("session_cancelled", {
     sessionId,
-    wasLive: before?.status === "live",
-    priorStatus: before?.status ?? null,
+    wasLive: loaded.current === "live",
+    priorStatus: loaded.current,
   });
 
-  revalidatePath("/sessions");
-  revalidatePath(`/sessions/${sessionId}`);
+  revalidateSessionPaths(sessionId);
+  return null;
+}
+
+// ============================================================
+// Start Session — upcoming → live (explicit)
+// ============================================================
+
+export async function startSessionAction(
+  sessionId: string
+): Promise<SessionActionState> {
+  const auth = await requireStaff(sessionId);
+  if (!auth.ok) return { error: auth.error };
+  const loaded = await loadSessionForLifecycle(sessionId);
+  if (!loaded.ok) return { error: loaded.error };
+
+  let target: SessionStatus;
+  try {
+    target = transitionForStart(loaded.current);
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Tidak bisa start" };
+  }
+
+  try {
+    await db
+      .update(sessions)
+      .set({ status: target, updatedAt: new Date() })
+      .where(eq(sessions.id, sessionId));
+  } catch (e) {
+    console.error("[startSessionAction] error:", e);
+    return { error: "Gagal start. Coba lagi." };
+  }
+
+  event("session_started", { sessionId, priorStatus: loaded.current });
+  revalidateSessionPaths(sessionId);
+  return null;
+}
+
+// ============================================================
+// End Session — upcoming/live → completed
+// ============================================================
+
+export async function endSessionAction(
+  sessionId: string
+): Promise<SessionActionState> {
+  const auth = await requireStaff(sessionId);
+  if (!auth.ok) return { error: auth.error };
+  const loaded = await loadSessionForLifecycle(sessionId);
+  if (!loaded.ok) return { error: loaded.error };
+
+  let target: SessionStatus;
+  try {
+    target = transitionForEnd(loaded.current);
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Tidak bisa end" };
+  }
+
+  try {
+    await db
+      .update(sessions)
+      .set({
+        status: target,
+        endedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(sessions.id, sessionId));
+  } catch (e) {
+    console.error("[endSessionAction] error:", e);
+    return { error: "Gagal end. Coba lagi." };
+  }
+
+  event("session_ended", { sessionId, priorStatus: loaded.current });
+  revalidateSessionPaths(sessionId);
+  return null;
+}
+
+// ============================================================
+// Reopen Session — completed/cancelled → live (kalau ada rounds) atau upcoming
+// ============================================================
+
+export async function reopenSessionAction(
+  sessionId: string
+): Promise<SessionActionState> {
+  const auth = await requireStaff(sessionId);
+  if (!auth.ok) return { error: auth.error };
+  const loaded = await loadSessionForLifecycle(sessionId);
+  if (!loaded.ok) return { error: loaded.error };
+
+  // Cek apakah ada rounds
+  const [roundRow] = await db
+    .select({ id: matchRoundSets.id })
+    .from(matchRoundSets)
+    .where(eq(matchRoundSets.sessionId, sessionId))
+    .limit(1);
+  const hasRounds = !!roundRow;
+
+  let target: SessionStatus;
+  try {
+    target = transitionForReopen(loaded.current, hasRounds);
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Tidak bisa reopen" };
+  }
+
+  try {
+    await db
+      .update(sessions)
+      .set({
+        status: target,
+        endedAt: null, // bersihkan ended_at saat reopen
+        updatedAt: new Date(),
+      })
+      .where(eq(sessions.id, sessionId));
+  } catch (e) {
+    console.error("[reopenSessionAction] error:", e);
+    return { error: "Gagal reopen. Coba lagi." };
+  }
+
+  event("session_reopened", {
+    sessionId,
+    priorStatus: loaded.current,
+    targetStatus: target,
+    hasRounds,
+  });
+  revalidateSessionPaths(sessionId);
   return null;
 }

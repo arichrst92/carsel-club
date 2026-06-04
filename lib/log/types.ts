@@ -10,12 +10,15 @@ export type LogType = "log" | "event";
 /** Arbitrary key-value context attached to a log entry. */
 export type LogContext = Record<string, unknown>;
 
-/** Event names yang di-instrument oleh app — Sprint 2 scope (8 events). */
+/** Event names yang di-instrument oleh app. */
 export type EventName =
   | "signup"
   | "login"
   | "session_created"
+  | "session_started" // Sprint 3
+  | "session_ended" // Sprint 3
   | "session_cancelled"
+  | "session_reopened" // Sprint 3
   | "round_generated"
   | "match_completed"
   | "referral_claimed"
