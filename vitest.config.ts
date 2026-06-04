@@ -44,6 +44,8 @@ export default defineConfig({
         // Sprint 4 — match lifecycle + timer
         "lib/match/lifecycle.ts",
         "lib/match/timer.ts",
+        // Sprint 5 — match detail helpers
+        "lib/match/detail-helpers.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

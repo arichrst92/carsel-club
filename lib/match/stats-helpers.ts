@@ -15,6 +15,9 @@ export type TeamImpact = {
   outcome: Outcome;
 };
 
+// Re-export Outcome label di helper untuk consistency (avoid drift)
+// — sumber labels: lib/match/detail-helpers.ts
+
 export type StatsDelta = {
   pointsDelta: number;
   matchesDelta: number;

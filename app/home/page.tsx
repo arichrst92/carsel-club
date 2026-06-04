@@ -308,7 +308,7 @@ export default async function HomePage() {
               {recent.map((m) => (
                 <Link
                   key={m.matchId}
-                  href={`/sessions/${m.sessionId}`}
+                  href={`/sessions/${m.sessionId}/matches/${m.matchId}`}
                   className="activity-item"
                   style={{ textDecoration: "none" }}
                 >
