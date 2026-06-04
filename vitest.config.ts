@@ -41,6 +41,9 @@ export default defineConfig({
         "lib/log/filter.ts",
         // Sprint 3 — session lifecycle
         "lib/sessions/lifecycle.ts",
+        // Sprint 4 — match lifecycle + timer
+        "lib/match/lifecycle.ts",
+        "lib/match/timer.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

@@ -6,8 +6,11 @@ import {
   updateMatchScoreAction,
   endMatchAction,
   editCompletedMatchScoreAction,
+  startMatchAction,
+  revertMatchAction,
 } from "@/app/actions/matches";
 import { ShareMatchButton } from "./ShareMatchButton";
+import { MatchTimer } from "./MatchTimer";
 import { Toast } from "@/components/ui/Toast";
 
 type ParticipantLookup = Record<
@@ -55,10 +58,14 @@ export function MatchCard({
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
+  const isPending_ = match.status === "pending";
+  const isLive = match.status === "live";
   const isCompleted = match.status === "completed";
   const status = STATUS_STYLES[match.status];
 
-  const showLiveControls = canManage && !isCompleted;
+  // Sprint 4: strict — pending matches no score adjust, harus Start dulu.
+  const showStartButton = canManage && isPending_;
+  const showLiveControls = canManage && isLive;
   const showEditControls = canManage && isCompleted;
   const canAdjust = showLiveControls || editing;
 
@@ -85,6 +92,7 @@ export function MatchCard({
 
     if (editing) return;
     if (isCompleted) return;
+    if (isPending_) return; // strict — should never happen, buttons hidden
 
     startTransition(async () => {
       const result = await updateMatchScoreAction(match.id, newT1, newT2);
@@ -93,6 +101,28 @@ export function MatchCard({
         setT1(match.team1Score);
         setT2(match.team2Score);
       }
+    });
+  }
+
+  function handleStart() {
+    setError(null);
+    startTransition(async () => {
+      const result = await startMatchAction(match.id);
+      if (result?.error) setError(result.error);
+    });
+  }
+
+  function handleRevert() {
+    if (
+      !confirm(
+        "Revert match ini ke LIVE?\n\nScores tetap, tapi stats yg sudah accrued akan di-reverse. Kamu bisa edit lagi setelah revert."
+      )
+    )
+      return;
+    setError(null);
+    startTransition(async () => {
+      const result = await revertMatchAction(match.id);
+      if (result?.error) setError(result.error);
     });
   }
 
@@ -156,20 +186,28 @@ export function MatchCard({
         >
           Court {match.courtNumber}
         </div>
-        <span
-          style={{
-            padding: "3px 10px",
-            borderRadius: "var(--r-full)",
-            fontSize: 10,
-            fontWeight: 800,
-            textTransform: "uppercase",
-            letterSpacing: "0.06em",
-            background: status.bg,
-            color: status.color,
-          }}
-        >
-          {status.label}
-        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {(isLive || isCompleted) && (
+            <MatchTimer
+              startedAt={match.startedAt}
+              endedAt={isCompleted ? match.endedAt : null}
+            />
+          )}
+          <span
+            style={{
+              padding: "3px 10px",
+              borderRadius: "var(--r-full)",
+              fontSize: 10,
+              fontWeight: 800,
+              textTransform: "uppercase",
+              letterSpacing: "0.06em",
+              background: status.bg,
+              color: status.color,
+            }}
+          >
+            {status.label}
+          </span>
+        </div>
       </div>
 
       {/* Teams */}
@@ -222,6 +260,35 @@ export function MatchCard({
       />
 
       {/* Actions */}
+      {showStartButton && (
+        <button
+          type="button"
+          onClick={handleStart}
+          disabled={isPending}
+          className="btn-primary-lg"
+          style={{
+            marginTop: "var(--s-3)",
+            padding: "10px 16px",
+            fontSize: 13,
+            width: "100%",
+          }}
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M5 3l14 9-14 9V3z" />
+          </svg>
+          <span>{isPending ? "Memulai..." : "Start Game"}</span>
+        </button>
+      )}
+
       {showLiveControls && (
         <button
           type="button"
@@ -240,25 +307,46 @@ export function MatchCard({
       )}
 
       {showEditControls && !editing && (
-        <button
-          type="button"
-          onClick={() => setEditing(true)}
-          style={{
-            marginTop: "var(--s-3)",
-            padding: "8px 14px",
-            width: "100%",
-            borderRadius: "var(--r-md)",
-            border: "1px solid var(--border-light)",
-            background: "transparent",
-            fontFamily: "var(--font-display)",
-            fontWeight: 700,
-            fontSize: 12,
-            color: "var(--text-700)",
-            cursor: "pointer",
-          }}
-        >
-          ✏️ Edit Score
-        </button>
+        <div style={{ display: "flex", gap: 8, marginTop: "var(--s-3)" }}>
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            disabled={isPending}
+            style={{
+              flex: 1,
+              padding: "8px 14px",
+              borderRadius: "var(--r-md)",
+              border: "1px solid var(--border-light)",
+              background: "transparent",
+              fontFamily: "var(--font-display)",
+              fontWeight: 700,
+              fontSize: 12,
+              color: "var(--text-700)",
+              cursor: "pointer",
+            }}
+          >
+            ✏️ Edit Score
+          </button>
+          <button
+            type="button"
+            onClick={handleRevert}
+            disabled={isPending}
+            title="Revert ke LIVE — reverse stats yg sudah accrued"
+            style={{
+              padding: "8px 12px",
+              borderRadius: "var(--r-md)",
+              border: "1px solid var(--border-light)",
+              background: "transparent",
+              fontFamily: "var(--font-display)",
+              fontWeight: 700,
+              fontSize: 12,
+              color: "var(--text-700)",
+              cursor: "pointer",
+            }}
+          >
+            ↺ Revert
+          </button>
+        </div>
       )}
 
       {showEditControls && editing && (

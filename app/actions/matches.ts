@@ -24,6 +24,11 @@ import {
 import { generateRound } from "@/lib/match/generator";
 import { applyMatchScoreChange } from "@/lib/match/stats-sync";
 import { event } from "@/lib/log";
+import {
+  transitionForMatchStart,
+  transitionForMatchRevert,
+  canAdjustScore,
+} from "@/lib/match/lifecycle";
 
 export async function generateRoundAction(
   sessionId: string
@@ -200,6 +205,11 @@ export async function updateMatchScoreAction(
     };
   }
 
+  // Strict: pending matches harus di-Start dulu (Sprint 4 enforcement).
+  if (!canAdjustScore(loaded.status)) {
+    return { error: "Mulai match dulu (klik Start Game)." };
+  }
+
   try {
     await applyMatchScoreChange(matchId, team1Score, team2Score, "live");
   } catch (e) {
@@ -208,6 +218,93 @@ export async function updateMatchScoreAction(
   }
 
   revalidatePath(`/sessions/${loaded.sessionId}`);
+  return null;
+}
+
+// ============================================================
+// Start Match — pending → live + started_at
+// ============================================================
+
+export async function startMatchAction(
+  matchId: string
+): Promise<{ error?: string } | null> {
+  const me = await getCurrentUser();
+  if (!me) redirect("/login");
+
+  const loaded = await loadMatchForMutation(matchId);
+  if (!("ok" in loaded)) return loaded;
+
+  if (!(await isSessionStaff(loaded.sessionId, me.id))) {
+    return { error: "Hanya host/co-host yang bisa start match" };
+  }
+
+  try {
+    transitionForMatchStart(loaded.status);
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Tidak bisa start" };
+  }
+
+  // Transition pending → live, scores stay 0 (no stats applied).
+  try {
+    await applyMatchScoreChange(matchId, 0, 0, "live");
+  } catch (e) {
+    console.error("[startMatchAction]", e);
+    return { error: "Gagal start match." };
+  }
+
+  event("match_started", { matchId, sessionId: loaded.sessionId });
+  revalidatePath(`/sessions/${loaded.sessionId}`);
+  revalidatePath(`/sessions/${loaded.sessionId}/matches`);
+  return null;
+}
+
+// ============================================================
+// Revert Match — completed → live (preserve scores, reverse stats)
+// ============================================================
+
+export async function revertMatchAction(
+  matchId: string
+): Promise<{ error?: string } | null> {
+  const me = await getCurrentUser();
+  if (!me) redirect("/login");
+
+  const loaded = await loadMatchForMutation(matchId);
+  if (!("ok" in loaded)) return loaded;
+
+  if (!(await isSessionStaff(loaded.sessionId, me.id))) {
+    return { error: "Hanya host/co-host yang bisa revert" };
+  }
+
+  try {
+    transitionForMatchRevert(loaded.status);
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Tidak bisa revert" };
+  }
+
+  // Load current scores untuk dipertahankan
+  const [row] = await db
+    .select({ t1: matches.team1Score, t2: matches.team2Score })
+    .from(matches)
+    .where(eq(matches.id, matchId))
+    .limit(1);
+  if (!row) return { error: "Match tidak ditemukan" };
+
+  // applyMatchScoreChange dari completed → live akan reverse stats
+  // (delta dari completed-impact ke null-impact = negate).
+  try {
+    await applyMatchScoreChange(matchId, row.t1, row.t2, "live");
+  } catch (e) {
+    console.error("[revertMatchAction]", e);
+    return { error: "Gagal revert match." };
+  }
+
+  event("match_reverted", {
+    matchId,
+    sessionId: loaded.sessionId,
+    preservedScores: { team1: row.t1, team2: row.t2 },
+  });
+  revalidatePath(`/sessions/${loaded.sessionId}`);
+  revalidatePath(`/sessions/${loaded.sessionId}/matches`);
   return null;
 }
 

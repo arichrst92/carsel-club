@@ -20,7 +20,9 @@ export type EventName =
   | "session_cancelled"
   | "session_reopened" // Sprint 3
   | "round_generated"
+  | "match_started" // Sprint 4
   | "match_completed"
+  | "match_reverted" // Sprint 4
   | "referral_claimed"
   | "upload_success";
 
