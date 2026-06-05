@@ -7,7 +7,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { and, eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
   matches,
@@ -162,6 +162,176 @@ export async function generateRoundAction(
   });
 
   revalidatePath(`/sessions/${sessionId}`);
+  return null;
+}
+
+// ============================================================
+// Regenerate Round — hapus pending matches + re-run generator
+// ============================================================
+
+export async function regenerateRoundAction(
+  roundSetId: string
+): Promise<{ error?: string } | null> {
+  const me = await getCurrentUser();
+  if (!me) redirect("/login");
+
+  // Load round set + matches
+  const [round] = await db
+    .select()
+    .from(matchRoundSets)
+    .where(eq(matchRoundSets.id, roundSetId))
+    .limit(1);
+
+  if (!round) return { error: "Round tidak ditemukan" };
+
+  if (!(await isSessionStaff(round.sessionId, me.id))) {
+    return { error: "Hanya host/co-host yang bisa regenerate" };
+  }
+
+  if (round.status !== "pending") {
+    return {
+      error: "Hanya round status 'pending' yang bisa di-regenerate",
+    };
+  }
+
+  // Check semua matches pending
+  const existingMatches = await db
+    .select({
+      id: matches.id,
+      status: matches.status,
+      team1P1Id: matches.team1P1Id,
+      team1P2Id: matches.team1P2Id,
+      team2P1Id: matches.team2P1Id,
+      team2P2Id: matches.team2P2Id,
+    })
+    .from(matches)
+    .where(eq(matches.matchRoundSetId, roundSetId));
+
+  const allPending = existingMatches.every((m) => m.status === "pending");
+  if (!allPending) {
+    return {
+      error:
+        "Ada match yang sudah live/completed. Hanya round dengan semua match pending yang bisa di-regenerate.",
+    };
+  }
+
+  // Derive participant pool dari matches existing (yg dipilih saat generate awal)
+  const originalParticipantIds = new Set<string>();
+  for (const m of existingMatches) {
+    originalParticipantIds.add(m.team1P1Id);
+    originalParticipantIds.add(m.team1P2Id);
+    originalParticipantIds.add(m.team2P1Id);
+    originalParticipantIds.add(m.team2P2Id);
+  }
+
+  // Load fresh sessionMatches stats untuk participants (untuk sit-out fairness)
+  const participants = await db
+    .select({
+      id: sessionParticipants.id,
+      sessionMatches: sessionParticipants.sessionMatches,
+    })
+    .from(sessionParticipants)
+    .where(eq(sessionParticipants.sessionId, round.sessionId));
+
+  const activePool = participants.filter((p) =>
+    originalParticipantIds.has(p.id)
+  );
+
+  if (activePool.length < 4) {
+    return { error: "Butuh minimal 4 pemain untuk regenerate" };
+  }
+
+  // Load session untuk numCourts
+  const [session] = await db
+    .select({ numCourts: sessions.numCourts })
+    .from(sessions)
+    .where(eq(sessions.id, round.sessionId))
+    .limit(1);
+  if (!session) return { error: "Session tidak ditemukan" };
+
+  // Pair history dari rounds LAIN (exclude current round yang sedang
+  // di-regenerate, supaya pasangan di round ini tidak jadi self-reference).
+  const pastMatchesExcludingCurrent = await db
+    .select({
+      team1P1Id: matches.team1P1Id,
+      team1P2Id: matches.team1P2Id,
+      team2P1Id: matches.team2P1Id,
+      team2P2Id: matches.team2P2Id,
+    })
+    .from(matches)
+    .innerJoin(matchRoundSets, eq(matches.matchRoundSetId, matchRoundSets.id))
+    .where(
+      and(
+        eq(matchRoundSets.sessionId, round.sessionId),
+        ne(matches.matchRoundSetId, roundSetId)
+      )
+    );
+
+  const pairHistory = new Map<string, Set<string>>();
+  function record(a: string, b: string) {
+    if (!pairHistory.has(a)) pairHistory.set(a, new Set());
+    pairHistory.get(a)!.add(b);
+    if (!pairHistory.has(b)) pairHistory.set(b, new Set());
+    pairHistory.get(b)!.add(a);
+  }
+  for (const m of pastMatchesExcludingCurrent) {
+    record(m.team1P1Id, m.team1P2Id);
+    record(m.team2P1Id, m.team2P2Id);
+  }
+
+  // Regenerate
+  let result;
+  try {
+    result = generateRound(activePool, session.numCourts, pairHistory);
+  } catch (e) {
+    console.error("[regenerateRoundAction] algo error:", e);
+    return { error: "Gagal generate pairing. Coba lagi." };
+  }
+
+  // Transaction: delete existing matches + insert new
+  try {
+    await db.transaction(async (tx) => {
+      await tx
+        .delete(matches)
+        .where(eq(matches.matchRoundSetId, roundSetId));
+
+      if (result.matches.length > 0) {
+        await tx.insert(matches).values(
+          result.matches.map((m) => ({
+            matchRoundSetId: roundSetId,
+            courtNumber: m.courtNumber,
+            matchPosition: m.courtNumber,
+            team1P1Id: m.team1[0],
+            team1P2Id: m.team1[1],
+            team2P1Id: m.team2[0],
+            team2P2Id: m.team2[1],
+            status: "pending" as const,
+          }))
+        );
+      }
+
+      // Update generated_by (track who regenerated last)
+      await tx
+        .update(matchRoundSets)
+        .set({ generatedBy: me.id })
+        .where(eq(matchRoundSets.id, roundSetId));
+    });
+  } catch (e) {
+    console.error("[regenerateRoundAction] tx error:", e);
+    return { error: "Gagal save round. Coba lagi." };
+  }
+
+  event("round_regenerated", {
+    sessionId: round.sessionId,
+    roundSetId,
+    roundNumber: round.roundNumber,
+    courts: result.matches.length,
+    players: activePool.length,
+    violations: result.violations,
+  });
+
+  revalidatePath(`/sessions/${round.sessionId}`);
+  revalidatePath(`/sessions/${round.sessionId}/matches`);
   return null;
 }
 

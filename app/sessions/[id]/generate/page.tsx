@@ -70,6 +70,8 @@ export default async function GenerateMatchPage({ params }: PageProps) {
       <GenerateMatchConfig
         sessionId={session.id}
         sessionTitle={session.title}
+        sessionFormat={session.format}
+        sessionFixPartners={session.fixPartners}
         numCourts={session.numCourts}
         nextRoundNumber={nextRoundNumber}
         participants={participants}

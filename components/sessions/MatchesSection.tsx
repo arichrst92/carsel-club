@@ -1,6 +1,7 @@
 import { getRoundsWithMatches } from "@/lib/db/queries/matches";
 import { MatchCard } from "./MatchCard";
 import { GenerateRoundButton } from "./GenerateRoundButton";
+import { RegenerateRoundButton } from "./RegenerateRoundButton";
 
 type Participant = {
   id: string;
@@ -93,25 +94,49 @@ export async function MatchesSection({
           .filter((p) => p.isPlaying && !playingIds.has(p.id))
           .map((p) => lookup[p.id].name);
 
+        const allPending =
+          round.matches.length > 0 &&
+          round.matches.every((m) => m.status === "pending");
+        const canRegenerate =
+          staff && !isTerminal && round.status === "pending" && allPending;
+
         return (
           <section key={round.id} style={{ marginBottom: "var(--s-5)" }}>
-            <div className="section-head">
+            <div
+              className="section-head"
+              style={{ alignItems: "center", gap: 8 }}
+            >
               <h3>Round {round.roundNumber}</h3>
-              <span
+              <div
                 style={{
-                  fontSize: 11,
-                  color: "var(--text-500)",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.04em",
+                  marginLeft: "auto",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
                 }}
               >
-                {round.status === "completed"
-                  ? "Selesai"
-                  : round.status === "in_progress"
-                    ? "Live"
-                    : "Pending"}
-              </span>
+                {canRegenerate && (
+                  <RegenerateRoundButton
+                    roundSetId={round.id}
+                    roundNumber={round.roundNumber}
+                  />
+                )}
+                <span
+                  style={{
+                    fontSize: 11,
+                    color: "var(--text-500)",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.04em",
+                  }}
+                >
+                  {round.status === "completed"
+                    ? "Selesai"
+                    : round.status === "in_progress"
+                      ? "Live"
+                      : "Pending"}
+                </span>
+              </div>
             </div>
 
             <div

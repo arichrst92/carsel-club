@@ -11,6 +11,7 @@
 import { useState, useTransition, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { generateRoundAction } from "@/app/actions/matches";
+import { suggestRoundCount } from "@/lib/match/round-count";
 import { Toast } from "@/components/ui/Toast";
 
 type Participant = {
@@ -26,6 +27,8 @@ type Participant = {
 type Props = {
   sessionId: string;
   sessionTitle: string;
+  sessionFormat: "americano" | "mexicano" | "tournament";
+  sessionFixPartners: boolean;
   numCourts: number;
   nextRoundNumber: number;
   participants: Participant[];
@@ -34,6 +37,8 @@ type Props = {
 export function GenerateMatchConfig({
   sessionId,
   sessionTitle,
+  sessionFormat,
+  sessionFixPartners,
   numCourts,
   nextRoundNumber,
   participants,
@@ -50,6 +55,17 @@ export function GenerateMatchConfig({
   const playingThisRound = courtsThisRound * 4;
   const sitOuts = activeCount - playingThisRound;
   const canGenerate = activeCount >= 4;
+
+  // Sprint 14: smart default round count suggestion
+  const roundSuggestion = useMemo(
+    () =>
+      suggestRoundCount({
+        format: sessionFormat,
+        fixPartners: sessionFixPartners,
+        playerCount: activeCount,
+      }),
+    [sessionFormat, sessionFixPartners, activeCount]
+  );
 
   // Grouping
   const hostsAndCohosts = useMemo(
@@ -145,6 +161,46 @@ export function GenerateMatchConfig({
             {sessionTitle}
           </div>
         </div>
+
+        {/* Sprint 14: Smart default round count hint */}
+        {canGenerate && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "10px 14px",
+              background: "var(--bg-soft)",
+              border: "1px dashed var(--border)",
+              borderRadius: "var(--r-md)",
+              marginBottom: "var(--s-3)",
+              fontSize: 12,
+            }}
+          >
+            <span style={{ fontSize: 18 }}>💡</span>
+            <div style={{ flex: 1 }}>
+              <div
+                style={{
+                  fontWeight: 700,
+                  color: "var(--text-900)",
+                  fontFamily: "var(--font-display)",
+                }}
+              >
+                Suggested: ~{roundSuggestion.suggested} round total
+              </div>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "var(--text-500)",
+                  fontWeight: 600,
+                  marginTop: 2,
+                }}
+              >
+                {roundSuggestion.reason}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Quick actions */}
         <div
