@@ -10,6 +10,7 @@ import {
   matchRoundSets,
   sessionParticipants,
   sessions,
+  tierDefinitions,
   users,
 } from "@/lib/db/schema";
 
@@ -83,5 +84,125 @@ export async function getPublicSessionView(sessionId: string) {
     currentRound,
     currentMatches,
     totalRounds,
+  };
+}
+
+// ============================================================
+// getPublicMatchView — Sprint 6: per-match share
+// ============================================================
+
+export type PublicMatchPlayer = {
+  participantId: string;
+  side: "team1" | "team2";
+  slot: 1 | 2;
+  name: string;
+  isMember: boolean;
+  avatarUrl: string | null;
+  tierName: string | null;
+  tierColor: string | null;
+};
+
+export async function getPublicMatchView(matchId: string) {
+  const [row] = await db
+    .select({
+      mId: matches.id,
+      mStatus: matches.status,
+      mCourtNumber: matches.courtNumber,
+      mT1Score: matches.team1Score,
+      mT2Score: matches.team2Score,
+      mStartedAt: matches.startedAt,
+      mEndedAt: matches.endedAt,
+      mT1P1: matches.team1P1Id,
+      mT1P2: matches.team1P2Id,
+      mT2P1: matches.team2P1Id,
+      mT2P2: matches.team2P2Id,
+      rNumber: matchRoundSets.roundNumber,
+      sId: sessions.id,
+      sTitle: sessions.title,
+      sVenueName: sessions.venueName,
+      sFormat: sessions.format,
+      sStatus: sessions.status,
+      sScheduledAt: sessions.scheduledAt,
+      hostName: users.displayName,
+    })
+    .from(matches)
+    .innerJoin(matchRoundSets, eq(matchRoundSets.id, matches.matchRoundSetId))
+    .innerJoin(sessions, eq(sessions.id, matchRoundSets.sessionId))
+    .leftJoin(users, eq(users.id, sessions.hostId))
+    .where(eq(matches.id, matchId))
+    .limit(1);
+
+  if (!row) return null;
+
+  // Fetch 4 players
+  const partIds = [row.mT1P1, row.mT1P2, row.mT2P1, row.mT2P2];
+  const partRows = await db
+    .select({
+      pId: sessionParticipants.id,
+      pUserId: sessionParticipants.userId,
+      pGuestName: sessionParticipants.guestName,
+      uDisplayName: users.displayName,
+      uAvatarUrl: users.avatarUrl,
+      tName: tierDefinitions.name,
+      tColor: tierDefinitions.color,
+    })
+    .from(sessionParticipants)
+    .leftJoin(users, eq(users.id, sessionParticipants.userId))
+    .leftJoin(
+      tierDefinitions,
+      eq(tierDefinitions.id, users.currentTierId)
+    )
+    .where(inArray(sessionParticipants.id, partIds));
+
+  const byId = new Map(partRows.map((r) => [r.pId, r]));
+
+  function makePlayer(
+    pid: string,
+    side: "team1" | "team2",
+    slot: 1 | 2
+  ): PublicMatchPlayer {
+    const p = byId.get(pid);
+    return {
+      participantId: pid,
+      side,
+      slot,
+      name: p?.pGuestName ?? p?.uDisplayName ?? "?",
+      isMember: !!p?.pUserId,
+      avatarUrl: p?.uAvatarUrl ?? null,
+      tierName: p?.tName ?? null,
+      tierColor: p?.tColor ?? null,
+    };
+  }
+
+  const players: PublicMatchPlayer[] = [
+    makePlayer(row.mT1P1, "team1", 1),
+    makePlayer(row.mT1P2, "team1", 2),
+    makePlayer(row.mT2P1, "team2", 1),
+    makePlayer(row.mT2P2, "team2", 2),
+  ];
+
+  return {
+    match: {
+      id: row.mId,
+      status: row.mStatus,
+      courtNumber: row.mCourtNumber,
+      team1Score: row.mT1Score,
+      team2Score: row.mT2Score,
+      startedAt: row.mStartedAt,
+      endedAt: row.mEndedAt,
+    },
+    round: {
+      number: row.rNumber,
+    },
+    session: {
+      id: row.sId,
+      title: row.sTitle,
+      venueName: row.sVenueName,
+      format: row.sFormat,
+      status: row.sStatus,
+      scheduledAt: row.sScheduledAt,
+      hostName: row.hostName,
+    },
+    players,
   };
 }

@@ -389,7 +389,7 @@ export function MatchCard({
       {/* Share button — only for completed matches */}
       {isCompleted && !editing && (
         <ShareMatchButton
-          sessionId={sessionId}
+          matchId={match.id}
           sessionTitle={sessionTitle}
           team1Names={team1Names}
           team2Names={team2Names}

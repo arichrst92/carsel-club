@@ -246,7 +246,7 @@ export default async function MatchDetailPage({ params }: PageProps) {
         {isCompleted && (
           <section>
             <ShareMatchButton
-              sessionId={session.id}
+              matchId={match.id}
               sessionTitle={session.title}
               team1Names={team1Names}
               team2Names={team2Names}

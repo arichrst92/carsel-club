@@ -1,7 +1,7 @@
 "use client";
 
 type Props = {
-  sessionId: string;
+  matchId: string;
   sessionTitle: string;
   team1Names: string[];
   team2Names: string[];
@@ -48,7 +48,7 @@ function buildText({
 }
 
 export function ShareMatchButton({
-  sessionId,
+  matchId,
   sessionTitle,
   team1Names,
   team2Names,
@@ -56,7 +56,7 @@ export function ShareMatchButton({
   team2Score,
 }: Props) {
   async function handleShare() {
-    const url = `${getAppUrl()}/s/${sessionId}`;
+    const url = `${getAppUrl()}/s/match/${matchId}`;
     const text = buildText({
       sessionTitle,
       team1Names,
