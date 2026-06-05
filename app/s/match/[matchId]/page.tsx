@@ -393,6 +393,8 @@ function PublicPlayerRow({
     avatarUrl: string | null;
     tierName: string | null;
     tierColor: string | null;
+    totalMatches: number;
+    totalWins: number;
   };
   t1Score: number;
   t2Score: number;
@@ -400,6 +402,10 @@ function PublicPlayerRow({
 }) {
   const stats = computePlayerStats(t1Score, t2Score, player.side);
   const initial = (player.name.trim()[0] ?? "?").toUpperCase();
+  const winRate =
+    player.totalMatches >= 5
+      ? Math.round((player.totalWins / player.totalMatches) * 100)
+      : null;
 
   return (
     <div
@@ -452,10 +458,35 @@ function PublicPlayerRow({
             color: "var(--text-500)",
             fontWeight: 600,
             marginTop: 2,
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
           }}
         >
-          {player.tierName ?? "—"} ·{" "}
-          {player.side === "team1" ? "Tim 1" : "Tim 2"}
+          {player.tierName ? (
+            <>
+              <span
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: "50%",
+                  background: player.tierColor ?? "var(--text-400)",
+                  display: "inline-block",
+                }}
+              />
+              {player.tierName}
+            </>
+          ) : (
+            <span>—</span>
+          )}
+          <span>·</span>
+          <span>{player.side === "team1" ? "Tim 1" : "Tim 2"}</span>
+          {winRate !== null && (
+            <>
+              <span>·</span>
+              <span>{winRate}% WR</span>
+            </>
+          )}
         </div>
       </div>
       {completed && (

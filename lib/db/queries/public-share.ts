@@ -38,7 +38,7 @@ export async function getPublicSessionView(sessionId: string) {
 
   if (!session) return null;
 
-  // Get all participants (for name lookup + leaderboard)
+  // Get all participants — Sprint 7: include tier + avatar + lifetime stats
   const participants = await db
     .select({
       id: sessionParticipants.id,
@@ -52,9 +52,18 @@ export async function getPublicSessionView(sessionId: string) {
       sessionLosses: sessionParticipants.sessionLosses,
       sessionDraws: sessionParticipants.sessionDraws,
       userDisplayName: users.displayName,
+      userAvatarUrl: users.avatarUrl,
+      userTotalMatches: users.totalMatches,
+      userTotalWins: users.totalWins,
+      tierName: tierDefinitions.name,
+      tierColor: tierDefinitions.color,
     })
     .from(sessionParticipants)
     .leftJoin(users, eq(users.id, sessionParticipants.userId))
+    .leftJoin(
+      tierDefinitions,
+      eq(tierDefinitions.id, users.currentTierId)
+    )
     .where(eq(sessionParticipants.sessionId, sessionId));
 
   // Latest round + matches
@@ -100,6 +109,8 @@ export type PublicMatchPlayer = {
   avatarUrl: string | null;
   tierName: string | null;
   tierColor: string | null;
+  totalMatches: number;
+  totalWins: number;
 };
 
 export async function getPublicMatchView(matchId: string) {
@@ -143,6 +154,8 @@ export async function getPublicMatchView(matchId: string) {
       pGuestName: sessionParticipants.guestName,
       uDisplayName: users.displayName,
       uAvatarUrl: users.avatarUrl,
+      uTotalMatches: users.totalMatches,
+      uTotalWins: users.totalWins,
       tName: tierDefinitions.name,
       tColor: tierDefinitions.color,
     })
@@ -171,6 +184,8 @@ export async function getPublicMatchView(matchId: string) {
       avatarUrl: p?.uAvatarUrl ?? null,
       tierName: p?.tName ?? null,
       tierColor: p?.tColor ?? null,
+      totalMatches: p?.uTotalMatches ?? 0,
+      totalWins: p?.uTotalWins ?? 0,
     };
   }
 

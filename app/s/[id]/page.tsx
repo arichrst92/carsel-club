@@ -60,12 +60,33 @@ export default async function PublicLiveView({ params }: PageProps) {
   const { session, participants, currentRound, currentMatches, totalRounds } =
     data;
 
+  // Sprint 7: lookup carry tier + avatar + winRate per participant
   const lookup = participants.reduce<
-    Record<string, { name: string; isMember: boolean }>
+    Record<
+      string,
+      {
+        name: string;
+        isMember: boolean;
+        avatarUrl: string | null;
+        tierName: string | null;
+        tierColor: string | null;
+        winRate: number;
+        totalMatches: number;
+      }
+    >
   >((acc, p) => {
+    const wr =
+      p.userTotalMatches && p.userTotalMatches > 0
+        ? Math.round(((p.userTotalWins ?? 0) / p.userTotalMatches) * 100)
+        : 0;
     acc[p.id] = {
       name: p.guestName ?? p.userDisplayName ?? "?",
       isMember: p.userId !== null,
+      avatarUrl: p.userAvatarUrl ?? null,
+      tierName: p.tierName ?? null,
+      tierColor: p.tierColor ?? null,
+      winRate: wr,
+      totalMatches: p.userTotalMatches ?? 0,
     };
     return acc;
   }, {});
@@ -437,6 +458,19 @@ function elapsedMin(startedAt: Date | string | null): string | null {
   return `${mins} min`;
 }
 
+type LiveLookup = Record<
+  string,
+  {
+    name: string;
+    isMember: boolean;
+    avatarUrl: string | null;
+    tierName: string | null;
+    tierColor: string | null;
+    winRate: number;
+    totalMatches: number;
+  }
+>;
+
 function CourtMatchCard({
   match,
   lookup,
@@ -454,13 +488,12 @@ function CourtMatchCard({
     startedAt: Date | string | null;
     endedAt: Date | string | null;
   };
-  lookup: Record<string, { name: string; isMember: boolean }>;
+  lookup: LiveLookup;
 }) {
-  const t1p1 = lookup[match.team1P1Id]?.name ?? "?";
-  const t1p2 = lookup[match.team1P2Id]?.name ?? "?";
-  const t2p1 = lookup[match.team2P1Id]?.name ?? "?";
-  const t2p2 = lookup[match.team2P2Id]?.name ?? "?";
-  const initial = (n: string) => (n.trim()[0] ?? "?").toUpperCase();
+  const p1 = lookup[match.team1P1Id];
+  const p2 = lookup[match.team1P2Id];
+  const p3 = lookup[match.team2P1Id];
+  const p4 = lookup[match.team2P2Id];
 
   const isLive = match.status === "live";
   const isCompleted = match.status === "completed";
@@ -499,14 +532,8 @@ function CourtMatchCard({
           {/* Top team */}
           <div className="court-team top">
             <div className="court-team-positions">
-              <div className="court-player team-1">
-                <div className="cp-avatar">{initial(t1p1)}</div>
-                <div className="cp-name">{t1p1}</div>
-              </div>
-              <div className="court-player team-1">
-                <div className="cp-avatar">{initial(t1p2)}</div>
-                <div className="cp-name">{t1p2}</div>
-              </div>
+              <CourtPlayer entry={p1} team="team-1" />
+              <CourtPlayer entry={p2} team="team-1" />
             </div>
           </div>
 
@@ -518,14 +545,8 @@ function CourtMatchCard({
           {/* Bottom team */}
           <div className="court-team bottom">
             <div className="court-team-positions">
-              <div className="court-player team-2">
-                <div className="cp-avatar">{initial(t2p1)}</div>
-                <div className="cp-name">{t2p1}</div>
-              </div>
-              <div className="court-player team-2">
-                <div className="cp-avatar">{initial(t2p2)}</div>
-                <div className="cp-name">{t2p2}</div>
-              </div>
+              <CourtPlayer entry={p3} team="team-2" />
+              <CourtPlayer entry={p4} team="team-2" />
             </div>
           </div>
 
@@ -537,17 +558,84 @@ function CourtMatchCard({
         <div className="live-team-strip">
           <div className="lts-team">
             <span className="lts-name">
-              {t1p1} · {t1p2}
+              {p1?.name ?? "?"} · {p2?.name ?? "?"}
             </span>
           </div>
           <div className="lts-vs">vs</div>
           <div className="lts-team right">
             <span className="lts-name">
-              {t2p1} · {t2p2}
+              {p3?.name ?? "?"} · {p4?.name ?? "?"}
             </span>
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function CourtPlayer({
+  entry,
+  team,
+}: {
+  entry?: LiveLookup[string];
+  team: "team-1" | "team-2";
+}) {
+  const name = entry?.name ?? "?";
+  const initial = (name.trim()[0] ?? "?").toUpperCase();
+  const tierName = entry?.tierName ?? null;
+  const tierColor = entry?.tierColor ?? null;
+  const winRate = entry?.winRate ?? 0;
+  const hasStats = (entry?.totalMatches ?? 0) >= 5; // min 5 match utk credibility
+  const avatarUrl = entry?.avatarUrl ?? null;
+
+  return (
+    <div className={`court-player ${team}`} style={{ position: "relative" }}>
+      <div
+        className="cp-avatar"
+        style={
+          avatarUrl
+            ? {
+                background: `url(${avatarUrl}) center/cover no-repeat`,
+                color: "transparent",
+              }
+            : tierColor
+              ? {
+                  background: `linear-gradient(135deg, ${tierColor}, ${tierColor})`,
+                }
+              : undefined
+        }
+      >
+        {!avatarUrl && initial}
+      </div>
+      <div className="cp-name">{name}</div>
+      {tierName && (
+        <div
+          style={{
+            fontSize: 8,
+            fontWeight: 800,
+            color: tierColor ?? "var(--text-500)",
+            textTransform: "uppercase",
+            letterSpacing: "0.04em",
+            marginTop: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 3,
+          }}
+        >
+          <span
+            style={{
+              width: 5,
+              height: 5,
+              borderRadius: "50%",
+              background: tierColor ?? "var(--text-400)",
+              display: "inline-block",
+            }}
+          />
+          {tierName}
+          {hasStats && <span style={{ opacity: 0.7 }}>· {winRate}% WR</span>}
+        </div>
+      )}
     </div>
   );
 }
