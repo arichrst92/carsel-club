@@ -88,3 +88,25 @@ export function winRate(wins: number, matches: number): number {
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+/**
+ * Convert relative path → absolute URL.
+ *
+ * Used untuk OG image server-side rendering yang butuh full URLs untuk
+ * <img> tags. Returns path apa adanya kalau already absolute.
+ *
+ * @param path     Path like "/uploads/avatars/x.webp" or full URL
+ * @param baseUrl  Optional fallback base. Default: NEXT_PUBLIC_APP_URL or localhost:3000
+ */
+export function toAbsoluteUrl(
+  path: string | null | undefined,
+  baseUrl?: string
+): string | null {
+  if (!path) return null;
+  if (/^https?:\/\//i.test(path)) return path;
+  const base =
+    baseUrl ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const stripped = base.replace(/\/+$/, "");
+  const prefixed = path.startsWith("/") ? path : `/${path}`;
+  return `${stripped}${prefixed}`;
+}

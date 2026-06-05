@@ -170,6 +170,66 @@ describe("winRate", () => {
   });
 });
 
+describe("toAbsoluteUrl", () => {
+  it("null/undefined → null", async () => {
+    const { toAbsoluteUrl } = await import("@/lib/utils");
+    expect(toAbsoluteUrl(null)).toBe(null);
+    expect(toAbsoluteUrl(undefined)).toBe(null);
+  });
+
+  it("returns absolute URL apa adanya", async () => {
+    const { toAbsoluteUrl } = await import("@/lib/utils");
+    expect(toAbsoluteUrl("https://cdn.example.com/x.webp")).toBe(
+      "https://cdn.example.com/x.webp"
+    );
+    expect(toAbsoluteUrl("http://localhost:3000/foo")).toBe(
+      "http://localhost:3000/foo"
+    );
+  });
+
+  it("prefix relative path dgn baseUrl param", async () => {
+    const { toAbsoluteUrl } = await import("@/lib/utils");
+    expect(
+      toAbsoluteUrl("/uploads/avatars/x.webp", "https://carsel.club")
+    ).toBe("https://carsel.club/uploads/avatars/x.webp");
+  });
+
+  it("strip trailing slash dari baseUrl", async () => {
+    const { toAbsoluteUrl } = await import("@/lib/utils");
+    expect(toAbsoluteUrl("/x.webp", "https://carsel.club///")).toBe(
+      "https://carsel.club/x.webp"
+    );
+  });
+
+  it("path tanpa leading slash → ditambah", async () => {
+    const { toAbsoluteUrl } = await import("@/lib/utils");
+    expect(toAbsoluteUrl("uploads/x.webp", "https://carsel.club")).toBe(
+      "https://carsel.club/uploads/x.webp"
+    );
+  });
+
+  it("default fallback ke localhost:3000 kalau tidak ada env atau param", async () => {
+    const { toAbsoluteUrl } = await import("@/lib/utils");
+    // No env, no param
+    const orig = process.env.NEXT_PUBLIC_APP_URL;
+    delete process.env.NEXT_PUBLIC_APP_URL;
+    expect(toAbsoluteUrl("/x.webp")).toBe("http://localhost:3000/x.webp");
+    if (orig !== undefined) process.env.NEXT_PUBLIC_APP_URL = orig;
+  });
+
+  it("env NEXT_PUBLIC_APP_URL dipakai kalau no param", async () => {
+    const { toAbsoluteUrl } = await import("@/lib/utils");
+    const orig = process.env.NEXT_PUBLIC_APP_URL;
+    process.env.NEXT_PUBLIC_APP_URL = "https://carsel.club";
+    expect(toAbsoluteUrl("/x.webp")).toBe("https://carsel.club/x.webp");
+    if (orig !== undefined) {
+      process.env.NEXT_PUBLIC_APP_URL = orig;
+    } else {
+      delete process.env.NEXT_PUBLIC_APP_URL;
+    }
+  });
+});
+
 describe("sleep", () => {
   beforeEach(() => {
     vi.useFakeTimers();
