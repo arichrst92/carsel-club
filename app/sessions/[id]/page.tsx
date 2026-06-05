@@ -17,6 +17,7 @@ import { StartSessionButton } from "@/components/sessions/StartSessionButton";
 import { EndSessionButton } from "@/components/sessions/EndSessionButton";
 import { ReopenSessionButton } from "@/components/sessions/ReopenSessionButton";
 import { SessionStatusTimeline } from "@/components/sessions/SessionStatusTimeline";
+import { CoverPhotoUploader } from "@/components/sessions/CoverPhotoUploader";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -95,19 +96,26 @@ export default async function SessionDetailPage({ params }: PageProps) {
       </header>
 
       <main className="app-content subscreen with-footer">
-        {/* COVER PHOTO */}
-        {session.coverPhotoUrl && (
-          <div
-            style={{
-              width: "100%",
-              height: 160,
-              background: `url(${session.coverPhotoUrl}) center/cover no-repeat`,
-              borderRadius: "var(--r-xl)",
-              marginBottom: "var(--s-2)",
-              boxShadow: "var(--shadow-card)",
-            }}
-            aria-label="Session cover photo"
+        {/* COVER PHOTO — staff bisa upload/replace/hapus, viewer cuma lihat */}
+        {staff && !isTerminal ? (
+          <CoverPhotoUploader
+            sessionId={session.id}
+            currentCoverUrl={session.coverPhotoUrl}
           />
+        ) : (
+          session.coverPhotoUrl && (
+            <div
+              style={{
+                width: "100%",
+                height: 160,
+                background: `url(${session.coverPhotoUrl}) center/cover no-repeat`,
+                borderRadius: "var(--r-xl)",
+                marginBottom: "var(--s-2)",
+                boxShadow: "var(--shadow-card)",
+              }}
+              aria-label="Session cover photo"
+            />
+          )
         )}
 
         {/* HERO */}

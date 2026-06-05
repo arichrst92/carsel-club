@@ -14,7 +14,6 @@ type FormData = {
   playType: "freeplay" | "tournament";
   venueName: string;
   mapsUrl: string;
-  coverPhotoUrl: string;
   date: string; // YYYY-MM-DD
   timeStart: string; // HH:mm
   timeEnd: string; // HH:mm (optional)
@@ -53,7 +52,6 @@ const INITIAL: FormData = {
   playType: "freeplay",
   venueName: "",
   mapsUrl: "",
-  coverPhotoUrl: "",
   date: defaultDateStr(),
   timeStart: defaultTimeStart(),
   timeEnd: defaultTimeEnd(),
@@ -140,7 +138,7 @@ export function CreateSessionForm() {
     fd.set("visibility", data.visibility);
     fd.set("venue_name", data.venueName);
     fd.set("maps_url", data.mapsUrl);
-    fd.set("cover_photo_url", data.coverPhotoUrl);
+    // Cover photo: upload via session detail after create (Sprint 9 flow)
     fd.set("scheduled_at", scheduledAt.toISOString());
     if (scheduledEndAt) fd.set("scheduled_end_at", scheduledEndAt.toISOString());
     fd.set("num_courts", String(data.numCourts));
@@ -462,37 +460,6 @@ function Step2Location({
               <span>Link akan dibagikan ke pemain saat invite via WhatsApp.</span>
             </div>
           )}
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">Cover Photo URL (Optional)</label>
-          <div className="input-with-icon">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect x="3" y="3" width="18" height="18" rx="2" />
-              <circle cx="9" cy="9" r="2" />
-              <path d="M21 15l-5-5L5 21" />
-            </svg>
-            <input
-              type="url"
-              className="form-input"
-              placeholder="https://imgur.com/...jpg"
-              value={data.coverPhotoUrl}
-              onChange={(e) => setField("coverPhotoUrl", e.target.value)}
-            />
-          </div>
-          <p className="form-help">
-            URL foto venue/court. Bisa Imgur, Cloudinary, atau hosting gambar
-            lain.
-          </p>
         </div>
 
         <div className="form-group">

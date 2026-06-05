@@ -9,6 +9,45 @@
 
 ---
 
+## 📊 Progress Tracker (last update: 2026-06-02 / Sprint 8 done)
+
+**Completed:** 8 / 36 (22%)
+
+| # | Sprint | Status | Commit / Notes |
+|---|---|---|---|
+| 0 | Testing Foundation | ✅ | Vitest + 5 modules 100% cov (151 test) |
+| 1 | Storage Infrastructure | ✅ | Local FS + sharp + FileUpload (205 test) |
+| 2 | Observability (self-hosted) | ✅ | `/monitor` page + 8 events + cron cleanup (273 test) |
+| 3 | Session Lifecycle | ✅ | Start/End/Cancel/Reopen + timeline |
+| 4 | Match Lifecycle | ✅ | Start Game + Timer + Revert + strict adjust |
+| 5 | Match Detail Page | ✅ | `/sessions/[id]/matches/[matchId]` |
+| 6 | Per-match Share Link | ✅ | `/s/match/[id]` + OG image |
+| 7 | Live View Stats per Pemain | ✅ | Tier badge + winRate% + avatar di court |
+| 8 | Avatar Upload | ✅ | `/profile/edit` + display consistency |
+| 9 | Cover Photo Session | ⏳ in progress | — |
+| 10-36 | (sisanya) | ⏸️ pending | Foto group, Image cards, Generate v2, Mexicano, dst |
+
+**Coverage:** 15 file pure logic 100% (statements/branches/functions/lines). UI components dan server actions DB-heavy di-test integration Sprint 35.
+
+**Velocity actual:** 8 sprint dalam 1 hari sesi (jauh di atas estimasi 1-week per sprint). Realistic projection sisanya: ~3-5 minggu kalau intensitas dipertahankan.
+
+**Events tracked:**
+`signup`, `login`, `referral_claimed`, `session_created`, `session_started`, `session_ended`, `session_cancelled`, `session_reopened`, `round_generated`, `match_started`, `match_completed`, `match_reverted`, `upload_success` (13 events, expandable).
+
+**Routes baru:**
+- `/monitor` (admin), `/api/cron/clean-logs`, `/api/log/error`
+- `/sessions/[id]/matches/[matchId]` (Sprint 5)
+- `/s/match/[matchId]`, `/api/og/match/[matchId]` (Sprint 6)
+- `/uploads/[...path]` (Sprint 1 dev fallback)
+
+**Open decisions revisited:**
+- D1 (auto vs explicit start session) — Sprint 3: keep auto + add explicit Start
+- D2 (reopen from terminal) — Sprint 3: yes, soft terminal
+- D3 (cron infra) — Sprint 28 (belum)
+- D4 (tournament scope) — Sprint 31 (belum)
+
+---
+
 ## Working Agreements (BERLAKU UNTUK SEMUA SPRINT)
 
 ### 1. Setiap task wajib reference ke 3 sumber
