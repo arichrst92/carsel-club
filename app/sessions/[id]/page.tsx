@@ -18,6 +18,8 @@ import { EndSessionButton } from "@/components/sessions/EndSessionButton";
 import { ReopenSessionButton } from "@/components/sessions/ReopenSessionButton";
 import { SessionStatusTimeline } from "@/components/sessions/SessionStatusTimeline";
 import { CoverPhotoUploader } from "@/components/sessions/CoverPhotoUploader";
+import { GroupPhotoGallery } from "@/components/sessions/GroupPhotoGallery";
+import { listGroupPhotos } from "@/lib/db/queries/session-photos";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -54,6 +56,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
   const { session, participants } = result;
   const staff = await isSessionStaff(id, user.id);
   const rounds = await getRoundsWithMatches(id);
+  const groupPhotos = await listGroupPhotos(id);
   const isParticipant = participants.some((p) => p.userId === user.id);
   const canJoinPublic =
     !isParticipant &&
@@ -569,6 +572,13 @@ export default async function SessionDetailPage({ params }: PageProps) {
             </Link>
           )}
         </section>
+
+        {/* GROUP PHOTOS — visible to anyone who can view session */}
+        <GroupPhotoGallery
+          sessionId={session.id}
+          photos={groupPhotos}
+          canManage={staff}
+        />
 
         {/* LIFECYCLE ACTIONS — host/co-host only */}
         {staff && (

@@ -374,6 +374,36 @@ export const matches = pgTable(
 );
 
 // ============================================================
+// SESSION GROUP PHOTOS — Sprint 10
+// ============================================================
+// Max 5 photos per session (enforced di action layer, bukan DB).
+// Host/co-host bisa upload + delete. Visible ke semua yang bisa view session.
+
+export const sessionGroupPhotos = pgTable(
+  "session_group_photos",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    sessionId: uuid("session_id")
+      .notNull()
+      .references(() => sessions.id, { onDelete: "cascade" }),
+    storageKey: text("storage_key").notNull(),
+    url: text("url").notNull(),
+    uploadedByUserId: uuid("uploaded_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("idx_session_group_photos_session").on(
+      t.sessionId,
+      t.createdAt.desc()
+    ),
+  ]
+);
+
+// ============================================================
 // APP LOGS — observability (Sprint 2)
 // ============================================================
 // Single table dengan discriminator `type`:

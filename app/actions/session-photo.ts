@@ -12,11 +12,13 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+import { nanoid } from "nanoid";
 import { db } from "@/lib/db/client";
-import { sessions } from "@/lib/db/schema";
+import { sessions, sessionGroupPhotos } from "@/lib/db/schema";
 import { getCurrentUser } from "@/lib/auth/get-current-user";
 import { isSessionStaff } from "@/lib/db/queries/sessions";
+import { countGroupPhotos } from "@/lib/db/queries/session-photos";
 import { saveImage, storage, MAX_UPLOAD_BYTES } from "@/lib/storage";
 import { checkUploadRate } from "@/lib/storage/rate-limit";
 import { event, error as logError } from "@/lib/log";
@@ -127,4 +129,141 @@ export async function removeCoverPhotoAction(
   revalidatePath("/find");
   revalidatePath(`/s/${sessionId}`);
   return { success: "Cover dihapus." };
+}
+
+// ============================================================
+// SESSION GROUP PHOTOS (Sprint 10)
+// ============================================================
+
+const MAX_GROUP_PHOTOS = 5;
+
+export type GroupPhotoState = {
+  error?: string;
+  success?: string;
+  url?: string;
+} | null;
+
+export async function addGroupPhotoAction(
+  sessionId: string,
+  _prev: GroupPhotoState,
+  formData: FormData
+): Promise<GroupPhotoState> {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+
+  if (!(await isSessionStaff(sessionId, user!.id))) {
+    return { error: "Hanya host/co-host yang bisa upload foto group" };
+  }
+
+  // Count check (max 5)
+  const existing = await countGroupPhotos(sessionId);
+  if (existing >= MAX_GROUP_PHOTOS) {
+    return {
+      error: `Maksimal ${MAX_GROUP_PHOTOS} foto group per session.`,
+    };
+  }
+
+  const rate = checkUploadRate(user!.id);
+  if (!rate.ok) {
+    const min = Math.ceil(rate.retryAfterMs / 60000);
+    return { error: `Upload terlalu sering. Coba lagi dalam ${min} menit.` };
+  }
+
+  const file = formData.get("file");
+  if (!file || !(file instanceof File) || file.size === 0) {
+    return { error: "Pilih file dulu" };
+  }
+  if (file.size > MAX_UPLOAD_BYTES) {
+    const mb = Math.round(MAX_UPLOAD_BYTES / 1024 / 1024);
+    return { error: `File terlalu besar. Maksimum ${mb} MB.` };
+  }
+
+  let buffer: Buffer;
+  try {
+    buffer = Buffer.from(await file.arrayBuffer());
+  } catch (e) {
+    logError("group_photo_read_failed", { error: e });
+    return { error: "Gagal baca file." };
+  }
+
+  const photoId = nanoid(12);
+  const storageKey = `sessions/${sessionId}/group/${photoId}.webp`;
+  let savedUrl: string;
+  try {
+    const saved = await saveImage(buffer, "photo", storageKey);
+    savedUrl = saved.url;
+  } catch (e) {
+    logError("group_photo_save_failed", { error: e, sessionId });
+    const msg = e instanceof Error ? e.message : "Gagal upload foto.";
+    return { error: msg };
+  }
+
+  try {
+    await db.insert(sessionGroupPhotos).values({
+      sessionId,
+      storageKey,
+      url: savedUrl,
+      uploadedByUserId: user!.id,
+    });
+  } catch (e) {
+    logError("group_photo_db_insert_failed", { error: e });
+    // Best-effort cleanup
+    try {
+      await storage.deleteFile(storageKey);
+    } catch {}
+    return { error: "Gagal simpan ke session. Coba lagi." };
+  }
+
+  event("upload_success", {
+    kind: "group_photo",
+    sessionId,
+    photoId,
+  });
+
+  revalidatePath(`/sessions/${sessionId}`);
+  revalidatePath(`/s/${sessionId}`);
+  return { success: "Foto ditambahkan", url: savedUrl };
+}
+
+export async function removeGroupPhotoAction(
+  photoId: string
+): Promise<GroupPhotoState> {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+
+  // Load to get sessionId + storageKey
+  const [photo] = await db
+    .select({
+      id: sessionGroupPhotos.id,
+      sessionId: sessionGroupPhotos.sessionId,
+      storageKey: sessionGroupPhotos.storageKey,
+    })
+    .from(sessionGroupPhotos)
+    .where(eq(sessionGroupPhotos.id, photoId))
+    .limit(1);
+
+  if (!photo) return { error: "Foto tidak ditemukan" };
+
+  if (!(await isSessionStaff(photo.sessionId, user!.id))) {
+    return { error: "Hanya host/co-host yang bisa hapus foto" };
+  }
+
+  try {
+    await storage.deleteFile(photo.storageKey);
+  } catch (e) {
+    logError("group_photo_delete_storage_failed", { error: e });
+  }
+
+  try {
+    await db
+      .delete(sessionGroupPhotos)
+      .where(eq(sessionGroupPhotos.id, photoId));
+  } catch (e) {
+    logError("group_photo_delete_db_failed", { error: e });
+    return { error: "Gagal hapus foto." };
+  }
+
+  revalidatePath(`/sessions/${photo.sessionId}`);
+  revalidatePath(`/s/${photo.sessionId}`);
+  return { success: "Foto dihapus." };
 }
