@@ -69,8 +69,20 @@ export default async function HomePage() {
               <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
             </svg>
           </Link>
-          <Link href="/profile" className="avatar" aria-label="Profile">
-            {initial}
+          <Link
+            href="/profile"
+            className="avatar"
+            aria-label="Profile"
+            style={
+              user.avatarUrl
+                ? {
+                    background: `url(${user.avatarUrl}) center/cover no-repeat`,
+                    color: "transparent",
+                  }
+                : undefined
+            }
+          >
+            {!user.avatarUrl && initial}
           </Link>
         </div>
       </header>

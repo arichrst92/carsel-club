@@ -143,7 +143,9 @@ export default async function ProfilePage() {
                 width: 96,
                 height: 96,
                 borderRadius: "50%",
-                background: "linear-gradient(135deg, #FB7185, #F43F5E)",
+                background: profile.avatarUrl
+                  ? `url(${profile.avatarUrl}) center/cover no-repeat`
+                  : "linear-gradient(135deg, #FB7185, #F43F5E)",
                 color: "#fff",
                 display: "grid",
                 placeItems: "center",
@@ -154,7 +156,7 @@ export default async function ProfilePage() {
                 border: "4px solid var(--bg)",
               }}
             >
-              {initial}
+              {!profile.avatarUrl && initial}
             </div>
             <div
               style={{

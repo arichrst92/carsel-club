@@ -7,6 +7,7 @@ type ParticipantData = {
   role: "host" | "co_host" | "player" | "guest";
   isPlaying: boolean;
   userDisplayName: string | null;
+  userAvatarUrl?: string | null;
 };
 
 const ROLE_LABELS: Record<ParticipantData["role"], string> = {
@@ -48,7 +49,19 @@ export function ParticipantRow({
 
   return (
     <div className="player-list-item">
-      <div className={`player-avatar-lg ${avatarCls}`}>{initial}</div>
+      <div
+        className={`player-avatar-lg ${avatarCls}`}
+        style={
+          participant.userAvatarUrl
+            ? {
+                background: `url(${participant.userAvatarUrl}) center/cover no-repeat`,
+                color: "transparent",
+              }
+            : undefined
+        }
+      >
+        {!participant.userAvatarUrl && initial}
+      </div>
       <div className="player-info">
         <div className="player-name">
           <span>{name}</span>

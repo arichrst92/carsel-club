@@ -20,6 +20,7 @@ type Props = {
   totalPoints: number;
   totalMatches: number;
   tierName: string | null;
+  avatarUrl?: string | null;
 };
 
 export function FriendRow(props: Props) {
@@ -43,11 +44,16 @@ export function FriendRow(props: Props) {
     <div className="player-list-item">
       <div
         className="player-avatar-lg member-1"
-        style={{
-          background: "linear-gradient(135deg, #06B6D4, #0EA5E9)",
-        }}
+        style={
+          props.avatarUrl
+            ? {
+                background: `url(${props.avatarUrl}) center/cover no-repeat`,
+                color: "transparent",
+              }
+            : { background: "linear-gradient(135deg, #06B6D4, #0EA5E9)" }
+        }
       >
-        {initial}
+        {!props.avatarUrl && initial}
       </div>
       <div className="player-info">
         <div className="player-name">

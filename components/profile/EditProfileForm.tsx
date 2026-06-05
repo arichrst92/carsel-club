@@ -33,8 +33,6 @@ export function EditProfileForm({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const initial = (displayName.trim()[0] ?? "?").toUpperCase();
-
   function handleSubmit() {
     setError(null);
 
@@ -60,34 +58,6 @@ export function EditProfileForm({
   return (
     <>
       <main className="app-content subscreen with-footer">
-        {/* Avatar preview */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: "var(--s-5)",
-          }}
-        >
-          <div
-            style={{
-              width: 96,
-              height: 96,
-              borderRadius: "50%",
-              background: "linear-gradient(135deg, #FB7185, #F43F5E)",
-              color: "#fff",
-              display: "grid",
-              placeItems: "center",
-              fontFamily: "var(--font-display)",
-              fontWeight: 800,
-              fontSize: 40,
-              boxShadow: "var(--shadow-md)",
-              border: "4px solid var(--bg)",
-            }}
-          >
-            {initial}
-          </div>
-        </div>
-
         {/* Name */}
         <section className="form-section">
           <div className="form-group">

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/get-current-user";
 import { EditProfileForm } from "@/components/profile/EditProfileForm";
+import { AvatarUploader } from "@/components/profile/AvatarUploader";
 
 export const metadata = {
   title: "Edit Profile",
@@ -8,6 +9,7 @@ export const metadata = {
 
 export default async function EditProfilePage() {
   const user = await requireUser();
+  const initial = (user.displayName.trim()[0] ?? "?").toUpperCase();
 
   return (
     <div className="app-shell">
@@ -29,6 +31,11 @@ export default async function EditProfilePage() {
         <h2 className="subscreen-title">Edit Profile</h2>
         <div style={{ width: 40 }} />
       </header>
+
+      <AvatarUploader
+        currentAvatarUrl={user.avatarUrl ?? null}
+        initial={initial}
+      />
 
       <EditProfileForm
         initialDisplayName={user.displayName}

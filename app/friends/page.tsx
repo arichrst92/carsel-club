@@ -60,6 +60,7 @@ export default async function FriendsPage() {
                   totalPoints={f.totalPoints}
                   totalMatches={f.totalMatches}
                   tierName={f.tierName}
+                  avatarUrl={f.avatarUrl ?? null}
                 />
               ))}
             </div>
