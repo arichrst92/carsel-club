@@ -5,7 +5,9 @@ import {
   getNextSession,
   getRecentMatches,
 } from "@/lib/db/queries/home";
+import { getTierById } from "@/lib/db/queries/public-profile";
 import { BottomNav } from "@/components/nav/BottomNav";
+import { TierUpModal } from "@/components/home/TierUpModal";
 import { logoutAction } from "@/app/actions/auth";
 import { formatDate, formatTime, formatTimeRange, winRate } from "@/lib/utils";
 
@@ -41,8 +43,27 @@ export default async function HomePage() {
   const wr = winRate(user.totalWins, user.totalMatches);
   const initial = (user.displayName.trim()[0] ?? "U").toUpperCase();
 
+  // Sprint 12: tier-up modal kalau ada unseen tier-up
+  const currentTierId = user.currentTierId ?? 1;
+  const lastSeenTierId = user.lastSeenTierId ?? 1;
+  const hasUnseenTierUp = currentTierId > lastSeenTierId;
+  const newTier = hasUnseenTierUp ? await getTierById(currentTierId) : null;
+
   return (
     <div className="app-shell">
+      {/* Tier-up celebration modal */}
+      {newTier && (
+        <TierUpModal
+          userId={user.id}
+          displayName={user.displayName}
+          newTierId={newTier.id}
+          newTierName={newTier.name}
+          newTierColor={newTier.color}
+          totalPoints={user.totalPoints}
+          totalMatches={user.totalMatches}
+        />
+      )}
+
       {/* HEADER */}
       <header className="app-header">
         <div className="logo">

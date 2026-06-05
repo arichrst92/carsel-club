@@ -1,0 +1,2 @@
+ALTER TABLE "users" ADD COLUMN "last_seen_tier_id" integer DEFAULT 1;--> statement-breakpoint
+ALTER TABLE "users" ADD CONSTRAINT "users_last_seen_tier_id_tier_definitions_id_fk" FOREIGN KEY ("last_seen_tier_id") REFERENCES "public"."tier_definitions"("id") ON DELETE no action ON UPDATE no action;

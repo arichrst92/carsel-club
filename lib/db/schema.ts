@@ -109,6 +109,11 @@ export const users = pgTable(
     currentTierId: integer("current_tier_id").references(
       () => tierDefinitions.id
     ).default(1),
+    // Sprint 12: track tier yang sudah di-acknowledge user (untuk tier-up
+    // modal celebration). Null = belum pernah login post-creation.
+    lastSeenTierId: integer("last_seen_tier_id").references(
+      () => tierDefinitions.id
+    ).default(1),
     isAdmin: boolean("is_admin").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()

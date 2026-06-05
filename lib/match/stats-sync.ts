@@ -19,6 +19,7 @@ import {
   isZeroDelta,
   computeTierId,
 } from "./stats-helpers";
+import { event } from "@/lib/log";
 
 /**
  * Main entry: change match score + status, sync stats atomically.
@@ -108,11 +109,23 @@ export async function applyMatchScoreChange(
               updatedUser.totalPoints,
               updatedUser.totalMatches
             );
-            if (newTierId !== updatedUser.currentTierId) {
+            const oldTierId = updatedUser.currentTierId ?? 1;
+            if (newTierId !== oldTierId) {
               await tx
                 .update(users)
                 .set({ currentTierId: newTierId })
                 .where(eq(users.id, p.userId));
+              // Sprint 12: fire tier_up event kalau naik (bukan turun).
+              // Tier IDs are sequential (1=Rookie → 6=Master) jadi ID compare OK.
+              if (newTierId > oldTierId) {
+                event("tier_up", {
+                  userId: p.userId,
+                  fromTierId: oldTierId,
+                  toTierId: newTierId,
+                  totalPoints: updatedUser.totalPoints,
+                  totalMatches: updatedUser.totalMatches,
+                });
+              }
             }
           }
         }

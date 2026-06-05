@@ -6,6 +6,7 @@ import { BottomNav } from "@/components/nav/BottomNav";
 import { logoutAction } from "@/app/actions/auth";
 import { winRate } from "@/lib/utils";
 import { ReferralShare } from "@/components/profile/ReferralShare";
+import { ProfileShareButton } from "@/components/profile/ProfileShareButton";
 import {
   ACHIEVEMENTS,
   getUnlockedCount,
@@ -511,6 +512,16 @@ export default async function ProfilePage() {
               ))}
             </div>
           )}
+        </section>
+
+        {/* PROFILE SHARE */}
+        <section style={{ marginBottom: "var(--s-2)" }}>
+          <ProfileShareButton
+            userId={profile.id}
+            displayName={profile.displayName}
+            tierName={profile.tierName}
+            totalPoints={profile.totalPoints}
+          />
         </section>
 
         {/* REFERRAL SHARE */}
