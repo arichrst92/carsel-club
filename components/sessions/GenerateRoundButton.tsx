@@ -1,15 +1,19 @@
-"use client";
+/**
+ * Sprint 13: GenerateRoundButton sekarang navigasi ke wizard
+ * /sessions/[id]/generate (bukan langsung action). Wizard handle override
+ * + summary preview + actual generate.
+ *
+ * Refs:
+ * - GUI: docs/CarselClubPrototype/generate-match.html
+ */
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { generateRoundAction } from "@/app/actions/matches";
-import { Toast } from "@/components/ui/Toast";
+import Link from "next/link";
 
 type Props = {
   sessionId: string;
   nextRoundNumber: number;
   activePlayerCount: number;
-  redirectAfter?: string; // path to redirect after success
+  redirectAfter?: string; // unused after Sprint 13 (wizard handles)
   variant?: "primary" | "footer";
 };
 
@@ -17,60 +21,51 @@ export function GenerateRoundButton({
   sessionId,
   nextRoundNumber,
   activePlayerCount,
-  redirectAfter,
   variant = "primary",
 }: Props) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-
   const insufficient = activePlayerCount < 4;
-  const isDisabled = insufficient || isPending;
+  const href = insufficient
+    ? "#"
+    : `/sessions/${sessionId}/generate`;
 
-  function handleClick() {
-    setError(null);
-    startTransition(async () => {
-      const result = await generateRoundAction(sessionId);
-      if (result?.error) {
-        setError(result.error);
-      } else if (redirectAfter) {
-        router.push(redirectAfter);
-        router.refresh();
-      }
-    });
-  }
-
-  const label = isPending
-    ? "Generating..."
-    : nextRoundNumber === 1
+  const label =
+    nextRoundNumber === 1
       ? "Generate Round 1"
       : `Generate Round ${nextRoundNumber}`;
 
+  const buttonContent = (
+    <>
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M12 2v6M12 18v4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M18 12h4" />
+      </svg>
+      <span>{label}</span>
+    </>
+  );
+
   if (variant === "footer") {
     return (
-      <>
-      <Toast message={error} onDismiss={() => setError(null)} />
       <div className="sticky-footer">
-        <button
-          type="button"
-          onClick={handleClick}
-          disabled={isDisabled}
-          className={`btn-primary-lg ${isPending ? "loading" : ""}`}
+        <Link
+          href={href}
+          aria-disabled={insufficient}
+          className="btn-primary-lg"
+          style={
+            insufficient
+              ? { pointerEvents: "none", opacity: 0.5 }
+              : undefined
+          }
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M12 2v6M12 18v4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M18 12h4" />
-          </svg>
-          <span>{label}</span>
-        </button>
+          {buttonContent}
+        </Link>
         {insufficient && (
           <p
             style={{
@@ -85,37 +80,24 @@ export function GenerateRoundButton({
           </p>
         )}
       </div>
-      </>
     );
   }
 
   return (
-    <>
-    <Toast message={error} onDismiss={() => setError(null)} />
     <div>
-      <button
-        type="button"
-        onClick={handleClick}
-        disabled={isDisabled}
-        className={`btn-primary-lg ${isPending ? "loading" : ""}`}
-        style={{ width: "100%" }}
+      <Link
+        href={href}
+        aria-disabled={insufficient}
+        className="btn-primary-lg"
+        style={{
+          width: "100%",
+          ...(insufficient
+            ? { pointerEvents: "none", opacity: 0.5 }
+            : {}),
+        }}
       >
-        <span>{label}</span>
-        {!isPending && (
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M5 12h14M12 5l7 7-7 7" />
-          </svg>
-        )}
-      </button>
+        {buttonContent}
+      </Link>
       {insufficient && (
         <p
           style={{
@@ -130,6 +112,5 @@ export function GenerateRoundButton({
         </p>
       )}
     </div>
-    </>
   );
 }

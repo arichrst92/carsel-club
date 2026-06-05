@@ -30,8 +30,18 @@ import {
   canAdjustScore,
 } from "@/lib/match/lifecycle";
 
+export type GenerateRoundOptions = {
+  /**
+   * Sprint 13: per-round override participant IDs yang ikut main.
+   * Kalau undefined → fallback ke isPlaying flag (default behavior).
+   * Kalau provided → cuma ID ini yang dipakai, regardless of isPlaying.
+   */
+  playingParticipantIds?: string[];
+};
+
 export async function generateRoundAction(
-  sessionId: string
+  sessionId: string,
+  options: GenerateRoundOptions = {}
 ): Promise<{ error?: string } | null> {
   const me = await getCurrentUser();
   if (!me) redirect("/login");
@@ -52,19 +62,27 @@ export async function generateRoundAction(
     return { error: "Session sudah selesai/dibatalkan" };
   }
 
-  // Get active participants
-  const activeParticipants = await db
+  // Get active participants — apply per-round override kalau ada
+  const overrideSet = options.playingParticipantIds
+    ? new Set(options.playingParticipantIds)
+    : null;
+
+  const allParticipants = await db
     .select({
       id: sessionParticipants.id,
       sessionMatches: sessionParticipants.sessionMatches,
+      isPlaying: sessionParticipants.isPlaying,
     })
     .from(sessionParticipants)
-    .where(
-      and(
-        eq(sessionParticipants.sessionId, sessionId),
-        eq(sessionParticipants.isPlaying, true)
-      )
-    );
+    .where(eq(sessionParticipants.sessionId, sessionId));
+
+  const activeParticipants = overrideSet
+    ? allParticipants
+        .filter((p) => overrideSet.has(p.id))
+        .map((p) => ({ id: p.id, sessionMatches: p.sessionMatches }))
+    : allParticipants
+        .filter((p) => p.isPlaying)
+        .map((p) => ({ id: p.id, sessionMatches: p.sessionMatches }));
 
   if (activeParticipants.length < 4) {
     return {
@@ -140,6 +158,7 @@ export async function generateRoundAction(
     players: activeParticipants.length,
     sitOuts: result.sitOuts.length,
     violations: result.violations,
+    hasOverride: !!overrideSet,
   });
 
   revalidatePath(`/sessions/${sessionId}`);
