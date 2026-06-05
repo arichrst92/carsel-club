@@ -50,6 +50,8 @@ export default defineConfig({
         "lib/match/round-count.ts",
         // Sprint 15 — swap helpers
         "lib/match/swap.ts",
+        // Sprint 16 — Mexicano generator
+        "lib/match/generator-mexicano.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

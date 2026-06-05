@@ -334,12 +334,10 @@ function Step1Info({
             </button>
             <button
               type="button"
-              className="segmented-option disabled"
-              title="Mexicano akan tersedia di v1.5"
+              className={`segmented-option ${data.format === "mexicano" ? "active" : ""}`}
+              onClick={() => setField("format", "mexicano")}
             >
-              <span>
-                Mexicano <span className="badge soon">Soon</span>
-              </span>
+              <span>Mexicano</span>
               <span className="seg-sub">Ranking pairing</span>
             </button>
           </div>

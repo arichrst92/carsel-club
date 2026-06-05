@@ -22,6 +22,7 @@ import {
   getNextRoundNumber,
 } from "@/lib/db/queries/matches";
 import { generateRound } from "@/lib/match/generator";
+import { generateMexicanoRound } from "@/lib/match/generator-mexicano";
 import { applyMatchScoreChange } from "@/lib/match/stats-sync";
 import { event } from "@/lib/log";
 import {
@@ -72,18 +73,15 @@ export async function generateRoundAction(
     .select({
       id: sessionParticipants.id,
       sessionMatches: sessionParticipants.sessionMatches,
+      sessionPoints: sessionParticipants.sessionPoints,
       isPlaying: sessionParticipants.isPlaying,
     })
     .from(sessionParticipants)
     .where(eq(sessionParticipants.sessionId, sessionId));
 
   const activeParticipants = overrideSet
-    ? allParticipants
-        .filter((p) => overrideSet.has(p.id))
-        .map((p) => ({ id: p.id, sessionMatches: p.sessionMatches }))
-    : allParticipants
-        .filter((p) => p.isPlaying)
-        .map((p) => ({ id: p.id, sessionMatches: p.sessionMatches }));
+    ? allParticipants.filter((p) => overrideSet.has(p.id))
+    : allParticipants.filter((p) => p.isPlaying);
 
   if (activeParticipants.length < 4) {
     return {
@@ -94,21 +92,40 @@ export async function generateRoundAction(
   // Build pair history
   const pairHistory = await buildPairHistoryForSession(sessionId);
 
-  // Generate
+  // Get next round number (untuk Mexicano: round 1 fallback ke random)
+  const nextRoundNumber = await getNextRoundNumber(sessionId);
+
+  // Sprint 16: dispatch by format
+  const isMexicano = session.format === "mexicano";
+  const generationMethod = isMexicano ? "auto_mexicano" : "auto_random";
+
   let result;
   try {
-    result = generateRound(
-      activeParticipants,
-      session.numCourts,
-      pairHistory
-    );
+    if (isMexicano) {
+      result = generateMexicanoRound(
+        activeParticipants.map((p) => ({
+          id: p.id,
+          sessionMatches: p.sessionMatches,
+          sessionPoints: p.sessionPoints,
+        })),
+        session.numCourts,
+        pairHistory,
+        nextRoundNumber === 1
+      );
+    } else {
+      result = generateRound(
+        activeParticipants.map((p) => ({
+          id: p.id,
+          sessionMatches: p.sessionMatches,
+        })),
+        session.numCourts,
+        pairHistory
+      );
+    }
   } catch (e) {
     console.error("[generateRoundAction] algo error:", e);
     return { error: "Gagal generate pairing. Coba lagi." };
   }
-
-  // Get next round number
-  const nextRoundNumber = await getNextRoundNumber(sessionId);
 
   // Atomic insert: round_set + matches + maybe transition session to 'live'
   try {
@@ -118,7 +135,7 @@ export async function generateRoundAction(
         .values({
           sessionId,
           roundNumber: nextRoundNumber,
-          generationMethod: "auto_random",
+          generationMethod,
           generatedBy: me.id,
           status: "pending",
         })
@@ -160,6 +177,8 @@ export async function generateRoundAction(
     sitOuts: result.sitOuts.length,
     violations: result.violations,
     hasOverride: !!overrideSet,
+    format: session.format,
+    method: generationMethod,
   });
 
   revalidatePath(`/sessions/${sessionId}`);
