@@ -21,6 +21,7 @@ export type EventName =
   | "session_reopened" // Sprint 3
   | "round_generated"
   | "round_regenerated" // Sprint 14
+  | "match_swap" // Sprint 15
   | "match_started" // Sprint 4
   | "match_completed"
   | "match_reverted" // Sprint 4

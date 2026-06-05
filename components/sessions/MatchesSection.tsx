@@ -2,6 +2,7 @@ import { getRoundsWithMatches } from "@/lib/db/queries/matches";
 import { MatchCard } from "./MatchCard";
 import { GenerateRoundButton } from "./GenerateRoundButton";
 import { RegenerateRoundButton } from "./RegenerateRoundButton";
+import { MatchSwapProvider } from "./MatchSwapProvider";
 
 type Participant = {
   id: string;
@@ -80,7 +81,7 @@ export async function MatchesSection({
   }
 
   return (
-    <>
+    <MatchSwapProvider enabled={staff && !isTerminal}>
       {rounds.map((round) => {
         const playingIds = new Set(
           round.matches.flatMap((m) => [
@@ -203,6 +204,6 @@ export async function MatchesSection({
           variant="footer"
         />
       )}
-    </>
+    </MatchSwapProvider>
   );
 }

@@ -11,7 +11,9 @@ import {
 } from "@/app/actions/matches";
 import { ShareMatchButton } from "./ShareMatchButton";
 import { MatchTimer } from "./MatchTimer";
+import { useMatchSwap } from "./MatchSwapProvider";
 import { Toast } from "@/components/ui/Toast";
+import type { MatchSlotKey } from "@/lib/match/swap";
 
 type ParticipantLookup = Record<
   string,
@@ -73,11 +75,11 @@ export function MatchCard({
   const t1Won = showWinner && match.team1Score > match.team2Score;
   const t2Won = showWinner && match.team2Score > match.team1Score;
 
-  const team1Names = [
+  const team1Names: [string, string] = [
     lookup[match.team1P1Id]?.name ?? "?",
     lookup[match.team1P2Id]?.name ?? "?",
   ];
-  const team2Names = [
+  const team2Names: [string, string] = [
     lookup[match.team2P1Id]?.name ?? "?",
     lookup[match.team2P2Id]?.name ?? "?",
   ];
@@ -221,6 +223,9 @@ export function MatchCard({
         editing={editing}
         won={t1Won}
         disabled={isPending}
+        match={match}
+        slotKeys={["team1P1Id", "team1P2Id"]}
+        playerNames={team1Names}
       />
 
       <div
@@ -257,6 +262,9 @@ export function MatchCard({
         editing={editing}
         won={t2Won}
         disabled={isPending}
+        match={match}
+        slotKeys={["team2P1Id", "team2P2Id"]}
+        playerNames={team2Names}
       />
 
       {/* Actions */}
@@ -412,6 +420,9 @@ function TeamRow({
   editing,
   won,
   disabled,
+  match,
+  slotKeys,
+  playerNames,
 }: {
   names: string[];
   score: number;
@@ -422,7 +433,96 @@ function TeamRow({
   editing: boolean;
   won: boolean;
   disabled?: boolean;
+  match: Match;
+  slotKeys: [MatchSlotKey, MatchSlotKey];
+  playerNames: [string, string];
 }) {
+  const swap = useMatchSwap();
+  // Sprint 15: swap-mode tap targets pada nama pemain (kalau match pending)
+  const swapEnabled = !!swap && swap.enabled && match.status === "pending";
+
+  const slotIds: [string, string] = [
+    match[slotKeys[0]],
+    match[slotKeys[1]],
+  ];
+
+  function PlayerName({ idx }: { idx: 0 | 1 }) {
+    const slot = slotKeys[idx];
+    const pid = slotIds[idx];
+    const name = playerNames[idx];
+    const isSelected =
+      swap?.selected?.matchId === match.id && swap?.selected?.slot === slot;
+
+    if (!swapEnabled) {
+      return (
+        <div
+          style={{
+            fontSize: idx === 0 ? 14 : 12,
+            fontWeight: idx === 0 ? 700 : 600,
+            color:
+              idx === 0
+                ? won
+                  ? "var(--text-900)"
+                  : "var(--text-700)"
+                : "var(--text-500)",
+            lineHeight: 1.3,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {name}
+        </div>
+      );
+    }
+
+    return (
+      <button
+        type="button"
+        onClick={() =>
+          swap!.handleTap({
+            matchId: match.id,
+            slot,
+            participantId: pid,
+            name,
+          })
+        }
+        disabled={swap!.isPending}
+        title="Tap untuk swap pemain"
+        style={{
+          background: isSelected
+            ? "var(--primary-50)"
+            : "transparent",
+          border: isSelected
+            ? "1.5px dashed var(--primary)"
+            : "1.5px dashed transparent",
+          padding: "2px 6px",
+          borderRadius: "var(--r-sm)",
+          fontFamily: "inherit",
+          fontSize: idx === 0 ? 14 : 12,
+          fontWeight: idx === 0 ? 700 : 600,
+          color: isSelected
+            ? "var(--primary-700)"
+            : idx === 0
+              ? won
+                ? "var(--text-900)"
+                : "var(--text-700)"
+              : "var(--text-500)",
+          textAlign: "left",
+          width: "100%",
+          cursor: swap!.isPending ? "wait" : "pointer",
+          lineHeight: 1.3,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {isSelected && "✓ "}
+        {name}
+      </button>
+    );
+  }
+
   return (
     <div style={{ padding: "var(--s-2) 0" }}>
       <div
@@ -434,32 +534,8 @@ function TeamRow({
         }}
       >
         <div style={{ minWidth: 0, flex: 1 }}>
-          <div
-            style={{
-              fontSize: 14,
-              fontWeight: 700,
-              color: won ? "var(--text-900)" : "var(--text-700)",
-              lineHeight: 1.3,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {names[0]}
-          </div>
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: "var(--text-500)",
-              lineHeight: 1.3,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {names[1]}
-          </div>
+          <PlayerName idx={0} />
+          <PlayerName idx={1} />
           {won && (
             <span
               style={{

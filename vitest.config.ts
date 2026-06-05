@@ -48,6 +48,8 @@ export default defineConfig({
         "lib/match/detail-helpers.ts",
         // Sprint 14 — round count smart default
         "lib/match/round-count.ts",
+        // Sprint 15 — swap helpers
+        "lib/match/swap.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

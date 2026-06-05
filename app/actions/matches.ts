@@ -29,6 +29,7 @@ import {
   transitionForMatchRevert,
   canAdjustScore,
 } from "@/lib/match/lifecycle";
+import { validateSwap, type MatchSlotKey } from "@/lib/match/swap";
 
 export type GenerateRoundOptions = {
   /**
@@ -332,6 +333,146 @@ export async function regenerateRoundAction(
 
   revalidatePath(`/sessions/${round.sessionId}`);
   revalidatePath(`/sessions/${round.sessionId}/matches`);
+  return null;
+}
+
+// ============================================================
+// Swap 2 pemain (Sprint 15)
+// ============================================================
+
+export async function swapPlayersAction(
+  matchAId: string,
+  slotA: MatchSlotKey,
+  matchBId: string,
+  slotB: MatchSlotKey
+): Promise<{ error?: string } | null> {
+  const me = await getCurrentUser();
+  if (!me) redirect("/login");
+
+  const isSameMatch = matchAId === matchBId;
+
+  // Load match A (dgn round info untuk staff check)
+  const [rowA] = await db
+    .select({
+      id: matches.id,
+      status: matches.status,
+      matchRoundSetId: matches.matchRoundSetId,
+      sessionId: matchRoundSets.sessionId,
+      team1P1Id: matches.team1P1Id,
+      team1P2Id: matches.team1P2Id,
+      team2P1Id: matches.team2P1Id,
+      team2P2Id: matches.team2P2Id,
+    })
+    .from(matches)
+    .innerJoin(matchRoundSets, eq(matches.matchRoundSetId, matchRoundSets.id))
+    .where(eq(matches.id, matchAId))
+    .limit(1);
+
+  if (!rowA) return { error: "Match A tidak ditemukan" };
+
+  if (!(await isSessionStaff(rowA.sessionId, me.id))) {
+    return { error: "Hanya host/co-host yang bisa swap pemain" };
+  }
+
+  // Status check: hanya pending
+  if (rowA.status !== "pending") {
+    return {
+      error: "Hanya match status 'pending' yang bisa di-swap pemainnya",
+    };
+  }
+
+  let rowB = rowA;
+  if (!isSameMatch) {
+    const [matchB] = await db
+      .select({
+        id: matches.id,
+        status: matches.status,
+        matchRoundSetId: matches.matchRoundSetId,
+        team1P1Id: matches.team1P1Id,
+        team1P2Id: matches.team1P2Id,
+        team2P1Id: matches.team2P1Id,
+        team2P2Id: matches.team2P2Id,
+      })
+      .from(matches)
+      .where(eq(matches.id, matchBId))
+      .limit(1);
+    if (!matchB) return { error: "Match B tidak ditemukan" };
+
+    if (matchB.matchRoundSetId !== rowA.matchRoundSetId) {
+      return { error: "Swap hanya boleh dalam round yang sama" };
+    }
+    if (matchB.status !== "pending") {
+      return {
+        error: "Match B sudah live/completed, tidak bisa di-swap",
+      };
+    }
+    rowB = { ...matchB, sessionId: rowA.sessionId };
+  }
+
+  // Pure validate
+  const validation = validateSwap(
+    {
+      team1P1Id: rowA.team1P1Id,
+      team1P2Id: rowA.team1P2Id,
+      team2P1Id: rowA.team2P1Id,
+      team2P2Id: rowA.team2P2Id,
+    },
+    slotA,
+    {
+      team1P1Id: rowB.team1P1Id,
+      team1P2Id: rowB.team1P2Id,
+      team2P1Id: rowB.team2P1Id,
+      team2P2Id: rowB.team2P2Id,
+    },
+    slotB,
+    isSameMatch
+  );
+  if (!validation.ok) return { error: validation.error };
+
+  // Apply via transaction
+  try {
+    await db.transaction(async (tx) => {
+      if (isSameMatch) {
+        // Tukar di satu match
+        const out = {
+          team1P1Id: rowA.team1P1Id,
+          team1P2Id: rowA.team1P2Id,
+          team2P1Id: rowA.team2P1Id,
+          team2P2Id: rowA.team2P2Id,
+        };
+        const tmp = out[slotA];
+        out[slotA] = out[slotB];
+        out[slotB] = tmp;
+        await tx.update(matches).set(out).where(eq(matches.id, matchAId));
+      } else {
+        const idA = rowA[slotA];
+        const idB = rowB[slotB];
+        await tx
+          .update(matches)
+          .set({ [slotA]: idB })
+          .where(eq(matches.id, matchAId));
+        await tx
+          .update(matches)
+          .set({ [slotB]: idA })
+          .where(eq(matches.id, matchBId));
+      }
+    });
+  } catch (e) {
+    console.error("[swapPlayersAction] tx error:", e);
+    return { error: "Gagal swap. Coba lagi." };
+  }
+
+  event("match_swap", {
+    sessionId: rowA.sessionId,
+    matchAId,
+    slotA,
+    matchBId,
+    slotB,
+    sameMatch: isSameMatch,
+  });
+
+  revalidatePath(`/sessions/${rowA.sessionId}`);
+  revalidatePath(`/sessions/${rowA.sessionId}/matches`);
   return null;
 }
 
