@@ -8,6 +8,7 @@ import {
 } from "@/app/actions/session-photo";
 import { Toast } from "@/components/ui/Toast";
 import { compressImageClient } from "@/lib/image/compress-client";
+import { ImageCropModal } from "@/components/ui/ImageCropModal";
 
 type Props = {
   sessionId: string;
@@ -20,18 +21,22 @@ export function CoverPhotoUploader({ sessionId, currentCoverUrl }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  // Sprint 50: file dipick → tampil crop modal dulu sebelum upload
+  const [pickedFile, setPickedFile] = useState<File | null>(null);
 
-  function handleFile(file: File) {
+  async function uploadCroppedFile(croppedFile: File) {
     setError(null);
     setSuccess(null);
 
     const reader = new FileReader();
     reader.onload = (e) => setPreview(String(e.target?.result ?? ""));
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(croppedFile);
+
+    setPickedFile(null);
 
     startTransition(async () => {
-      // Sprint 48: compress dulu supaya tidak hit 1MB Server Action limit
-      const compressed = await compressImageClient(file);
+      // Compress (crop sudah handle dimension, ini cuma re-encode kalau perlu)
+      const compressed = await compressImageClient(croppedFile);
       const fd = new FormData();
       fd.set("file", compressed);
       const result = await updateCoverPhotoAction(sessionId, null, fd);
@@ -48,7 +53,7 @@ export function CoverPhotoUploader({ sessionId, currentCoverUrl }: Props) {
 
   function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (file) handleFile(file);
+    if (file) setPickedFile(file); // open crop modal
     e.target.value = "";
   }
 
@@ -69,6 +74,16 @@ export function CoverPhotoUploader({ sessionId, currentCoverUrl }: Props) {
 
   return (
     <>
+      {/* Crop modal — Sprint 50 — buka saat user pick file baru */}
+      {pickedFile && (
+        <ImageCropModal
+          file={pickedFile}
+          aspectRatio={2}
+          outputWidth={1600}
+          onConfirm={uploadCroppedFile}
+          onCancel={() => setPickedFile(null)}
+        />
+      )}
       <Toast message={error} onDismiss={() => setError(null)} />
       <Toast
         message={success}

@@ -309,6 +309,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
               sessionTitle={session.title}
               venueName={session.venueName}
               scheduledAt={session.scheduledAt}
+              scheduledEndAt={session.scheduledEndAt}
               hostName={
                 participants.find((p) => p.role === "host")?.userDisplayName ??
                 null

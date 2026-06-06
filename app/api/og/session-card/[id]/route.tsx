@@ -19,6 +19,7 @@
 import { ImageResponse } from "next/og";
 import { getPublicSessionView } from "@/lib/db/queries/public-share";
 import { listSessionLeaderboard } from "@/lib/db/queries/session-leaderboard";
+import { getFullLogoDataUrl } from "@/lib/og/logo";
 
 export const dynamic = "force-dynamic";
 
@@ -120,6 +121,7 @@ export async function GET(req: Request, { params }: Props) {
     (m) => m.status === "completed"
   ).length;
   const status = session.status ?? "upcoming";
+  const logoUrl = await getFullLogoDataUrl();
 
   return new ImageResponse(
     (
@@ -224,22 +226,33 @@ export async function GET(req: Request, { params }: Props) {
               border: "1px solid rgba(255,255,255,0.4)",
             }}
           >
-            <div
-              style={{
-                width: 56,
-                height: 56,
-                background: "#fff",
-                borderRadius: 12,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: 900,
-                fontSize: 26,
-                color: "#0F766E",
-              }}
-            >
-              CC
-            </div>
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={logoUrl}
+                alt="Carsel Club"
+                width={72}
+                height={72}
+                style={{ background: "#fff", borderRadius: 12, padding: 4 }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: 56,
+                  height: 56,
+                  background: "#fff",
+                  borderRadius: 12,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: 900,
+                  fontSize: 26,
+                  color: "#0F766E",
+                }}
+              >
+                CC
+              </div>
+            )}
             <div
               style={{
                 fontWeight: 800,

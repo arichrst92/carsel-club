@@ -21,6 +21,7 @@ import {
   team2Won,
 } from "@/lib/match/detail-helpers";
 import { toAbsoluteUrl } from "@/lib/utils";
+import { getFullLogoDataUrl } from "@/lib/og/logo";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +33,7 @@ export async function GET(_req: Request, { params }: Props) {
   if (!data) return new Response("Not found", { status: 404 });
 
   const { match, round, session, players } = data;
+  const logoUrl = await getFullLogoDataUrl();
   const team1 = players.filter((p) => p.side === "team1");
   const team2 = players.filter((p) => p.side === "team2");
   const isLive = match.status === "live";
@@ -92,26 +94,35 @@ export async function GET(_req: Request, { params }: Props) {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoUrl} alt="Carsel Club" width={72} height={72} />
+            ) : (
+              <div
+                style={{
+                  width: 52,
+                  height: 52,
+                  background: "rgba(255,255,255,0.22)",
+                  borderRadius: 12,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: 800,
+                  fontSize: 22,
+                }}
+              >
+                CC
+              </div>
+            )}
             <div
               style={{
-                width: 52,
-                height: 52,
-                background: "rgba(255,255,255,0.22)",
-                borderRadius: 12,
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: 800,
-                fontSize: 22,
+                fontSize: 16,
+                opacity: 0.85,
+                fontWeight: 600,
               }}
             >
-              CC
-            </div>
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <div style={{ fontWeight: 800, fontSize: 26 }}>Carsel Club</div>
-              <div style={{ fontSize: 13, opacity: 0.85, fontWeight: 600 }}>
-                Court {match.courtNumber} · Round {round.number}
-              </div>
+              Court {match.courtNumber} · Round {round.number}
             </div>
           </div>
           <div

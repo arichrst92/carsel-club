@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { getPublicSessionView } from "@/lib/db/queries/public-share";
+import { getFullLogoDataUrl } from "@/lib/og/logo";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +26,7 @@ export async function GET(_req: Request, { params }: Props) {
   }
 
   const { session, participants, totalRounds, currentMatches } = data;
+  const logoUrl = await getFullLogoDataUrl();
 
   const top3 = [...participants]
     .filter((p) => p.sessionMatches > 0)
@@ -95,31 +97,35 @@ export async function GET(_req: Request, { params }: Props) {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div
-              style={{
-                width: 64,
-                height: 64,
-                background: "rgba(255,255,255,0.22)",
-                borderRadius: 14,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: 800,
-                fontSize: 30,
-              }}
-            >
-              CC
-            </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <div style={{ fontWeight: 800, fontSize: 30 }}>Carsel Club</div>
-              <div style={{ fontSize: 16, opacity: 0.85, fontWeight: 600 }}>
-                Padel Community Indonesia
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoUrl} alt="Carsel Club" width={88} height={88} />
+            ) : (
+              <div
+                style={{
+                  width: 64,
+                  height: 64,
+                  background: "rgba(255,255,255,0.22)",
+                  borderRadius: 14,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: 800,
+                  fontSize: 30,
+                }}
+              >
+                CC
               </div>
+            )}
+            <div
+              style={{
+                display: "flex",
+                fontSize: 16,
+                opacity: 0.85,
+                fontWeight: 600,
+              }}
+            >
+              Padel Community Indonesia
             </div>
           </div>
           <div

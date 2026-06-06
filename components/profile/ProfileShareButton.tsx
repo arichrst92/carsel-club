@@ -26,17 +26,21 @@ export function ProfileShareButton({
   async function handleShare() {
     const url = `${getAppUrl()}/u/${userId}`;
     const tierBit = tierName ? ` · ${tierName}` : "";
-    const text =
+
+    // Sprint 50: WA invitation. URL TIDAK include di body text untuk
+    // navigator.share — supaya tidak duplikat saat WhatsApp gabungkan
+    // text + url. WA fallback (wa.me) tetap perlu URL di text karena
+    // tidak ada parameter url terpisah.
+    const bodyText =
       `🎾 *${displayName}* di Carsel Club${tierBit}\n` +
       `${totalPoints} pts\n\n` +
-      `Lihat profile lengkap:\n${url}\n\n` +
       `Padel community Indonesia ⚡`;
 
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
           title: `${displayName} — Carsel Club`,
-          text,
+          text: bodyText, // tanpa URL — di-handle param url terpisah
           url,
         });
         return;
@@ -44,8 +48,9 @@ export function ProfileShareButton({
         if ((e as Error).name === "AbortError") return;
       }
     }
-    // Fallback: WhatsApp share intent
-    const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    // Fallback: WhatsApp share intent (URL inline karena param tunggal)
+    const waText = `${bodyText}\n\nLihat profile:\n${url}`;
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(waText)}`;
     window.open(waUrl, "_blank", "noopener,noreferrer");
     setToast("Membuka WhatsApp...");
   }

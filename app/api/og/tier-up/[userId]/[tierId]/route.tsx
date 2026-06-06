@@ -11,6 +11,7 @@ import {
   getTierById,
 } from "@/lib/db/queries/public-profile";
 import { toAbsoluteUrl } from "@/lib/utils";
+import { getFullLogoDataUrl } from "@/lib/og/logo";
 
 export const dynamic = "force-dynamic";
 
@@ -41,6 +42,7 @@ export async function GET(_req: Request, { params }: Props) {
   }
 
   const avatarUrl = toAbsoluteUrl(profile.avatarUrl);
+  const logoUrl = await getFullLogoDataUrl();
   const initial = (profile.displayName.trim()[0] ?? "?").toUpperCase();
   const tierColor = tier.color ?? "#9333ea";
   const emoji = TIER_EMOJI[tier.name] ?? "🎉";
@@ -85,24 +87,26 @@ export async function GET(_req: Request, { params }: Props) {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div
-              style={{
-                width: 48,
-                height: 48,
-                background: "rgba(255,255,255,0.18)",
-                borderRadius: 10,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: 800,
-                fontSize: 22,
-              }}
-            >
-              CC
-            </div>
-            <div style={{ fontWeight: 800, fontSize: 22, display: "flex" }}>
-              Carsel Club
-            </div>
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoUrl} alt="Carsel Club" width={64} height={64} />
+            ) : (
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  background: "rgba(255,255,255,0.18)",
+                  borderRadius: 10,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: 800,
+                  fontSize: 22,
+                }}
+              >
+                CC
+              </div>
+            )}
           </div>
           <div
             style={{

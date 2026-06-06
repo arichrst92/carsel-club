@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { formatDate, formatTime } from "@/lib/utils";
+import { formatDate, formatTime, formatTimeRange } from "@/lib/utils";
 import { Toast } from "@/components/ui/Toast";
 
 type Props = {
@@ -10,6 +10,8 @@ type Props = {
   sessionTitle: string;
   venueName?: string | null;
   scheduledAt: Date | string;
+  /** Sprint 50: tampil "HH:MM – HH:MM" di invite text. */
+  scheduledEndAt?: Date | string | null;
   hostName?: string | null;
 };
 
@@ -25,6 +27,7 @@ export function SessionShareActions({
   sessionTitle,
   venueName,
   scheduledAt,
+  scheduledEndAt = null,
   hostName,
 }: Props) {
   const [copied, setCopied] = useState(false);
@@ -34,10 +37,14 @@ export function SessionShareActions({
     const baseUrl = getAppUrl();
     const liveUrl = `${baseUrl}/s/${sessionId}`;
     const dateStr = formatDate(scheduledAt);
-    const timeStr = formatTime(scheduledAt);
+    // Sprint 50: kalau ada scheduledEndAt → tampilkan range "HH:MM – HH:MM"
+    const timeStr = scheduledEndAt
+      ? formatTimeRange(scheduledAt, scheduledEndAt)
+      : formatTime(scheduledAt);
 
     let text = `🎾 *${sessionTitle}*\n`;
-    text += `📅 ${dateStr} · ${timeStr}\n`;
+    text += `📅 ${dateStr}\n`;
+    text += `⏰ ${timeStr}\n`;
     if (venueName) text += `📍 ${venueName}\n`;
     if (hostName) text += `👤 Host: ${hostName}\n`;
     text += `\n🔗 Live score & info:\n${liveUrl}\n`;

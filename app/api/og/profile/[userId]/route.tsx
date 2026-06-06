@@ -11,6 +11,7 @@ import { ImageResponse } from "next/og";
 import { getPublicProfile } from "@/lib/db/queries/public-profile";
 import { winRate } from "@/lib/utils";
 import { toAbsoluteUrl } from "@/lib/utils";
+import { getFullLogoDataUrl } from "@/lib/og/logo";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,7 @@ export async function GET(_req: Request, { params }: Props) {
 
   const wr = winRate(profile.totalWins, profile.totalMatches);
   const avatarUrl = toAbsoluteUrl(profile.avatarUrl);
+  const logoUrl = await getFullLogoDataUrl();
   const initial = (profile.displayName.trim()[0] ?? "?").toUpperCase();
   const tierColor = profile.tierColor ?? "#94a3b8";
 
@@ -65,26 +67,35 @@ export async function GET(_req: Request, { params }: Props) {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoUrl} alt="Carsel Club" width={72} height={72} />
+            ) : (
+              <div
+                style={{
+                  width: 52,
+                  height: 52,
+                  background: "rgba(255,255,255,0.22)",
+                  borderRadius: 12,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: 800,
+                  fontSize: 22,
+                }}
+              >
+                CC
+              </div>
+            )}
             <div
               style={{
-                width: 52,
-                height: 52,
-                background: "rgba(255,255,255,0.22)",
-                borderRadius: 12,
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: 800,
-                fontSize: 22,
+                fontSize: 13,
+                opacity: 0.85,
+                fontWeight: 600,
               }}
             >
-              CC
-            </div>
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <div style={{ fontWeight: 800, fontSize: 24 }}>Carsel Club</div>
-              <div style={{ fontSize: 13, opacity: 0.85, fontWeight: 600 }}>
-                Padel Community Indonesia
-              </div>
+              Padel Community Indonesia
             </div>
           </div>
         </div>
