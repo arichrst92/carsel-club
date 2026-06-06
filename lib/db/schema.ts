@@ -78,6 +78,12 @@ export const joinRequestStatusEnum = pgEnum("join_request_status", [
   "rejected",
 ]);
 
+export const friendRequestStatusEnum = pgEnum("friend_request_status", [
+  "pending",
+  "accepted",
+  "rejected",
+]);
+
 export const logTypeEnum = pgEnum("log_type", ["log", "event"]);
 export const logLevelEnum = pgEnum("log_level", [
   "info",
@@ -307,6 +313,35 @@ export const matchRoundSets = pgTable(
     index("idx_mrs_session").on(t.sessionId, t.roundNumber),
     unique("uq_mrs_session_round").on(t.sessionId, t.roundNumber),
     check("round_number_positive", sql`${t.roundNumber} > 0`),
+  ]
+);
+
+// ============================================================
+// FRIEND REQUESTS — Sprint 22
+// ============================================================
+
+export const friendRequests = pgTable(
+  "friend_requests",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    fromUserId: uuid("from_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    toUserId: uuid("to_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    status: friendRequestStatusEnum("status").notNull().default("pending"),
+    message: text("message"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+  },
+  (t) => [
+    index("idx_friend_req_to_status").on(t.toUserId, t.status),
+    index("idx_friend_req_from_status").on(t.fromUserId, t.status),
+    unique("uq_friend_req_pair").on(t.fromUserId, t.toUserId),
+    check("friend_req_no_self", sql`${t.fromUserId} <> ${t.toUserId}`),
   ]
 );
 

@@ -27,6 +27,9 @@ export type EventName =
   | "join_requested" // Sprint 20
   | "join_approved" // Sprint 20
   | "join_rejected" // Sprint 20
+  | "friend_request_sent" // Sprint 22
+  | "friend_request_accepted" // Sprint 22
+  | "friend_request_rejected" // Sprint 22
   | "match_started" // Sprint 4
   | "match_completed"
   | "match_reverted" // Sprint 4
