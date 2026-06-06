@@ -1,0 +1,18 @@
+[Unit]
+Description=Carsel Club nightly backup (pg_dump + rsync)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/carsel/scripts/backup.sh
+EnvironmentFile=/etc/carsel-backup.env
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+# Capture stdout/stderr ke journal for `journalctl -u carsel-backup`
+StandardOutput=journal
+StandardError=journal
+
+# Alert on failure — replace email or webhook in OnFailure unit
+# OnFailure=carsel-backup-alert@%n.service

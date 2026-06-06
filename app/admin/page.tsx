@@ -5,6 +5,13 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth/admin";
 import { getAdminCounts } from "@/lib/db/queries/admin";
+import { getLatestBackupAt } from "@/lib/db/queries/backup";
+import {
+  evaluateBackupHealth,
+  formatBackupAge,
+  statusColor,
+  statusLabel,
+} from "@/lib/backup/health";
 
 export const metadata = {
   title: "Admin",
@@ -14,7 +21,11 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminIndex() {
   await requireAdmin();
-  const counts = await getAdminCounts();
+  const [counts, lastBackupAt] = await Promise.all([
+    getAdminCounts(),
+    getLatestBackupAt(),
+  ]);
+  const health = evaluateBackupHealth(new Date(), lastBackupAt);
 
   return (
     <div className="app-shell">
@@ -62,6 +73,61 @@ export default async function AdminIndex() {
             sub="completed"
             emoji="🎾"
           />
+        </section>
+
+        {/* Sprint 36: backup health */}
+        <section
+          style={{
+            marginTop: "var(--s-3)",
+            background: "var(--bg-card)",
+            border: "1px solid var(--border)",
+            borderRadius: "var(--r-lg)",
+            padding: "var(--s-3) var(--s-4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <div>
+            <div
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 800,
+                fontSize: 13,
+                color: "var(--text-900)",
+              }}
+            >
+              💾 Backup
+            </div>
+            <div
+              style={{
+                fontSize: 11,
+                color: "var(--text-500)",
+                fontWeight: 600,
+                marginTop: 2,
+              }}
+            >
+              Last:{" "}
+              {health.lastBackupAt
+                ? `${health.lastBackupAt.toISOString().slice(0, 16).replace("T", " ")} (${formatBackupAge(health.hoursSince)} lalu)`
+                : "—"}
+            </div>
+          </div>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 800,
+              color: statusColor(health.status),
+              textTransform: "uppercase",
+              letterSpacing: 0.5,
+              padding: "var(--s-1) var(--s-2)",
+              borderRadius: "var(--r-md)",
+              background: "var(--bg-soft)",
+              border: `1px solid ${statusColor(health.status)}`,
+            }}
+          >
+            {statusLabel(health.status)}
+          </div>
         </section>
 
         <nav

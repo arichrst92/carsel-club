@@ -78,6 +78,8 @@ export default defineConfig({
         "lib/errors/friendly.ts",
         // Sprint 35 — stats recompute
         "lib/stats/recompute.ts",
+        // Sprint 36 — backup health
+        "lib/backup/health.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

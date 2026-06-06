@@ -43,6 +43,7 @@ export type EventName =
   | "bracket_generated" // Sprint 31
   | "bracket_advanced" // Sprint 31
   | "admin_stats_recomputed" // Sprint 35
+  | "backup_completed" // Sprint 36
   | "referral_claimed"
   | "upload_success";
 

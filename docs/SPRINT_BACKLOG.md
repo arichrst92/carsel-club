@@ -885,16 +885,33 @@ Deferred:
 
 ---
 
-### Sprint 36 — Backup setup
+### Sprint 36 — Backup setup ✅
 **Goal**: Activate backup sebelum pre-public launch
 
 Sub-tasks:
-- Rsync script ke Backblaze B2 (atau VPS secondary) untuk `/var/www/carsel-uploads/`
-- Cron daily 02:00 WIB
-- Postgres `pg_dump` nightly + sync ke same destination
-- Restore documentation di `docs/DEPLOYMENT.md`
-- Monitoring: alert kalau backup fail (Sentry capture atau email)
-- Restore drill (test restore di staging)
+- Pure helper (100% cov, lib/backup/health.ts):
+  - evaluateBackupHealth(now, lastBackupAt, thresholds?) — categorizes
+    ok/stale/critical/never via OK_HOURS_DEFAULT=26, STALE_HOURS_DEFAULT=50
+  - statusLabel + statusColor + formatBackupAge ("<1 jam" / "12 jam" / "2 hari")
+- Scripts (scripts/):
+  - backup.sh — sources /etc/carsel-backup.env, runs pg_dump | gzip,
+    rsyncs uploads + dump ke BACKUP_REMOTE, cleans up local dumps older
+    than BACKUP_RETENTION_DAYS, pings BACKUP_PING_URL with stamp
+  - restore.sh — confirm-gated drop + reload schema, gunzip into psql,
+    optional uploads sync
+- Systemd templates (scripts/systemd/):
+  - carsel-backup.service (oneshot, journal logging)
+  - carsel-backup.timer (OnCalendar=*-*-* 19:00:00 UTC = 02:00 WIB)
+  - carsel-reminder.{service,timer} (Sprint 28 reminder cron units now
+    documented untuk reference)
+- API endpoint /api/cron/backup-ping — Bearer CRON_SECRET, logs
+  backup_completed event with dump filename + stamp
+- Query getLatestBackupAt — reads last backup_completed di app_logs
+- Admin dashboard /admin: backup health card showing last timestamp +
+  status pill (Sehat/Terlambat/Kritis colored by statusColor)
+- Event log: backup_completed added to EventName union
+- Docs (docs/BACKUP_RESTORE.md): setup, dry-run, restore drill, monitoring,
+  DR rebuild, retention policy
 
 **DoD**: Backup jalan terus, restore drill berhasil.
 

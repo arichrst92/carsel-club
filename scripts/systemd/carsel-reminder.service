@@ -1,0 +1,11 @@
+[Unit]
+Description=Carsel Club session reminder ping (H-1)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/curl -fsS -X POST \
+  -H "Authorization: Bearer ${CRON_SECRET}" \
+  https://carsel.club/api/cron/session-reminder
+EnvironmentFile=/etc/carsel-cron.env
