@@ -77,9 +77,11 @@ export default async function SessionLeaderboardPage({
   const sort = parseSort(sp.sort);
 
   const rows = await listSessionLeaderboard(id);
-  // Sort + rank
+  // Sort + rank — tampilkan semua peserta (termasuk yg sedang
+  // benched / isPlaying=false). Yg !isPlaying ditandai badge "Benched"
+  // di item, tapi tetap masuk ranking. Kalau di-filter saja, peserta
+  // baru dgn 0 match sering hilang dari daftar (Sprint 49 fix).
   const ranked = [...rows]
-    .filter((r) => r.isPlaying)
     .sort((a, b) => {
       const diff = getSortValue(b, sort) - getSortValue(a, sort);
       if (diff !== 0) return diff;

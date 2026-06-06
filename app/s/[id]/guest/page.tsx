@@ -7,6 +7,7 @@
  * - GUI: docs/CarselClubPrototype/guest-join.html
  */
 
+import { AppLogoMark } from "@/components/ui/AppLogoMark";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { eq } from "drizzle-orm";
@@ -60,7 +61,7 @@ export default async function GuestJoinPage({ params }: PageProps) {
         }}
       >
         <div className="logo">
-          <div className="logo-mark">CC</div>
+          <AppLogoMark />
           <span className="logo-text">Carsel Club</span>
         </div>
         <Link

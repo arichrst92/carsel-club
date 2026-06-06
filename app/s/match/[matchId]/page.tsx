@@ -9,6 +9,7 @@
  * - Plan: docs/SPRINT_BACKLOG.md Sprint 6
  */
 
+import { AppLogoMark } from "@/components/ui/AppLogoMark";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getPublicMatchView } from "@/lib/db/queries/public-share";
@@ -100,7 +101,7 @@ export default async function PublicMatchView({ params }: PageProps) {
         }}
       >
         <div className="logo">
-          <div className="logo-mark">CC</div>
+          <AppLogoMark />
           <span className="logo-text">Carsel Club</span>
         </div>
         <Link

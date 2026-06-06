@@ -1,4 +1,5 @@
 import { Skeleton, SkeletonCard } from "@/components/ui/Skeleton";
+import { AppLogoMark } from "@/components/ui/AppLogoMark";
 import { BottomNav } from "@/components/nav/BottomNav";
 
 export default function FindLoading() {
@@ -6,7 +7,7 @@ export default function FindLoading() {
     <div className="app-shell">
       <header className="app-header">
         <div className="logo">
-          <div className="logo-mark">CC</div>
+          <AppLogoMark />
           <span className="logo-text">Find Session</span>
         </div>
       </header>

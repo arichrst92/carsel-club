@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { AppLogoMark } from "@/components/ui/AppLogoMark";
 import Link from "next/link";
 import { getPublicSessionView } from "@/lib/db/queries/public-share";
 import { AutoRefresh } from "@/components/share/AutoRefresh";
@@ -121,7 +122,7 @@ export default async function PublicLiveView({ params }: PageProps) {
         }}
       >
         <div className="logo">
-          <div className="logo-mark">CC</div>
+          <AppLogoMark />
           <span className="logo-text">Carsel Club</span>
         </div>
         <Link

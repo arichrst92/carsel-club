@@ -7,6 +7,7 @@
  * - GUI: docs/CarselClubPrototype/leaderboard.html
  */
 
+import { AppLogoMark } from "@/components/ui/AppLogoMark";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/get-current-user";
 import { BottomNav } from "@/components/nav/BottomNav";
@@ -98,7 +99,7 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
     <div className="app-shell">
       <header className="app-header">
         <div className="logo">
-          <div className="logo-mark">CC</div>
+          <AppLogoMark />
           <span className="logo-text">Leaderboard</span>
         </div>
       </header>

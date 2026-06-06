@@ -110,7 +110,9 @@ export async function getSessionLeaderboardHero(
     })
     .from(sessionParticipants)
     .where(eq(sessionParticipants.sessionId, sessionId));
-  const playerCount = participants.filter((p) => p.isPlaying).length;
+  // Sprint 49: count semua peserta (termasuk benched) supaya angka di
+  // hero match dgn count di section Pemain (X) di session detail.
+  const playerCount = participants.length;
   const totalPoints = participants.reduce(
     (acc, p) => acc + p.sessionPoints,
     0

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AppLogoMark } from "@/components/ui/AppLogoMark";
 import { requireUser } from "@/lib/auth/get-current-user";
 import { listMySessions } from "@/lib/db/queries/sessions";
 import { SessionListItem } from "@/components/sessions/SessionListItem";
@@ -91,7 +92,7 @@ export default async function SessionsPage({
     <div className="app-shell">
       <header className="app-header">
         <div className="logo">
-          <div className="logo-mark">CC</div>
+          <AppLogoMark />
           <span className="logo-text">My Sessions</span>
         </div>
         <div className="header-actions">

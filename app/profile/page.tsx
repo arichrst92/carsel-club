@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AppLogoMark } from "@/components/ui/AppLogoMark";
 import { requireUser } from "@/lib/auth/get-current-user";
 import { getProfileData } from "@/lib/db/queries/profile";
 import { getRecentMatches } from "@/lib/db/queries/home";
@@ -141,7 +142,7 @@ export default async function ProfilePage() {
     <div className="app-shell">
       <header className="app-header">
         <div className="logo">
-          <div className="logo-mark">CC</div>
+          <AppLogoMark />
           <span className="logo-text">Profile</span>
         </div>
         <div className="header-actions">

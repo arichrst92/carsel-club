@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AppLogoMark } from "@/components/ui/AppLogoMark";
 import { requireUser } from "@/lib/auth/get-current-user";
 import { listPublicSessions } from "@/lib/db/queries/find-sessions";
 import { BottomNav } from "@/components/nav/BottomNav";
@@ -31,7 +32,7 @@ export default async function FindSessionPage({ searchParams }: PageProps) {
     <div className="app-shell">
       <header className="app-header">
         <div className="logo">
-          <div className="logo-mark">CC</div>
+          <AppLogoMark />
           <span className="logo-text">Find Session</span>
         </div>
       </header>
