@@ -39,6 +39,7 @@ export type EventName =
   | "match_completed"
   | "match_reverted" // Sprint 4
   | "tier_up" // Sprint 12
+  | "session_reminder_sent" // Sprint 28
   | "referral_claimed"
   | "upload_success";
 

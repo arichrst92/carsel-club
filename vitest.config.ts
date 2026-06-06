@@ -62,6 +62,9 @@ export default defineConfig({
         // Sprint 27 — push helpers
         "lib/push/subscriptions.ts",
         "lib/push/payload.ts",
+        // Sprint 28 — WA template + reminder window
+        "lib/notifications/wa-template.ts",
+        "lib/notifications/reminder-window.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

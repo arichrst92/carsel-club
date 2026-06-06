@@ -605,17 +605,30 @@ Sub-tasks:
 
 ---
 
-### Sprint 28 — WA reminders + session H-1 cron
+### Sprint 28 — WA reminders + session H-1 cron ✅
 **Goal**: WhatsApp reminder via Fonnte
 
 Sub-tasks:
-- Cron endpoint `/api/cron/session-reminder` — query sessions starting in 1 hour
-- Send WA reminder ke participants via Fonnte
-- Track sent (kolom `sessions.reminderSentAt`)
-- Cron setup (Vercel cron atau systemd timer di VPS — decide saat sprint)
-- Per-user opt-out
+- Schema: `sessions.reminder_sent_at` (timestamp, idempotency marker)
+- Pure helpers (100% cov):
+  - `lib/notifications/wa-template.ts` — buildWaMessage per type (10 templates,
+    URL builder strips trailing slashes)
+  - `lib/notifications/reminder-window.ts` — isReminderEligible
+    (DEFAULT_REMINDER_WINDOW 50-75 min — tolerates cron jitter),
+    minutesBetween, displayMinutes
+- Queries:
+  - listSessionsDueForReminder(now, min, max)
+  - markReminderSent (atomic claim — only succeeds if null)
+  - listSessionParticipantUserIds (skips guests)
+- Dispatcher: createNotification extends — if shouldDeliver("wa") + FONNTE_TOKEN
+  + NEXT_PUBLIC_APP_URL set, sends WA via Fonnte client (per-user opt-out via prefs)
+- Cron endpoint `/api/cron/session-reminder` — Bearer CRON_SECRET, scans window,
+  atomic claim, fires notifySessionReminder per participant
+- Event log: `session_reminder_sent` (per session, with participant count)
+- Cron infra decision (D3): systemd timer di VPS via curl every 5 min
 
-**DoD**: 1 jam sebelum session, participants dapat WA reminder.
+**DoD**: 1 jam sebelum session, participants dapat WA + in-app + push (per pref).
+Idempotent — multi-runner safe via atomic UPDATE ... WHERE reminder_sent_at IS NULL.
 
 ---
 

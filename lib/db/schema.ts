@@ -246,6 +246,8 @@ export const sessions = pgTable(
     maxRounds: integer("max_rounds"),
     description: text("description"),
     endedAt: timestamp("ended_at", { withTimezone: true }),
+    // Sprint 28: marker for H-1 reminder cron idempotency
+    reminderSentAt: timestamp("reminder_sent_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

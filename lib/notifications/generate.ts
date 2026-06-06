@@ -28,9 +28,14 @@ import type {
 } from "./types";
 import { formatNotification } from "./format";
 import { shouldDeliver } from "./prefs";
+import { buildWaMessage } from "./wa-template";
 import { getNotificationPrefs } from "@/lib/db/queries/notifications";
 import { buildPushPayload } from "@/lib/push/payload";
 import { sendToUser } from "@/lib/push/send";
+import { sendWhatsApp } from "@/lib/fonnte/client";
+import { db as dbClient } from "@/lib/db/client";
+import { users } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 async function createNotification<T extends NotificationType>(
   userId: string,
@@ -54,20 +59,27 @@ async function createNotification<T extends NotificationType>(
   }
   if (!notificationId) return;
 
-  // Sprint 27: dispatch web push if user pref allows + outside quiet hours
+  // Sprint 27-28: dispatch push + WA if user pref + outside quiet hours
   try {
     const prefs = await getNotificationPrefs(userId);
     const currentHour = new Date().getHours();
-    if (
-      shouldDeliver(
-        prefs.settings,
-        type,
-        "push",
-        currentHour,
-        prefs.quietStartHour,
-        prefs.quietEndHour
-      )
-    ) {
+    const pushAllowed = shouldDeliver(
+      prefs.settings,
+      type,
+      "push",
+      currentHour,
+      prefs.quietStartHour,
+      prefs.quietEndHour
+    );
+    const waAllowed = shouldDeliver(
+      prefs.settings,
+      type,
+      "wa",
+      currentHour,
+      prefs.quietStartHour,
+      prefs.quietEndHour
+    );
+    if (pushAllowed) {
       const fmt = formatNotification(
         type,
         payload as unknown as Record<string, unknown>
@@ -75,8 +87,37 @@ async function createNotification<T extends NotificationType>(
       const pushPayload = buildPushPayload(type, notificationId, fmt);
       await sendToUser(userId, pushPayload);
     }
+    if (waAllowed) {
+      await dispatchWa(userId, type, payload);
+    }
   } catch (e) {
-    console.error(`[notify:${type}] push dispatch failed:`, e);
+    console.error(`[notify:${type}] secondary dispatch failed:`, e);
+  }
+}
+
+async function dispatchWa<T extends NotificationType>(
+  userId: string,
+  type: T,
+  payload: NotificationPayloadByType[T]
+): Promise<void> {
+  // Skip if Fonnte not configured (e.g., dev w/o credentials)
+  if (!process.env.FONNTE_TOKEN) return;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  if (!appUrl) {
+    console.warn("[notify:wa] NEXT_PUBLIC_APP_URL missing — WA skipped");
+    return;
+  }
+  const [u] = await dbClient
+    .select({ phone: users.whatsappNumber })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  if (!u || !u.phone) return;
+  try {
+    const message = buildWaMessage(type, payload, { appUrl });
+    await sendWhatsApp({ target: u.phone, message });
+  } catch (e) {
+    console.error(`[notify:wa:${type}] send failed:`, e);
   }
 }
 
