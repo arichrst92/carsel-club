@@ -90,6 +90,19 @@ export const profileVisibilityEnum = pgEnum("profile_visibility", [
   "private",
 ]);
 
+export const notificationTypeEnum = pgEnum("notification_type", [
+  "session_invite",
+  "session_reminder",
+  "session_cancelled",
+  "tier_up",
+  "match_result",
+  "friend_request",
+  "friend_accepted",
+  "join_requested",
+  "join_approved",
+  "join_rejected",
+]);
+
 export const logTypeEnum = pgEnum("log_type", ["log", "event"]);
 export const logLevelEnum = pgEnum("log_level", [
   "info",
@@ -323,6 +336,30 @@ export const matchRoundSets = pgTable(
     index("idx_mrs_session").on(t.sessionId, t.roundNumber),
     unique("uq_mrs_session_round").on(t.sessionId, t.roundNumber),
     check("round_number_positive", sql`${t.roundNumber} > 0`),
+  ]
+);
+
+// ============================================================
+// NOTIFICATIONS — Sprint 25
+// ============================================================
+
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: notificationTypeEnum("type").notNull(),
+    payload: jsonb("payload").notNull().default(sql`'{}'::jsonb`),
+    readAt: timestamp("read_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("idx_notif_user_created").on(t.userId, t.createdAt.desc()),
+    index("idx_notif_user_unread").on(t.userId, t.readAt),
   ]
 );
 

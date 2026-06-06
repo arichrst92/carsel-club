@@ -23,6 +23,11 @@ import {
 import { getCurrentUser } from "@/lib/auth/get-current-user";
 import { isSessionStaff } from "@/lib/db/queries/sessions";
 import { event } from "@/lib/log";
+import {
+  notifyJoinRequested,
+  notifyJoinApproved,
+  notifyJoinRejected,
+} from "@/lib/notifications/generate";
 
 export type JoinRequestState = {
   error?: string;
@@ -120,6 +125,24 @@ export async function requestJoinAction(
 
   event("join_requested", { sessionId, userId: me!.id });
 
+  // Notify host
+  const [sessionInfo] = await db
+    .select({
+      title: sessions.title,
+      hostId: sessions.hostId,
+    })
+    .from(sessions)
+    .where(eq(sessions.id, sessionId))
+    .limit(1);
+  if (sessionInfo) {
+    notifyJoinRequested(sessionInfo.hostId, {
+      sessionId,
+      sessionTitle: sessionInfo.title,
+      requesterUserId: me!.id,
+      requesterDisplayName: me!.displayName,
+    });
+  }
+
   revalidatePath(`/sessions/${sessionId}`);
   revalidatePath("/find");
   return { success: "Request terkirim. Menunggu approval host." };
@@ -189,6 +212,18 @@ export async function approveJoinRequestAction(
 
   event("join_approved", { sessionId: req.sessionId, userId: req.userId });
 
+  const [sessionInfo] = await db
+    .select({ title: sessions.title })
+    .from(sessions)
+    .where(eq(sessions.id, req.sessionId))
+    .limit(1);
+  if (sessionInfo) {
+    notifyJoinApproved(req.userId, {
+      sessionId: req.sessionId,
+      sessionTitle: sessionInfo.title,
+    });
+  }
+
   revalidatePath(`/sessions/${req.sessionId}`);
   revalidatePath(`/sessions/${req.sessionId}/participants`);
   return { success: "Request di-approve" };
@@ -234,6 +269,18 @@ export async function rejectJoinRequestAction(
   }
 
   event("join_rejected", { sessionId: req.sessionId, userId: req.userId });
+
+  const [sessionInfo] = await db
+    .select({ title: sessions.title })
+    .from(sessions)
+    .where(eq(sessions.id, req.sessionId))
+    .limit(1);
+  if (sessionInfo) {
+    notifyJoinRejected(req.userId, {
+      sessionId: req.sessionId,
+      sessionTitle: sessionInfo.title,
+    });
+  }
 
   revalidatePath(`/sessions/${req.sessionId}`);
   return { success: "Request di-reject" };

@@ -18,10 +18,11 @@ import { revalidatePath } from "next/cache";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/lib/db/client";
-import { sessionParticipants, users } from "@/lib/db/schema";
+import { sessionParticipants, sessions, users } from "@/lib/db/schema";
 import { getCurrentUser } from "@/lib/auth/get-current-user";
 import { isSessionStaff } from "@/lib/db/queries/sessions";
 import { normalizePhone, isValidIndonesianPhone } from "@/lib/auth/otp";
+import { notifySessionInvite } from "@/lib/notifications/generate";
 
 export type FoundUser = {
   id: string;
@@ -128,6 +129,20 @@ export async function addMemberAction(
   } catch (e) {
     console.error("[addMemberAction]", e);
     return { error: "Gagal tambah pemain. Coba lagi." };
+  }
+
+  // Sprint 25: notify invited user
+  const [session] = await db
+    .select({ title: sessions.title })
+    .from(sessions)
+    .where(eq(sessions.id, sessionId))
+    .limit(1);
+  if (session) {
+    notifySessionInvite(userId, {
+      sessionId,
+      sessionTitle: session.title,
+      inviterName: me!.displayName,
+    });
   }
 
   revalidatePath(`/sessions/${sessionId}`);

@@ -54,6 +54,8 @@ export default defineConfig({
         "lib/match/generator-mexicano.ts",
         // Sprint 17 — Fix Partners (Round Robin)
         "lib/match/generator-fix-partners.ts",
+        // Sprint 25 — notification formatter
+        "lib/notifications/format.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

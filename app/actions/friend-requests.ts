@@ -27,6 +27,10 @@ import {
   isValidIndonesianPhone,
 } from "@/lib/auth/otp";
 import { event } from "@/lib/log";
+import {
+  notifyFriendRequest,
+  notifyFriendAccepted,
+} from "@/lib/notifications/generate";
 
 export type FriendRequestState = {
   error?: string;
@@ -158,6 +162,11 @@ export async function sendFriendRequestAction(
     fromUserId: me.id,
     toUserId,
   });
+  notifyFriendRequest(toUserId, {
+    fromUserId: me.id,
+    fromDisplayName: me.displayName,
+    message: message?.trim() || null,
+  });
 
   revalidatePath("/friends");
   return { success: `Request terkirim ke ${target.displayName}!` };
@@ -209,6 +218,10 @@ export async function acceptFriendRequestAction(
   event("friend_request_accepted", {
     fromUserId: req.fromUserId,
     toUserId: req.toUserId,
+  });
+  notifyFriendAccepted(req.fromUserId, {
+    byUserId: me.id,
+    byDisplayName: me.displayName,
   });
 
   revalidatePath("/friends");

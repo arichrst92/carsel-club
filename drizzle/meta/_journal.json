@@ -57,6 +57,13 @@
       "when": 1780722897117,
       "tag": "0007_overjoyed_scrambler",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1780723427594,
+      "tag": "0008_sprint25_notifications",
+      "breakpoints": true
     }
   ]
 }

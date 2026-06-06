@@ -20,6 +20,8 @@ import {
   computeTierId,
 } from "./stats-helpers";
 import { event } from "@/lib/log";
+import { notifyTierUp } from "@/lib/notifications/generate";
+import { TIERS } from "@/lib/constants";
 
 /**
  * Main entry: change match score + status, sync stats atomically.
@@ -125,6 +127,14 @@ export async function applyMatchScoreChange(
                   totalPoints: updatedUser.totalPoints,
                   totalMatches: updatedUser.totalMatches,
                 });
+                const tierInfo = TIERS.find((t) => t.id === newTierId);
+                if (tierInfo) {
+                  notifyTierUp(p.userId, {
+                    fromTierId: oldTierId,
+                    toTierId: newTierId,
+                    tierName: tierInfo.name,
+                  });
+                }
               }
             }
           }

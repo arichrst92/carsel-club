@@ -536,18 +536,23 @@ Sub-tasks:
 
 ## Notifications (Sprint 25-28)
 
-### Sprint 25 — Notifications: schema + generators
+### Sprint 25 — Notifications: schema + generators ✅
 **Goal**: Foundation notification system
 
 Sub-tasks:
-- Table `notifications` (id, userId, type, payload JSONB, readAt, createdAt)
-- Event generators (Server Action wrappers):
-  - `notifySessionInvite(...)` — saat add to session
-  - `notifyTierUp(...)` — saat tier change
-  - `notifyMatchResult(...)` — saat match completed
-  - `notifyFriendRequest(...)` — saat new friend req
-  - `notifySessionReminder(...)` — H-1 jam (set up via cron Sprint 28)
-- Query: unread count + paginated list
+- Table `notifications` (id, userId, type, payload JSONB, readAt, createdAt) + indexes
+- `notification_type` enum (10 types)
+- Typed generators (fire-and-forget) di `lib/notifications/generate.ts`:
+  - `notifySessionInvite`, `notifyTierUp`, `notifyMatchResult`,
+    `notifyFriendRequest`, `notifyFriendAccepted`, `notifySessionReminder`,
+    `notifySessionCancelled`, `notifyJoinRequested`, `notifyJoinApproved`,
+    `notifyJoinRejected`
+- Pure formatter `lib/notifications/format.ts` (icon/title/body/href + relative time)
+- Query helpers: `listNotifications` + `countUnreadNotifications`
+- Wired ke existing actions: addMember, sendFriendRequest, acceptFriendRequest,
+  requestJoin, approveJoinRequest, rejectJoinRequest, endMatch (per-player),
+  stats-sync tier-up
+- 19 unit tests pure formatter (100% coverage)
 
 **DoD**: Events trigger insert, query unread count works.
 
