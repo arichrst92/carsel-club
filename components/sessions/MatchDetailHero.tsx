@@ -12,7 +12,6 @@ import {
   OUTCOME_EMOJI,
   OUTCOME_LABEL,
   team1Won,
-  team2Won,
   isDraw,
 } from "@/lib/match/detail-helpers";
 import { MATCH_STATUS_LABEL } from "@/lib/match/lifecycle";
@@ -26,7 +25,6 @@ type Props = {
 export function MatchDetailHero({ match, team1Names, team2Names }: Props) {
   const isCompleted = match.status === "completed";
   const t1W = team1Won(match.team1Score, match.team2Score);
-  const t2W = team2Won(match.team1Score, match.team2Score);
   const draw = isDraw(match.team1Score, match.team2Score);
 
   return (
@@ -64,53 +62,24 @@ export function MatchDetailHero({ match, team1Names, team2Names }: Props) {
         {MATCH_STATUS_LABEL[match.status]}
       </div>
 
-      {/* Outcome banner (kalau completed) */}
+      {/* Outcome banner (kalau completed). Sprint 46: score sudah di court — hero tinggal status + outcome pill saja */}
       {isCompleted && (
-        <div style={{ marginBottom: "var(--s-3)" }}>
+        <div>
           {draw ? (
             <OutcomePill outcome="draw" />
           ) : t1W ? (
-            <OutcomePill outcome="win" subtitle={`${team1Names[0]} · ${team1Names[1]}`} />
+            <OutcomePill
+              outcome="win"
+              subtitle={`${team1Names[0]} · ${team1Names[1]}`}
+            />
           ) : (
-            <OutcomePill outcome="win" subtitle={`${team2Names[0]} · ${team2Names[1]}`} />
+            <OutcomePill
+              outcome="win"
+              subtitle={`${team2Names[0]} · ${team2Names[1]}`}
+            />
           )}
         </div>
       )}
-
-      {/* Final score */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr auto 1fr",
-          alignItems: "center",
-          gap: "var(--s-3)",
-          marginTop: "var(--s-2)",
-        }}
-      >
-        <TeamScore
-          names={team1Names}
-          score={match.team1Score}
-          isWinner={t1W}
-          highlight={isCompleted}
-        />
-        <div
-          style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 800,
-            fontSize: 20,
-            opacity: 0.6,
-          }}
-        >
-          –
-        </div>
-        <TeamScore
-          names={team2Names}
-          score={match.team2Score}
-          isWinner={t2W}
-          highlight={isCompleted}
-          align="right"
-        />
-      </div>
     </section>
   );
 }
@@ -151,59 +120,3 @@ function OutcomePill({
   );
 }
 
-function TeamScore({
-  names,
-  score,
-  isWinner,
-  highlight,
-  align = "left",
-}: {
-  names: [string, string];
-  score: number;
-  isWinner: boolean;
-  highlight: boolean;
-  align?: "left" | "right";
-}) {
-  return (
-    <div style={{ minWidth: 0, textAlign: align }}>
-      <div
-        style={{
-          fontSize: 12,
-          fontWeight: 700,
-          opacity: 0.85,
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-          marginBottom: 4,
-        }}
-      >
-        {names[0]}
-      </div>
-      <div
-        style={{
-          fontSize: 12,
-          fontWeight: 600,
-          opacity: 0.75,
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-          marginBottom: 8,
-        }}
-      >
-        {names[1]}
-      </div>
-      <div
-        style={{
-          fontFamily: "var(--font-display)",
-          fontWeight: 800,
-          fontSize: 48,
-          lineHeight: 1,
-          color: highlight && isWinner ? "#FACC15" : "currentColor",
-          opacity: highlight && !isWinner && score < 999 ? 0.7 : 1,
-        }}
-      >
-        {score}
-      </div>
-    </div>
-  );
-}

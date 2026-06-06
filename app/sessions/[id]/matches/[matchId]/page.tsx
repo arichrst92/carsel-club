@@ -18,7 +18,6 @@ import { getMatchDetail } from "@/lib/db/queries/match-detail";
 import { MatchDetailHero } from "@/components/sessions/MatchDetailHero";
 import { MatchPlayerCard } from "@/components/sessions/MatchPlayerCard";
 import { MatchTimer } from "@/components/sessions/MatchTimer";
-import { MatchDetailScoring } from "@/components/sessions/MatchDetailScoring";
 import { PadelCourtVisual } from "@/components/sessions/PadelCourtVisual";
 import { ShareMatchButton } from "@/components/sessions/ShareMatchButton";
 
@@ -90,28 +89,20 @@ export default async function MatchDetailPage({ params }: PageProps) {
           team2Names={team2Names}
         />
 
-        {/* Sprint 46: scoring controls — start/score +/-/end/edit/revert */}
-        <MatchDetailScoring
-          matchId={match.id}
-          team1Score={match.team1Score}
-          team2Score={match.team2Score}
-          status={match.status}
-          canManage={canManage}
-          team1Label={team1Names.join(" · ")}
-          team2Label={team2Names.join(" · ")}
-        />
-
-        {/* Sprint 46: padel court visual — denah lapangan + posisi pemain */}
+        {/* Sprint 46: padel court visual — single source of truth untuk
+            score + +/- buttons inline + action button (Start/End/Edit/Revert) */}
         <section>
           <div className="section-head">
-            <h3>Lineup</h3>
+            <h3>Lineup &amp; Score</h3>
           </div>
           <PadelCourtVisual
+            matchId={match.id}
             team1={team1}
             team2={team2}
             team1Score={match.team1Score}
             team2Score={match.team2Score}
-            showScore={isLive || isCompleted}
+            status={match.status}
+            canManage={canManage}
           />
         </section>
 
