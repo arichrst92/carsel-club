@@ -1,0 +1,362 @@
+"use client";
+
+/**
+ * Edit session form (Sprint 18).
+ *
+ * Single-page form (bukan wizard) untuk edit setelah create. Lock-aware:
+ * kalau hasRounds, match config fields di-disable + show notice.
+ *
+ * Refs:
+ * - GUI: docs/CarselClubPrototype/create-session.html (reuse field layout)
+ * - Plan: docs/SPRINT_BACKLOG.md Sprint 18
+ */
+
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { editSessionAction } from "@/app/actions/sessions";
+import { Toast } from "@/components/ui/Toast";
+
+type Props = {
+  sessionId: string;
+  hasRounds: boolean;
+  initial: {
+    title: string;
+    venueName: string;
+    mapsUrl: string | null;
+    scheduledAt: Date;
+    scheduledEndAt: Date | null;
+    description: string | null;
+    visibility: "private" | "public";
+    maxRounds: number | null;
+    format: "americano" | "mexicano" | "tournament";
+    playType: "freeplay" | "tournament";
+    numCourts: number;
+    fixPartners: boolean;
+  };
+};
+
+function toDateInput(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+function toTimeInput(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
+  const router = useRouter();
+  const [title, setTitle] = useState(initial.title);
+  const [venueName, setVenueName] = useState(initial.venueName);
+  const [mapsUrl, setMapsUrl] = useState(initial.mapsUrl ?? "");
+  const [date, setDate] = useState(toDateInput(initial.scheduledAt));
+  const [timeStart, setTimeStart] = useState(toTimeInput(initial.scheduledAt));
+  const [timeEnd, setTimeEnd] = useState(
+    initial.scheduledEndAt ? toTimeInput(initial.scheduledEndAt) : ""
+  );
+  const [description, setDescription] = useState(initial.description ?? "");
+  const [visibility, setVisibility] = useState(initial.visibility);
+  const [maxRounds, setMaxRounds] = useState(
+    initial.maxRounds ? String(initial.maxRounds) : ""
+  );
+  const [format, setFormat] = useState(initial.format);
+  const [playType, setPlayType] = useState(initial.playType);
+  const [numCourts, setNumCourts] = useState(initial.numCourts);
+  const [fixPartners, setFixPartners] = useState(initial.fixPartners);
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  function handleSubmit() {
+    setError(null);
+    if (title.trim().length < 2) {
+      setError("Nama session minimal 2 karakter");
+      return;
+    }
+    if (!date || !timeStart) {
+      setError("Tanggal & jam wajib diisi");
+      return;
+    }
+    const scheduledAt = new Date(`${date}T${timeStart}`);
+    if (isNaN(scheduledAt.getTime())) {
+      setError("Format tanggal tidak valid");
+      return;
+    }
+
+    startTransition(async () => {
+      const fd = new FormData();
+      fd.set("title", title.trim());
+      fd.set("venue_name", venueName.trim());
+      if (mapsUrl.trim()) fd.set("maps_url", mapsUrl.trim());
+      fd.set("scheduled_at", scheduledAt.toISOString());
+      if (timeEnd) {
+        fd.set(
+          "scheduled_end_at",
+          new Date(`${date}T${timeEnd}`).toISOString()
+        );
+      }
+      if (description.trim()) fd.set("description", description.trim());
+      fd.set("visibility", visibility);
+      if (maxRounds) fd.set("max_rounds", maxRounds);
+      // Match config — server check lock rule
+      fd.set("format", format);
+      fd.set("play_type", playType);
+      fd.set("num_courts", String(numCourts));
+      fd.set("fix_partners", fixPartners ? "on" : "off");
+
+      const result = await editSessionAction(sessionId, null, fd);
+      if (result?.error) {
+        setError(result.error);
+      } else {
+        router.refresh();
+      }
+    });
+  }
+
+  return (
+    <>
+      <Toast message={error} onDismiss={() => setError(null)} />
+      <main className="app-content subscreen with-footer">
+        {hasRounds && (
+          <div
+            style={{
+              padding: "10px 14px",
+              background: "var(--yellow-50, #FEF9C3)",
+              border: "1px solid #FACC15",
+              borderRadius: "var(--r-md)",
+              marginBottom: "var(--s-3)",
+              fontSize: 12,
+            }}
+          >
+            🔒 Match config (format, court, fix partners) di-lock karena
+            sudah ada round ter-generate.
+          </div>
+        )}
+
+        {/* Info */}
+        <section className="form-section">
+          <div className="form-group">
+            <label className="form-label">
+              Nama Session <span className="req">*</span>
+            </label>
+            <input
+              type="text"
+              className="form-input"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              maxLength={60}
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">
+              Venue <span className="req">*</span>
+            </label>
+            <input
+              type="text"
+              className="form-input"
+              value={venueName}
+              onChange={(e) => setVenueName(e.target.value)}
+              maxLength={80}
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Google Maps Link (Optional)</label>
+            <input
+              type="url"
+              className="form-input"
+              value={mapsUrl}
+              onChange={(e) => setMapsUrl(e.target.value)}
+              placeholder="https://maps.app.goo.gl/..."
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">
+              Tanggal <span className="req">*</span>
+            </label>
+            <input
+              type="date"
+              className="form-input"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+            />
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div className="form-group">
+              <label className="form-label">
+                Jam Mulai <span className="req">*</span>
+              </label>
+              <input
+                type="time"
+                className="form-input"
+                value={timeStart}
+                onChange={(e) => setTimeStart(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Jam Berakhir</label>
+              <input
+                type="time"
+                className="form-input"
+                value={timeEnd}
+                onChange={(e) => setTimeEnd(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Deskripsi (Optional)</label>
+            <textarea
+              className="form-input"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              maxLength={500}
+              rows={3}
+            />
+          </div>
+        </section>
+
+        {/* Visibility */}
+        <section className="form-section">
+          <div className="form-group">
+            <label className="form-label">Visibility</label>
+            <div className="segmented">
+              <button
+                type="button"
+                className={`segmented-option ${visibility === "private" ? "active" : ""}`}
+                onClick={() => setVisibility("private")}
+              >
+                <span>🔒 Private</span>
+                <span className="seg-sub">Invite-only</span>
+              </button>
+              <button
+                type="button"
+                className={`segmented-option ${visibility === "public" ? "active" : ""}`}
+                onClick={() => setVisibility("public")}
+              >
+                <span>🌍 Public</span>
+                <span className="seg-sub">Find di /find</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Match config — lock kalau hasRounds */}
+        <section className="form-section">
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 800,
+              color: "var(--text-500)",
+              textTransform: "uppercase",
+              letterSpacing: "0.06em",
+              marginBottom: 8,
+            }}
+          >
+            Match Config {hasRounds && "(🔒 locked)"}
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Format</label>
+            <div className="segmented">
+              {(["americano", "mexicano"] as const).map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  className={`segmented-option ${format === f ? "active" : ""}`}
+                  onClick={() => !hasRounds && setFormat(f)}
+                  disabled={hasRounds}
+                  style={hasRounds ? { opacity: 0.6 } : undefined}
+                >
+                  <span style={{ textTransform: "capitalize" }}>{f}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Type</label>
+            <div className="segmented">
+              {(["freeplay", "tournament"] as const).map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  className={`segmented-option ${playType === t ? "active" : ""}`}
+                  onClick={() => !hasRounds && setPlayType(t)}
+                  disabled={hasRounds}
+                  style={hasRounds ? { opacity: 0.6 } : undefined}
+                >
+                  <span style={{ textTransform: "capitalize" }}>{t}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Jumlah Court</label>
+            <input
+              type="number"
+              className="form-input"
+              value={numCourts}
+              onChange={(e) => setNumCourts(parseInt(e.target.value, 10) || 1)}
+              disabled={hasRounds}
+              min={1}
+              max={20}
+              style={hasRounds ? { opacity: 0.6 } : undefined}
+            />
+          </div>
+
+          <div className="form-group">
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                cursor: hasRounds ? "not-allowed" : "pointer",
+                opacity: hasRounds ? 0.6 : 1,
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={fixPartners}
+                onChange={(e) => !hasRounds && setFixPartners(e.target.checked)}
+                disabled={hasRounds}
+              />
+              <span className="form-label" style={{ margin: 0 }}>
+                Fix Partners (Round Robin)
+              </span>
+            </label>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Max Rounds (Optional)</label>
+            <input
+              type="number"
+              className="form-input"
+              value={maxRounds}
+              onChange={(e) => setMaxRounds(e.target.value)}
+              min={1}
+              max={50}
+              placeholder="Auto"
+            />
+          </div>
+        </section>
+      </main>
+
+      <div className="sticky-footer">
+        <button
+          type="button"
+          onClick={handleSubmit}
+          disabled={isPending}
+          className="btn-primary-lg"
+          style={{ width: "100%" }}
+        >
+          {isPending ? "Menyimpan..." : "Simpan Perubahan"}
+        </button>
+      </div>
+    </>
+  );
+}

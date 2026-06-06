@@ -23,6 +23,7 @@ import {
   type SessionStatus,
 } from "@/lib/sessions/lifecycle";
 import { matchRoundSets } from "@/lib/db/schema";
+import { count } from "drizzle-orm";
 
 export type SessionActionState = { error?: string } | null;
 
@@ -163,6 +164,177 @@ export async function createSessionAction(
 
   revalidatePath("/sessions");
   redirect(`/sessions/${newSessionId}`);
+}
+
+// ============================================================
+// Edit Session (Sprint 18)
+// ============================================================
+
+const EditSessionSchema = z.object({
+  title: z
+    .string()
+    .trim()
+    .min(2, "Nama session minimal 2 karakter")
+    .max(60, "Maksimal 60 karakter"),
+  venueName: z.string().trim().min(1, "Venue wajib diisi").max(80),
+  mapsUrl: z.string().trim().max(500).optional(),
+  scheduledAt: z
+    .string()
+    .min(1, "Tanggal & waktu wajib diisi")
+    .refine((s) => !isNaN(new Date(s).getTime()), "Format tanggal tidak valid"),
+  scheduledEndAt: z
+    .string()
+    .optional()
+    .refine(
+      (s) => !s || !isNaN(new Date(s).getTime()),
+      "Format jam berakhir tidak valid"
+    ),
+  description: z.string().trim().max(500).optional(),
+  visibility: z.enum(["private", "public"]),
+  maxRounds: z.coerce.number().int().min(1).max(50).optional(),
+  // Locked-after-round1 fields (server-validate kalau dikirim)
+  format: z.enum(["americano", "mexicano", "tournament"]).optional(),
+  playType: z.enum(["freeplay", "tournament"]).optional(),
+  numCourts: z.coerce.number().int().min(1).max(20).optional(),
+  fixPartners: z.coerce.boolean().optional(),
+});
+
+export async function editSessionAction(
+  sessionId: string,
+  _prev: SessionActionState,
+  formData: FormData
+): Promise<SessionActionState> {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+
+  if (!(await isSessionStaff(sessionId, user!.id))) {
+    return { error: "Hanya host/co-host yang bisa edit session" };
+  }
+
+  // Load current state
+  const [current] = await db
+    .select()
+    .from(sessions)
+    .where(eq(sessions.id, sessionId))
+    .limit(1);
+  if (!current) return { error: "Session tidak ditemukan" };
+
+  // Cek hasRounds untuk lock rules
+  const [{ value: roundCount }] = await db
+    .select({ value: count() })
+    .from(matchRoundSets)
+    .where(eq(matchRoundSets.sessionId, sessionId));
+  const hasRounds = roundCount > 0;
+
+  const s = (k: string): string | undefined => {
+    const v = formData.get(k);
+    return typeof v === "string" && v.length > 0 ? v : undefined;
+  };
+
+  const raw = {
+    title: s("title"),
+    venueName: s("venue_name"),
+    mapsUrl: s("maps_url"),
+    scheduledAt: s("scheduled_at"),
+    scheduledEndAt: s("scheduled_end_at"),
+    description: s("description"),
+    visibility: s("visibility") ?? "private",
+    maxRounds: s("max_rounds"),
+    format: s("format"),
+    playType: s("play_type"),
+    numCourts: s("num_courts"),
+    fixPartners:
+      formData.get("fix_partners") === "on"
+        ? true
+        : formData.get("fix_partners") === "off"
+          ? false
+          : undefined,
+  };
+
+  const parsed = EditSessionSchema.safeParse(raw);
+  if (!parsed.success) {
+    const firstIssue = parsed.error.issues[0];
+    return { error: firstIssue?.message ?? "Input tidak valid" };
+  }
+  const input = parsed.data;
+
+  const scheduledDate = new Date(input.scheduledAt);
+  const scheduledEndDate = input.scheduledEndAt
+    ? new Date(input.scheduledEndAt)
+    : null;
+  if (scheduledEndDate && scheduledEndDate.getTime() <= scheduledDate.getTime()) {
+    return { error: "Jam berakhir harus setelah jam mulai" };
+  }
+
+  // Lock rules: kalau hasRounds, tolak perubahan match config
+  const lockedChanges: string[] = [];
+  if (hasRounds) {
+    if (input.format !== undefined && input.format !== current.format) {
+      lockedChanges.push("format");
+    }
+    if (
+      input.playType !== undefined &&
+      input.playType !== current.playType
+    ) {
+      lockedChanges.push("tipe");
+    }
+    if (
+      input.numCourts !== undefined &&
+      input.numCourts !== current.numCourts
+    ) {
+      lockedChanges.push("jumlah court");
+    }
+    if (
+      input.fixPartners !== undefined &&
+      input.fixPartners !== current.fixPartners
+    ) {
+      lockedChanges.push("Fix Partners");
+    }
+  }
+  if (lockedChanges.length > 0) {
+    return {
+      error: `Tidak bisa ubah ${lockedChanges.join(", ")} karena sudah ada round yang ter-generate.`,
+    };
+  }
+
+  const updates: Partial<typeof sessions.$inferInsert> = {
+    title: input.title,
+    venueName: input.venueName,
+    mapsUrl: input.mapsUrl ?? null,
+    scheduledAt: scheduledDate,
+    scheduledEndAt: scheduledEndDate,
+    description: input.description ?? null,
+    visibility: input.visibility,
+    maxRounds: input.maxRounds ?? null,
+    updatedAt: new Date(),
+  };
+
+  // Match config bisa di-update kalau belum ada round
+  if (!hasRounds) {
+    if (input.format !== undefined) updates.format = input.format;
+    if (input.playType !== undefined) updates.playType = input.playType;
+    if (input.numCourts !== undefined) updates.numCourts = input.numCourts;
+    if (input.fixPartners !== undefined)
+      updates.fixPartners = input.fixPartners;
+  }
+
+  try {
+    await db.update(sessions).set(updates).where(eq(sessions.id, sessionId));
+  } catch (e) {
+    console.error("[editSessionAction] error:", e);
+    return { error: "Gagal simpan. Coba lagi." };
+  }
+
+  event("session_edited", {
+    sessionId,
+    hasRounds,
+    changedFields: Object.keys(updates).filter((k) => k !== "updatedAt"),
+  });
+
+  revalidatePath("/sessions");
+  revalidatePath(`/sessions/${sessionId}`);
+  revalidatePath(`/s/${sessionId}`);
+  redirect(`/sessions/${sessionId}`);
 }
 
 // ============================================================

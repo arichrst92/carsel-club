@@ -52,6 +52,8 @@ export default defineConfig({
         "lib/match/swap.ts",
         // Sprint 16 — Mexicano generator
         "lib/match/generator-mexicano.ts",
+        // Sprint 17 — Fix Partners (Round Robin)
+        "lib/match/generator-fix-partners.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

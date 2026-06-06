@@ -23,6 +23,11 @@ import {
 } from "@/lib/db/queries/matches";
 import { generateRound } from "@/lib/match/generator";
 import { generateMexicanoRound } from "@/lib/match/generator-mexicano";
+import {
+  formInitialPairs,
+  extractPairs,
+  generateFixPartnersRound,
+} from "@/lib/match/generator-fix-partners";
 import { applyMatchScoreChange } from "@/lib/match/stats-sync";
 import { event } from "@/lib/log";
 import {
@@ -95,13 +100,58 @@ export async function generateRoundAction(
   // Get next round number (untuk Mexicano: round 1 fallback ke random)
   const nextRoundNumber = await getNextRoundNumber(sessionId);
 
-  // Sprint 16: dispatch by format
+  // Sprint 16 + 17: dispatch by format + fixPartners
   const isMexicano = session.format === "mexicano";
+  const useFixPartners = session.fixPartners;
   const generationMethod = isMexicano ? "auto_mexicano" : "auto_random";
 
   let result;
   try {
-    if (isMexicano) {
+    if (useFixPartners) {
+      // Sprint 17: Round Robin dengan pair tetap
+      // Round 1 → form pairs. Round 2+ → extract dari round sebelumnya.
+      let pairs;
+      if (nextRoundNumber === 1) {
+        pairs = formInitialPairs(
+          activeParticipants.map((p) => ({
+            id: p.id,
+            sessionMatches: p.sessionMatches,
+            sessionPoints: p.sessionPoints,
+          })),
+          session.format
+        );
+      } else {
+        // Extract dari semua match round sebelumnya
+        const allPriorMatches = await db
+          .select({
+            team1P1Id: matches.team1P1Id,
+            team1P2Id: matches.team1P2Id,
+            team2P1Id: matches.team2P1Id,
+            team2P2Id: matches.team2P2Id,
+          })
+          .from(matches)
+          .innerJoin(
+            matchRoundSets,
+            eq(matches.matchRoundSetId, matchRoundSets.id)
+          )
+          .where(eq(matchRoundSets.sessionId, sessionId));
+        pairs = extractPairs(allPriorMatches);
+      }
+
+      if (pairs.length < 2) {
+        return {
+          error:
+            "Butuh minimal 4 pemain aktif dan pair valid untuk Fix Partners round",
+        };
+      }
+
+      result = generateFixPartnersRound(
+        pairs,
+        session.numCourts,
+        pairHistory,
+        nextRoundNumber - 1 // 0-indexed untuk round robin
+      );
+    } else if (isMexicano) {
       result = generateMexicanoRound(
         activeParticipants.map((p) => ({
           id: p.id,

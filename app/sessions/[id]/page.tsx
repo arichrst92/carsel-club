@@ -95,7 +95,26 @@ export default async function SessionDetailPage({ params }: PageProps) {
           </svg>
         </Link>
         <h2 className="subscreen-title">Session Detail</h2>
-        <div style={{ width: 40 }} />
+        {staff && !isTerminal ? (
+          <Link
+            href={`/sessions/${session.id}/edit`}
+            className="subscreen-action"
+            aria-label="Edit Session"
+            title="Edit Session"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontWeight: 700,
+              fontSize: 13,
+              color: "var(--primary-700)",
+              textDecoration: "none",
+              padding: "6px 10px",
+            }}
+          >
+            Edit
+          </Link>
+        ) : (
+          <div style={{ width: 40 }} />
+        )}
       </header>
 
       <main className="app-content subscreen with-footer">
