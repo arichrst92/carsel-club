@@ -15,7 +15,8 @@ export type NotificationType =
   | "friend_accepted"
   | "join_requested"
   | "join_approved"
-  | "join_rejected";
+  | "join_rejected"
+  | "achievement_unlocked";
 
 export type SessionInvitePayload = {
   sessionId: string;
@@ -80,6 +81,13 @@ export type JoinRejectedPayload = {
   sessionTitle: string;
 };
 
+export type AchievementUnlockedPayload = {
+  code: string;
+  name: string;
+  emoji: string;
+  description: string;
+};
+
 export type NotificationPayloadByType = {
   session_invite: SessionInvitePayload;
   session_reminder: SessionReminderPayload;
@@ -91,4 +99,5 @@ export type NotificationPayloadByType = {
   join_requested: JoinRequestedPayload;
   join_approved: JoinApprovedPayload;
   join_rejected: JoinRejectedPayload;
+  achievement_unlocked: AchievementUnlockedPayload;
 };

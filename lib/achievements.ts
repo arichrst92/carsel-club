@@ -1,7 +1,8 @@
 /**
  * Achievement badges.
- * Computed from user stats — no separate user_achievements table for v1.
- * In future, could persist earned_at timestamps for "first unlocked" celebrations.
+ *
+ * Sprint 29: persisted via user_achievements table (earned_at + idempotent).
+ * Catalog di sini = definitions only; runtime check stay pure.
  */
 
 export type Achievement = {
@@ -26,6 +27,11 @@ export type UserStatsForAchievement = {
   totalDraws: number;
   hostedCount: number;
   tierOrder: number; // 1=Rookie, 6=Master
+  // Sprint 29: streak + session-scoped (optional → defaults to 0 untuk callers
+  // yang belum dapat data)
+  bestWinStreak?: number;
+  currentSessionMatches?: number;
+  currentSessionWins?: number;
 };
 
 export const ACHIEVEMENTS: Achievement[] = [
@@ -181,6 +187,73 @@ export const ACHIEVEMENTS: Achievement[] = [
     check: (s) => s.hostedCount >= 25,
     progress: (s) => ({ current: Math.min(s.hostedCount, 25), target: 25 }),
   },
+
+  // ============ Streak achievements (Sprint 29) ============
+  {
+    code: "win_streak_3",
+    name: "Streak 3",
+    description: "3 menang berturut-turut",
+    emoji: "🔥",
+    category: "streak",
+    threshold: 3,
+    check: (s) => (s.bestWinStreak ?? 0) >= 3,
+    progress: (s) => ({
+      current: Math.min(s.bestWinStreak ?? 0, 3),
+      target: 3,
+    }),
+  },
+  {
+    code: "win_streak_5",
+    name: "Streak 5",
+    description: "5 menang berturut-turut",
+    emoji: "🚀",
+    category: "streak",
+    threshold: 5,
+    check: (s) => (s.bestWinStreak ?? 0) >= 5,
+    progress: (s) => ({
+      current: Math.min(s.bestWinStreak ?? 0, 5),
+      target: 5,
+    }),
+  },
+  {
+    code: "win_streak_10",
+    name: "Unstoppable",
+    description: "10 menang berturut-turut",
+    emoji: "⚡",
+    category: "streak",
+    threshold: 10,
+    check: (s) => (s.bestWinStreak ?? 0) >= 10,
+    progress: (s) => ({
+      current: Math.min(s.bestWinStreak ?? 0, 10),
+      target: 10,
+    }),
+  },
+  {
+    code: "perfect_day",
+    name: "Perfect Day",
+    description: "Menang semua match dalam 1 session (≥3 match)",
+    emoji: "🌟",
+    category: "streak",
+    threshold: 3,
+    check: (s) => {
+      const matches = s.currentSessionMatches ?? 0;
+      const wins = s.currentSessionWins ?? 0;
+      return matches >= 3 && wins === matches;
+    },
+  },
+  {
+    code: "hot_session",
+    name: "Hot Session",
+    description: "5 wins dalam satu session",
+    emoji: "🌶️",
+    category: "streak",
+    threshold: 5,
+    check: (s) => (s.currentSessionWins ?? 0) >= 5,
+    progress: (s) => ({
+      current: Math.min(s.currentSessionWins ?? 0, 5),
+      target: 5,
+    }),
+  },
 ];
 
 export function getEarnedAchievements(
@@ -197,4 +270,35 @@ export function getUnlockedCount(stats: UserStatsForAchievement): {
     unlocked: ACHIEVEMENTS.filter((a) => a.check(stats)).length,
     total: ACHIEVEMENTS.length,
   };
+}
+
+/**
+ * Sprint 29 — Streak transition pure.
+ *
+ * - "win" outcome → currentStreak + 1
+ * - "loss" / "draw" → reset 0
+ *
+ * bestStreak = max(current, prev best). Even draws break streak.
+ */
+export function nextStreak(
+  prevCurrent: number,
+  prevBest: number,
+  outcome: "win" | "loss" | "draw"
+): { current: number; best: number } {
+  const current = outcome === "win" ? prevCurrent + 1 : 0;
+  const best = Math.max(prevBest, current);
+  return { current, best };
+}
+
+/**
+ * Sprint 29 — Diff persisted earned codes vs current earned set.
+ * Returns codes yang baru earned (need persist + notify).
+ */
+export function detectNewlyUnlocked(
+  alreadyEarnedCodes: ReadonlySet<string>,
+  stats: UserStatsForAchievement
+): Achievement[] {
+  return ACHIEVEMENTS.filter(
+    (a) => a.check(stats) && !alreadyEarnedCodes.has(a.code)
+  );
 }

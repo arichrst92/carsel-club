@@ -22,6 +22,10 @@ import {
 import { event } from "@/lib/log";
 import { notifyTierUp } from "@/lib/notifications/generate";
 import { TIERS } from "@/lib/constants";
+import {
+  syncAchievementsAfterMatch,
+  type FreshOutcome,
+} from "./achievement-sync";
 
 /**
  * Main entry: change match score + status, sync stats atomically.
@@ -32,6 +36,8 @@ export async function applyMatchScoreChange(
   newT2Score: number,
   newStatus: "pending" | "live" | "completed"
 ): Promise<void> {
+  // Sprint 29: collect fresh-completion outcomes untuk post-tx achievement sync
+  const freshOutcomes: FreshOutcome[] = [];
   await db.transaction(async (tx) => {
     const [match] = await tx
       .select()
@@ -54,11 +60,13 @@ export async function applyMatchScoreChange(
 
     const team1Players = [match.team1P1Id, match.team1P2Id];
     const team2Players = [match.team2P1Id, match.team2P2Id];
+    // Sprint 29: fresh completion = match transitioning into completed
+    const isFreshCompletion = !oldCounted && newCounted;
 
     // Apply per-player deltas
-    for (const [delta, players] of [
-      [t1Delta, team1Players],
-      [t2Delta, team2Players],
+    for (const [delta, players, teamImpact] of [
+      [t1Delta, team1Players, newImpact?.team1 ?? null],
+      [t2Delta, team2Players, newImpact?.team2 ?? null],
     ] as const) {
       if (isZeroDelta(delta)) continue;
 
@@ -83,6 +91,14 @@ export async function applyMatchScoreChange(
           .limit(1);
 
         if (p?.userId) {
+          // Sprint 29: capture untuk achievement sync di luar tx
+          if (isFreshCompletion && teamImpact) {
+            freshOutcomes.push({
+              userId: p.userId,
+              participantId,
+              outcome: teamImpact.outcome,
+            });
+          }
           await tx
             .update(users)
             .set({
@@ -183,4 +199,9 @@ export async function applyMatchScoreChange(
       .set({ status: newRoundStatus })
       .where(eq(matchRoundSets.id, match.matchRoundSetId));
   });
+
+  // Sprint 29: streak + achievement sync (outside tx — best-effort, errors logged)
+  if (freshOutcomes.length > 0) {
+    await syncAchievementsAfterMatch(freshOutcomes);
+  }
 }

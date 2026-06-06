@@ -172,6 +172,19 @@ describe("formatNotification", () => {
     expect(r.body).toContain("Nope");
     expect(r.href).toBe("/sessions/s10");
   });
+
+  it("achievement_unlocked uses payload emoji + name + description", () => {
+    const r = formatNotification("achievement_unlocked", {
+      code: "win_streak_5",
+      name: "Streak 5",
+      emoji: "🚀",
+      description: "5 menang berturut-turut",
+    });
+    expect(r.icon).toBe("🚀");
+    expect(r.title).toContain("Streak 5");
+    expect(r.body).toBe("5 menang berturut-turut");
+    expect(r.href).toBe("/achievements");
+  });
 });
 
 describe("formatRelativeTime", () => {

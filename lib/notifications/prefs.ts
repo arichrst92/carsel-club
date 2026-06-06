@@ -47,6 +47,8 @@ const PER_TYPE_DEFAULTS: Partial<Record<NotificationType, ChannelPrefs>> = {
   tier_up: { in_app: true, push: true, wa: true },
   // Match result default WA off (noisy)
   match_result: { in_app: true, push: true, wa: false },
+  // Achievement unlock celebration → all on
+  achievement_unlocked: { in_app: true, push: true, wa: true },
 };
 
 /**

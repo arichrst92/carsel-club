@@ -25,6 +25,7 @@ import type {
   JoinRequestedPayload,
   JoinApprovedPayload,
   JoinRejectedPayload,
+  AchievementUnlockedPayload,
 } from "./types";
 import { formatNotification } from "./format";
 import { shouldDeliver } from "./prefs";
@@ -201,4 +202,11 @@ export function notifyJoinRejected(
   payload: JoinRejectedPayload
 ): void {
   dispatch(userId, "join_rejected", payload);
+}
+
+export function notifyAchievementUnlocked(
+  userId: string,
+  payload: AchievementUnlockedPayload
+): void {
+  dispatch(userId, "achievement_unlocked", payload);
 }

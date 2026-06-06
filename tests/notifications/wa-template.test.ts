@@ -189,6 +189,23 @@ describe("buildWaMessage", () => {
     expect(m).toContain("/sessions/s10");
   });
 
+  it("achievement_unlocked contains emoji + name + link", () => {
+    const m = buildWaMessage(
+      "achievement_unlocked",
+      {
+        code: "win_streak_5",
+        name: "Streak 5",
+        emoji: "🚀",
+        description: "5 menang berturut-turut",
+      },
+      ctx
+    );
+    expect(m).toContain("🚀");
+    expect(m).toContain("Streak 5");
+    expect(m).toContain("5 menang berturut-turut");
+    expect(m).toContain("/achievements");
+  });
+
   it("strips trailing slash in appUrl", () => {
     const m = buildWaMessage(
       "session_invite",

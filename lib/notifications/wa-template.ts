@@ -25,8 +25,9 @@ export type WaTemplateInput = {
 const BRAND = "*Carsel Club*";
 
 function joinUrl(appUrl: string, path: string): string {
+  // All callers pass paths yang start with "/" — strip trailing slash dari base.
   const base = appUrl.replace(/\/+$/, "");
-  return `${base}${path.startsWith("/") ? path : `/${path}`}`;
+  return `${base}${path}`;
 }
 
 function fmtSessionInvite(
@@ -149,6 +150,18 @@ function fmtJoinRejected(
 Lihat: ${joinUrl(ctx.appUrl, `/sessions/${p.sessionId}`)}`;
 }
 
+function fmtAchievementUnlocked(
+  p: NotificationPayloadByType["achievement_unlocked"],
+  ctx: WaTemplateInput
+): string {
+  return `${BRAND}
+
+${p.emoji} Achievement unlock: *${p.name}*
+${p.description}
+
+Lihat: ${joinUrl(ctx.appUrl, "/achievements")}`;
+}
+
 const TEMPLATES = {
   session_invite: fmtSessionInvite,
   session_reminder: fmtSessionReminder,
@@ -161,6 +174,7 @@ const TEMPLATES = {
   join_requested: fmtJoinRequested,
   join_approved: fmtJoinApproved,
   join_rejected: fmtJoinRejected,
+  achievement_unlocked: fmtAchievementUnlocked,
 } satisfies {
   [K in NotificationType]: (
     p: NotificationPayloadByType[K],

@@ -65,6 +65,8 @@ export default defineConfig({
         // Sprint 28 — WA template + reminder window
         "lib/notifications/wa-template.ts",
         "lib/notifications/reminder-window.ts",
+        // Sprint 30 — advanced stats
+        "lib/stats/advanced.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

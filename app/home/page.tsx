@@ -9,6 +9,9 @@ import { getTierById } from "@/lib/db/queries/public-profile";
 import { BottomNav } from "@/components/nav/BottomNav";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { TierUpModal } from "@/components/home/TierUpModal";
+import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
+import { getPendingCelebration } from "@/lib/db/queries/achievements";
+import { ACHIEVEMENTS } from "@/lib/achievements";
 import { logoutAction } from "@/app/actions/auth";
 import { formatDate, formatTime, formatTimeRange, winRate } from "@/lib/utils";
 
@@ -50,6 +53,14 @@ export default async function HomePage() {
   const hasUnseenTierUp = currentTierId > lastSeenTierId;
   const newTier = hasUnseenTierUp ? await getTierById(currentTierId) : null;
 
+  // Sprint 29: achievement celebration (priority below tier-up)
+  const pendingCelebration = newTier
+    ? null
+    : await getPendingCelebration(user.id);
+  const pendingDef = pendingCelebration
+    ? ACHIEVEMENTS.find((a) => a.code === pendingCelebration.code) ?? null
+    : null;
+
   return (
     <div className="app-shell">
       {/* Tier-up celebration modal */}
@@ -62,6 +73,16 @@ export default async function HomePage() {
           newTierColor={newTier.color}
           totalPoints={user.totalPoints}
           totalMatches={user.totalMatches}
+        />
+      )}
+
+      {/* Sprint 29: achievement unlock celebration */}
+      {pendingCelebration && pendingDef && (
+        <AchievementUnlockedModal
+          achievementId={pendingCelebration.id}
+          emoji={pendingDef.emoji}
+          name={pendingDef.name}
+          description={pendingDef.description}
         />
       )}
 

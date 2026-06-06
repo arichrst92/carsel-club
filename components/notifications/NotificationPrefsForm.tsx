@@ -31,6 +31,7 @@ const TYPE_LABELS: Record<NotificationType, string> = {
   join_requested: "Join request masuk (host)",
   join_approved: "Join request di-approve",
   join_rejected: "Join request di-reject",
+  achievement_unlocked: "Achievement unlock",
 };
 
 const TYPES: NotificationType[] = Object.keys(TYPE_LABELS) as NotificationType[];

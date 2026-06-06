@@ -101,6 +101,7 @@ export const notificationTypeEnum = pgEnum("notification_type", [
   "join_requested",
   "join_approved",
   "join_rejected",
+  "achievement_unlocked", // Sprint 29
 ]);
 
 export const logTypeEnum = pgEnum("log_type", ["log", "event"]);
@@ -155,6 +156,9 @@ export const users = pgTable(
     profileVisibility: profileVisibilityEnum("profile_visibility")
       .notNull()
       .default("public"),
+    // Sprint 29: streak tracking
+    currentWinStreak: integer("current_win_streak").notNull().default(0),
+    bestWinStreak: integer("best_win_streak").notNull().default(0),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -338,6 +342,35 @@ export const matchRoundSets = pgTable(
     index("idx_mrs_session").on(t.sessionId, t.roundNumber),
     unique("uq_mrs_session_round").on(t.sessionId, t.roundNumber),
     check("round_number_positive", sql`${t.roundNumber} > 0`),
+  ]
+);
+
+// ============================================================
+// USER ACHIEVEMENTS — Sprint 29
+// ============================================================
+
+/**
+ * Persisted achievement unlocks. UNIQUE(userId, code) ensures idempotent
+ * inserts (use ON CONFLICT DO NOTHING).
+ *
+ * dismissedAt = user telah lihat celebration modal (null = belum).
+ */
+export const userAchievements = pgTable(
+  "user_achievements",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    code: text("code").notNull(),
+    earnedAt: timestamp("earned_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    dismissedAt: timestamp("dismissed_at", { withTimezone: true }),
+  },
+  (t) => [
+    unique("user_achievements_user_code_unique").on(t.userId, t.code),
+    index("idx_user_achievements_user").on(t.userId),
   ]
 );
 

@@ -1,11 +1,16 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/get-current-user";
 import { getProfileData } from "@/lib/db/queries/profile";
+import { db } from "@/lib/db/client";
+import { eq } from "drizzle-orm";
+import { users } from "@/lib/db/schema";
 import {
   ACHIEVEMENTS,
   getUnlockedCount,
   type UserStatsForAchievement,
 } from "@/lib/achievements";
+import { listEarnedAchievements } from "@/lib/db/queries/achievements";
+import { formatDate } from "@/lib/utils";
 
 export const metadata = {
   title: "Achievements",
@@ -17,6 +22,15 @@ export default async function AchievementsPage() {
 
   if (!profile) return null;
 
+  // Sprint 29: get bestWinStreak from users row + earnedAt map from user_achievements
+  const [streak] = await db
+    .select({ bestWinStreak: users.bestWinStreak })
+    .from(users)
+    .where(eq(users.id, user.id))
+    .limit(1);
+  const earned = await listEarnedAchievements(user.id);
+  const earnedAtByCode = new Map(earned.map((e) => [e.code, e.earnedAt]));
+
   const stats: UserStatsForAchievement = {
     totalPoints: profile.totalPoints,
     totalMatches: profile.totalMatches,
@@ -25,9 +39,14 @@ export default async function AchievementsPage() {
     totalDraws: profile.totalDraws,
     hostedCount: profile.hostedCount,
     tierOrder: profile.tierOrder ?? 1,
+    bestWinStreak: streak?.bestWinStreak ?? 0,
+    // currentSession metrics not relevant on achievements page (cross-session view)
   };
 
-  const { unlocked, total } = getUnlockedCount(stats);
+  const { unlocked: liveUnlocked, total } = getUnlockedCount(stats);
+  // Use persisted count as ground truth (catches perfect_day/hot_session
+  // earned in past but not currently true)
+  const unlocked = Math.max(liveUnlocked, earnedAtByCode.size);
   const progressPct = Math.round((unlocked / total) * 100);
 
   const grouped: Record<string, typeof ACHIEVEMENTS> = {
@@ -139,7 +158,10 @@ export default async function AchievementsPage() {
                 }}
               >
                 {list.map((a) => {
-                  const earned = a.check(stats);
+                  const persisted = earnedAtByCode.get(a.code);
+                  const liveEarned = a.check(stats);
+                  const earned = !!persisted || liveEarned;
+                  const earnedAt = persisted ?? null;
                   const prog = a.progress?.(stats);
                   return (
                     <div
@@ -228,6 +250,21 @@ export default async function AchievementsPage() {
                           }}
                         >
                           ✓ Unlocked
+                          {earnedAt && (
+                            <span
+                              style={{
+                                display: "block",
+                                color: "var(--text-500)",
+                                marginTop: 2,
+                                fontWeight: 600,
+                                textTransform: "none",
+                                letterSpacing: 0,
+                                fontSize: 10,
+                              }}
+                            >
+                              {formatDate(earnedAt)}
+                            </span>
+                          )}
                         </div>
                       )}
                     </div>

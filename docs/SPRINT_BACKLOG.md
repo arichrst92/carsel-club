@@ -634,32 +634,70 @@ Idempotent — multi-runner safe via atomic UPDATE ... WHERE reminder_sent_at IS
 
 ## Stats & Achievements v2 (Sprint 29-30)
 
-### Sprint 29 — Achievements v2: streak + persist + celebration
+### Sprint 29 — Achievements v2: streak + persist + celebration ✅
 **Goal**: Streak detection + earned_at persist + celebration UI
 
 Sub-tasks:
-- Table `user_achievements` (userId, code, earnedAt)
-- Detect new achievement saat stats sync → insert row (idempotent)
-- Streak logic:
-  - Win streak 3/5/10
-  - Perfect day (semua match menang dalam session)
-  - Hot streak (5 game win in single session)
-- Notification + celebration modal saat first unlock
-- Update achievement page show earnedAt
+- Schema:
+  - users.current_win_streak + best_win_streak
+  - user_achievements (id, userId, code, earnedAt, dismissedAt) +
+    UNIQUE(userId, code), idx(userId)
+  - notification_type enum + `achievement_unlocked`
+- Catalog extension (lib/achievements.ts):
+  - 5 new achievements: win_streak_3/5/10, perfect_day (≥3 wins all in session),
+    hot_session (≥5 wins in session)
+  - UserStatsForAchievement extended with optional bestWinStreak,
+    currentSessionMatches, currentSessionWins
+- Pure helpers (100% cov):
+  - nextStreak(prev, prevBest, outcome) — win continues, loss/draw reset
+  - detectNewlyUnlocked(alreadyEarnedCodes, stats)
+  - Achievement check defaults handle missing optional fields safely
+- Notification type:
+  - achievement_unlocked added ke notification_type enum + payload type
+  - format + WA template added (10 → 11 types covered)
+  - notifyAchievementUnlocked generator
+  - PER_TYPE_DEFAULTS: all channels on
+- Integration:
+  - lib/match/achievement-sync.ts:
+    - syncAchievementsForPlayer (post-tx) — reads user, updates streak,
+      reads session stats, diffs against persisted, inserts new (ON CONFLICT
+      DO NOTHING), fires notifyAchievementUnlocked
+    - syncAchievementsAfterMatch (batch wrapper, errors logged not propagated)
+    - syncHostAchievements (called from createSessionAction)
+  - stats-sync.ts: collect freshOutcomes during tx, call
+    syncAchievementsAfterMatch outside tx (best-effort)
+  - sessions.createSessionAction: call syncHostAchievements after creation
+- UI:
+  - AchievementUnlockedModal (mirror TierUpModal pattern, tap dismiss action)
+  - dismissAchievementAction + dismissAllAchievementsAction
+  - getPendingCelebration query (first earned where dismissedAt is null)
+  - app/home/page.tsx: render modal if no tier-up modal pending
+  - app/achievements/page.tsx: show earnedAt date below unlocked, ground-truth
+    unlocked count via union (persisted ∪ live-check)
 
-**DoD**: Achievements persist, first-unlock celebration trigger.
+**DoD**: Achievements persist, first-unlock celebration trigger. Streak
+tracking persisted across sessions, session-scoped achievements (perfect_day,
+hot_session) computed at match-completed time.
 
 ---
 
-### Sprint 30 — Advanced stats: partner & head-to-head
+### Sprint 30 — Advanced stats: partner & head-to-head ✅
 **Goal**: Beyond simple lifetime stats
 
 Sub-tasks:
-- Query: stats per partner (W/L when paired)
-- Query: head-to-head (W/L vs specific opponent)
-- Query: best streak (longest win streak ever)
-- Display di profile → "Stats Mendalam" section
-- Filter UI: per partner, per opponent
+- Pure helpers (100% cov, lib/stats/advanced.ts):
+  - aggregatePartnerStats (same-team pairing, guest userId skipped)
+  - aggregateOpponentStats (per-opponent rows from other team)
+  - topPartners (winRate desc, won tiebreak, default minPlayed=3)
+  - topNemesis (lossRate desc, lost tiebreak)
+  - summarizeOutcomes (sanity check helper)
+- Query: getUserMatchOutcomes (4x sessionParticipants alias join) +
+  getUsersById (batch lookup for display names)
+- Profile UI: AdvancedStats section above achievements
+  - Best win streak card (orange gradient when ≥3)
+  - Best partners list (top 3, links to /u/[id])
+  - Nemesis list (top 3)
+- bestWinStreak from users.best_win_streak (Sprint 29 column)
 
 **DoD**: User bisa lihat best partner + nemesis di profile.
 

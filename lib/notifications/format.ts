@@ -141,6 +141,17 @@ function fmtJoinRejected(
   };
 }
 
+function fmtAchievementUnlocked(
+  p: NotificationPayloadByType["achievement_unlocked"]
+): FormattedNotification {
+  return {
+    icon: p.emoji,
+    title: `Achievement unlock — ${p.name}`,
+    body: p.description,
+    href: "/achievements",
+  };
+}
+
 const FORMATTERS = {
   session_invite: fmtSessionInvite,
   session_reminder: fmtSessionReminder,
@@ -152,6 +163,7 @@ const FORMATTERS = {
   join_requested: fmtJoinRequested,
   join_approved: fmtJoinApproved,
   join_rejected: fmtJoinRejected,
+  achievement_unlocked: fmtAchievementUnlocked,
 } as const;
 
 /**

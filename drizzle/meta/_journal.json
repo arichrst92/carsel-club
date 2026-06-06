@@ -85,6 +85,13 @@
       "when": 1780726039964,
       "tag": "0011_sprint28_reminder_sent_at",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1780726620674,
+      "tag": "0012_sprint29_achievements_v2",
+      "breakpoints": true
     }
   ]
 }

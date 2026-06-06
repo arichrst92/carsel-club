@@ -8,7 +8,8 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
+import { syncHostAchievements } from "@/lib/match/achievement-sync";
 import { z } from "zod";
 import { db } from "@/lib/db/client";
 import { sessions, sessionParticipants } from "@/lib/db/schema";
@@ -161,6 +162,18 @@ export async function createSessionAction(
     visibility: input.visibility,
     fixPartners: input.fixPartners,
   });
+
+  // Sprint 29: host achievements check (after session created)
+  try {
+    const hostedRows = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(sessions)
+      .where(eq(sessions.hostId, user!.id));
+    const hostedCount = Number(hostedRows[0]?.count ?? 0);
+    await syncHostAchievements(user!.id, hostedCount);
+  } catch (e) {
+    console.error("[createSessionAction] host achievement sync failed:", e);
+  }
 
   revalidatePath("/sessions");
   redirect(`/sessions/${newSessionId}`);

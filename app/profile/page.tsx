@@ -13,6 +13,23 @@ import {
   getUnlockedCount,
   type UserStatsForAchievement,
 } from "@/lib/achievements";
+import { db } from "@/lib/db/client";
+import { eq } from "drizzle-orm";
+import { users } from "@/lib/db/schema";
+import {
+  getUserMatchOutcomes,
+  getUsersById,
+} from "@/lib/db/queries/advanced-stats";
+import {
+  aggregatePartnerStats,
+  aggregateOpponentStats,
+  topPartners,
+  topNemesis,
+} from "@/lib/stats/advanced";
+import {
+  AdvancedStats,
+  type AdvancedStatsRow,
+} from "@/components/profile/AdvancedStats";
 
 export const metadata = {
   title: "Profile",
@@ -57,14 +74,42 @@ function formatJoinDate(d: Date | string): string {
 
 export default async function ProfilePage() {
   const user = await requireUser();
-  const [profile, recent] = await Promise.all([
+  const [profile, recent, outcomes, streakRow] = await Promise.all([
     getProfileData(user.id),
     getRecentMatches(user.id, 5),
+    getUserMatchOutcomes(user.id),
+    db
+      .select({ bestWinStreak: users.bestWinStreak })
+      .from(users)
+      .where(eq(users.id, user.id))
+      .limit(1),
   ]);
 
   if (!profile) {
     return null;
   }
+
+  // Sprint 30: advanced stats — aggregate + resolve display names
+  const partnerAggs = aggregatePartnerStats(outcomes);
+  const opponentAggs = aggregateOpponentStats(outcomes);
+  const bestPartnersRaw = topPartners(partnerAggs, 3);
+  const nemesisRaw = topNemesis(opponentAggs, 3);
+  const lookupIds = [
+    ...bestPartnersRaw.map((p) => p.userId),
+    ...nemesisRaw.map((p) => p.userId),
+  ];
+  const userMap = await getUsersById(lookupIds);
+  const toRow = (a: (typeof bestPartnersRaw)[number]): AdvancedStatsRow => {
+    const u = userMap.get(a.userId);
+    return {
+      ...a,
+      displayName: u?.displayName ?? "User",
+      avatarUrl: u?.avatarUrl ?? null,
+    };
+  };
+  const bestPartners = bestPartnersRaw.map(toRow);
+  const nemesis = nemesisRaw.map(toRow);
+  const bestWinStreak = streakRow[0]?.bestWinStreak ?? 0;
 
   const wr = winRate(profile.totalWins, profile.totalMatches);
   const initial = (profile.displayName.trim()[0] ?? "U").toUpperCase();
@@ -444,6 +489,14 @@ export default async function ProfilePage() {
             hostedCount: profile.hostedCount,
             tierOrder: profile.tierOrder ?? 1,
           }}
+        />
+
+        {/* SPRINT 30: ADVANCED STATS */}
+        <AdvancedStats
+          bestPartners={bestPartners}
+          nemesis={nemesis}
+          bestWinStreak={bestWinStreak}
+          totalCompletedMatches={outcomes.length}
         />
 
         {/* ACHIEVEMENTS PREVIEW */}

@@ -267,6 +267,10 @@ describe("getUnlockedCount", () => {
         totalWins: 1000,
         hostedCount: 100,
         tierOrder: 6,
+        // Sprint 29: streak + per-session inputs untuk catalog v2
+        bestWinStreak: 100,
+        currentSessionMatches: 10,
+        currentSessionWins: 10,
       })
     );
     expect(r.unlocked).toBe(ACHIEVEMENTS.length);
