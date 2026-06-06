@@ -809,6 +809,15 @@ h4 { font-size: 15px; line-height: 1.4; }
   display: flex;
   flex-direction: column;
   gap: 6px;
+  /* Sprint 50: supaya bisa shrink di dalam grid 1fr 1fr — kalau tidak,
+     input date/time iOS Safari yg punya min-width intrinsic akan
+     menyebabkan overflow ke luar viewport. */
+  min-width: 0;
+}
+.form-input {
+  /* Sprint 50: ensure shrink-safe + tidak overflow grid cell */
+  min-width: 0;
+  max-width: 100%;
 }
 .form-label {
   font-family: var(--font-display);
@@ -5899,4 +5908,81 @@ h4 { font-size: 15px; line-height: 1.4; }
 @keyframes skeleton-shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+/* ============================================================
+   FORMAT CARD (Sprint 50) — opsi format di Create Session step 1.
+   Lebih readable di mobile vs segmented control 3-kolom.
+   ========================================================== */
+.format-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.format-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  width: 100%;
+}
+.format-card:hover {
+  border-color: var(--primary-200);
+  background: var(--primary-50);
+}
+.format-card.active {
+  border-color: var(--primary);
+  background: var(--primary-50);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.12);
+}
+.fc-emoji {
+  font-size: 28px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: var(--bg-soft);
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+.format-card.active .fc-emoji {
+  background: var(--primary-100);
+}
+.fc-content {
+  flex: 1;
+  min-width: 0;
+}
+.fc-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--text-900);
+  margin-bottom: 2px;
+}
+.fc-sub {
+  font-size: 11.5px;
+  color: var(--text-500);
+  font-weight: 600;
+  line-height: 1.4;
+}
+.format-card.active .fc-title { color: var(--primary-700); }
+.fc-radio {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+.format-card.active .fc-radio {
+  background: var(--primary);
+  border-color: var(--primary);
 }

@@ -406,7 +406,7 @@ export function MatchCard({
               cursor: "pointer",
             }}
           >
-            Cancel
+            Batal
           </button>
           <button
             type="button"
@@ -419,7 +419,7 @@ export function MatchCard({
               fontSize: 12,
             }}
           >
-            {isPending ? "..." : "Save"}
+            {isPending ? "..." : "Simpan"}
           </button>
         </div>
       )}

@@ -275,7 +275,7 @@ export function ImageCropModal({
                 fontWeight: 600,
               }}
             >
-              Loading…
+              Memuat…
             </div>
           )}
           {/* Frame overlay */}

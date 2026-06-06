@@ -17,6 +17,8 @@
  */
 
 import { ImageResponse } from "next/og";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { getPublicSessionView } from "@/lib/db/queries/public-share";
 import { listSessionLeaderboard } from "@/lib/db/queries/session-leaderboard";
 import { getFullLogoDataUrl } from "@/lib/og/logo";
@@ -45,43 +47,85 @@ function formatTimeID(d: Date | string): string {
   }).format(date);
 }
 
-/**
- * Resolve cover URL ke absolute URL berdasarkan request host
- * (lebih reliable daripada env var di dev).
- */
-function resolveCoverAbsolute(
-  rawUrl: string | null,
-  req: Request
-): string | null {
-  if (!rawUrl) return null;
-  if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://"))
-    return rawUrl;
-  const reqUrl = new URL(req.url);
-  const origin =
-    process.env.NEXT_PUBLIC_APP_URL ?? `${reqUrl.protocol}//${reqUrl.host}`;
-  return `${origin.replace(/\/+$/, "")}${
-    rawUrl.startsWith("/") ? rawUrl : `/${rawUrl}`
-  }`;
-}
+const EXT_MIME: Record<string, string> = {
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
+  ".webp": "image/webp",
+  ".avif": "image/avif",
+  ".heic": "image/heic",
+};
 
 /**
- * Fetch cover image as data URL — Satori-safe.
- * Returns null kalau gagal (fallback ke gradient).
+ * Sprint 50: Resolve cover URL ke data URL.
+ *
+ * Priority:
+ * 1. Kalau path lokal `/uploads/xxx` → baca dari disk (UPLOAD_DIR).
+ *    Hindari fetch self-loop HTTPS yg sering timeout di production.
+ * 2. Kalau full URL eksternal → fetch HTTP dgn timeout 5s.
+ * 3. Kalau apa pun gagal → null (gradient fallback dipakai).
  */
-async function fetchAsDataUrl(url: string): Promise<string | null> {
-  try {
-    const r = await fetch(url, {
-      // 5s safety timeout via AbortSignal
-      signal: AbortSignal.timeout(5000),
-    });
-    if (!r.ok) return null;
-    const buf = await r.arrayBuffer();
-    const ct = r.headers.get("content-type") ?? "image/jpeg";
-    const b64 = Buffer.from(buf).toString("base64");
-    return `data:${ct};base64,${b64}`;
-  } catch {
-    return null;
+async function resolveCoverDataUrl(
+  rawUrl: string | null
+): Promise<string | null> {
+  if (!rawUrl) return null;
+
+  const uploadDir = path.resolve(
+    process.env.UPLOAD_DIR ?? path.join(process.cwd(), "uploads")
+  );
+  const uploadPrefix =
+    process.env.NEXT_PUBLIC_UPLOAD_URL_BASE ?? "/uploads";
+
+  // Strip prefix kalau URL relatif lokal
+  let relativeKey: string | null = null;
+  if (rawUrl.startsWith(uploadPrefix + "/")) {
+    relativeKey = rawUrl.slice(uploadPrefix.length + 1);
+  } else if (rawUrl.startsWith("/uploads/")) {
+    relativeKey = rawUrl.slice("/uploads/".length);
   }
+
+  // Path A — baca dari disk
+  if (relativeKey) {
+    try {
+      // Path safety: tolak ..
+      if (
+        relativeKey.includes("..") ||
+        relativeKey.includes("\0") ||
+        path.isAbsolute(relativeKey)
+      ) {
+        return null;
+      }
+      const absolute = path.join(uploadDir, relativeKey);
+      const rel = path.relative(uploadDir, absolute);
+      if (rel.startsWith("..") || path.isAbsolute(rel)) return null;
+
+      const buf = await readFile(absolute);
+      const ext = path.extname(absolute).toLowerCase();
+      const mime = EXT_MIME[ext] ?? "image/jpeg";
+      return `data:${mime};base64,${buf.toString("base64")}`;
+    } catch (e) {
+      console.warn(
+        "[og/session-card] failed read cover from disk:",
+        relativeKey,
+        e
+      );
+      return null;
+    }
+  }
+
+  // Path B — URL eksternal (jarang dipakai sekarang, tapi safety)
+  if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://")) {
+    try {
+      const r = await fetch(rawUrl, { signal: AbortSignal.timeout(5000) });
+      if (!r.ok) return null;
+      const buf = await r.arrayBuffer();
+      const ct = r.headers.get("content-type") ?? "image/jpeg";
+      return `data:${ct};base64,${Buffer.from(buf).toString("base64")}`;
+    } catch {
+      return null;
+    }
+  }
+  return null;
 }
 
 const STATUS_BG: Record<string, string> = {
@@ -98,30 +142,26 @@ const STATUS_LABEL: Record<string, string> = {
   cancelled: "❌ Dibatalkan",
 };
 
-export async function GET(req: Request, { params }: Props) {
+export async function GET(_req: Request, { params }: Props) {
   const { id } = await params;
-  const data = await getPublicSessionView(id);
-  if (!data) return new Response("Not found", { status: 404 });
+  try {
+    const data = await getPublicSessionView(id);
+    if (!data) return new Response("Not found", { status: 404 });
 
-  const { session } = data;
-  const lb = await listSessionLeaderboard(id);
-  const top = lb
-    .filter((r) => r.isPlaying)
-    .sort((a, b) => b.sessionPoints - a.sessionPoints)
-    .slice(0, 5);
+    const { session } = data;
+    const lb = await listSessionLeaderboard(id);
+    const top = lb
+      .sort((a, b) => b.sessionPoints - a.sessionPoints)
+      .slice(0, 5);
 
-  const absoluteCover = resolveCoverAbsolute(
-    session.coverPhotoUrl ?? null,
-    req
-  );
-  const coverDataUrl = absoluteCover
-    ? await fetchAsDataUrl(absoluteCover)
-    : null;
-  const completedMatches = data.currentMatches.filter(
-    (m) => m.status === "completed"
-  ).length;
-  const status = session.status ?? "upcoming";
-  const logoUrl = await getFullLogoDataUrl();
+    const coverDataUrl = await resolveCoverDataUrl(
+      session.coverPhotoUrl ?? null
+    );
+    const completedMatches = data.currentMatches.filter(
+      (m) => m.status === "completed"
+    ).length;
+    const status = session.status ?? "upcoming";
+    const logoUrl = await getFullLogoDataUrl();
 
   return new ImageResponse(
     (
@@ -493,6 +533,13 @@ export async function GET(req: Request, { params }: Props) {
       height: 1920,
     }
   );
+  } catch (e) {
+    console.error("[og/session-card] render failed:", e);
+    return new Response(
+      `Render error: ${e instanceof Error ? e.message : "unknown"}`,
+      { status: 500 }
+    );
+  }
 }
 
 function StatTile({

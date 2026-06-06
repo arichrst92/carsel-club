@@ -320,36 +320,78 @@ function Step1Info({
 
         <div className="form-group">
           <label className="form-label">Format Permainan</label>
-          <div className="segmented">
-            <button
-              type="button"
-              className={`segmented-option ${data.format === "americano" ? "active" : ""}`}
-              onClick={() => setField("format", "americano")}
-            >
-              <span>Americano</span>
-              <span className="seg-sub">Partner rotate</span>
-            </button>
-            <button
-              type="button"
-              className={`segmented-option ${data.format === "mexicano" ? "active" : ""}`}
-              onClick={() => setField("format", "mexicano")}
-            >
-              <span>Mexicano</span>
-              <span className="seg-sub">Ranking pairing</span>
-            </button>
-            <button
-              type="button"
-              className={`segmented-option ${data.format === "tournament" ? "active" : ""}`}
-              onClick={() => setField("format", "tournament")}
-            >
-              <span>Tournament</span>
-              <span className="seg-sub">Single elim</span>
-            </button>
+          <div className="format-card-list">
+            <FormatCard
+              active={data.format === "americano"}
+              onSelect={() => setField("format", "americano")}
+              emoji="🔄"
+              title="Americano"
+              sub="Pasangan dirotasi tiap ronde — semua main dgn semua."
+            />
+            <FormatCard
+              active={data.format === "mexicano"}
+              onSelect={() => setField("format", "mexicano")}
+              emoji="📊"
+              title="Mexicano"
+              sub="Pairing berdasar ranking — tiap ronde adu pemain rangking serupa."
+            />
+            <FormatCard
+              active={data.format === "tournament"}
+              onSelect={() => setField("format", "tournament")}
+              emoji="🏆"
+              title="Tournament"
+              sub="Sistem gugur — pemenang lanjut, kalah tersingkir."
+            />
           </div>
         </div>
 
       </section>
     </>
+  );
+}
+
+function FormatCard({
+  active,
+  onSelect,
+  emoji,
+  title,
+  sub,
+}: {
+  active: boolean;
+  onSelect: () => void;
+  emoji: string;
+  title: string;
+  sub: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`format-card ${active ? "active" : ""}`}
+      aria-pressed={active}
+    >
+      <div className="fc-emoji">{emoji}</div>
+      <div className="fc-content">
+        <div className="fc-title">{title}</div>
+        <div className="fc-sub">{sub}</div>
+      </div>
+      <div className="fc-radio" aria-hidden>
+        {active && (
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        )}
+      </div>
+    </button>
   );
 }
 
@@ -399,7 +441,7 @@ function Step2Location({
         </div>
 
         <div className="form-group">
-          <label className="form-label">Google Maps Link (Optional)</label>
+          <label className="form-label">Google Maps Link (Opsional)</label>
           <div className="input-with-icon">
             <svg
               width="18"

@@ -424,7 +424,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
         {/* MATCH SETTINGS RECAP */}
         <section>
           <div className="section-head">
-            <h3>Match Settings</h3>
+            <h3>Pengaturan Match</h3>
           </div>
           <div className="info-row-list">
             <div className="info-row">
@@ -713,7 +713,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
             >
               <path d="M9 11H4l3-3M9 13H4l3 3M14 11h5l-3-3M14 13h5l-3 3" />
             </svg>
-            <span>View Matches & Score</span>
+            <span>Lihat Match & Skor</span>
           </Link>
         </div>
       )}

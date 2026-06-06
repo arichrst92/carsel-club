@@ -162,7 +162,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Google Maps Link (Optional)</label>
+            <label className="form-label">Google Maps Link (Opsional)</label>
             <input
               type="url"
               className="form-input"
@@ -208,7 +208,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Deskripsi (Optional)</label>
+            <label className="form-label">Deskripsi (Opsional)</label>
             <textarea
               className="form-input"
               value={description}
@@ -338,7 +338,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Max Rounds (Optional)</label>
+            <label className="form-label">Max Rounds (Opsional)</label>
             <input
               type="number"
               className="form-input"

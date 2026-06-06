@@ -498,7 +498,7 @@ export default async function ProfilePage() {
             <StatCard
               variant="teal"
               value={profile.hostedCount}
-              label="Sessions Hosted"
+              label="Sesi Di-host"
               icon="👑"
             />
           </div>
@@ -523,19 +523,6 @@ export default async function ProfilePage() {
           nemesis={nemesis}
           bestWinStreak={bestWinStreak}
           totalCompletedMatches={outcomes.length}
-        />
-
-        {/* ACHIEVEMENTS PREVIEW */}
-        <ProfileAchievements
-          stats={{
-            totalPoints: profile.totalPoints,
-            totalMatches: profile.totalMatches,
-            totalWins: profile.totalWins,
-            totalLosses: profile.totalLosses,
-            totalDraws: profile.totalDraws,
-            tierOrder: profile.tierOrder ?? 1,
-            hostedCount: profile.hostedCount,
-          }}
         />
 
         {/* RECENT MATCHES */}
@@ -623,7 +610,7 @@ export default async function ProfilePage() {
         {/* SETTINGS */}
         <section>
           <div className="section-head">
-            <h3>Settings</h3>
+            <h3>Pengaturan</h3>
           </div>
           <div
             style={{
@@ -640,14 +627,14 @@ export default async function ProfilePage() {
             <Link href="/profile/edit" style={{ textDecoration: "none" }}>
               <SettingsRow
                 icon="✏️"
-                title="Edit Profile"
+                title="Ubah Profil"
                 sub="Nama, kota"
               />
             </Link>
             <Link href="/friends" style={{ textDecoration: "none" }}>
               <SettingsRow
                 icon="👥"
-                title="Friends"
+                title="Teman"
                 sub="Following + followers + teman padel"
               />
             </Link>
