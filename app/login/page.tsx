@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { PhoneForm } from "@/components/auth/PhoneForm";
 
 export const metadata = {
@@ -9,9 +10,18 @@ export default function LoginPage() {
     <div className="auth-shell">
       {/* HERO */}
       <section className="auth-hero">
-        <div className="auth-brand">
-          <div className="auth-brand-mark">CC</div>
-          <div className="auth-brand-text">Carsel Club</div>
+        <div
+          className="auth-brand"
+          style={{ display: "flex", justifyContent: "center" }}
+        >
+          <Image
+            src="/full-logo.png"
+            alt="Carsel Club"
+            width={180}
+            height={180}
+            priority
+            style={{ display: "block", marginBottom: 16 }}
+          />
         </div>
 
         <h1 className="auth-hero-title">

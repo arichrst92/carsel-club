@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { requireUser } from "@/lib/auth/get-current-user";
 import {
   getTierInfo,
@@ -97,7 +98,14 @@ export default async function HomePage() {
       {/* HEADER */}
       <header className="app-header">
         <div className="logo">
-          <div className="logo-mark">CC</div>
+          <Image
+            src="/icon.png"
+            alt="Carsel Club"
+            width={36}
+            height={36}
+            priority
+            style={{ display: "block" }}
+          />
           <span className="logo-text">Carsel Club</span>
         </div>
         <div className="header-actions">
