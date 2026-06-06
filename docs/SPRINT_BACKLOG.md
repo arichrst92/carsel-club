@@ -971,3 +971,119 @@ Sprint 27 (Web Push) ──► Sprint 33 (PWA install linked dgn push)
 ---
 
 **Last updated:** 2026-06-02 (initial draft, post-audit)
+
+---
+
+## Post-Audit Closeout (Sprint 37-41)
+
+Hasil retro audit setelah Sprint 36 (`docs/PADEL_APP_KONSEP.md` + prototype HTML
++ `docs/CarselClubBackend/schema.sql` vs built). 5 sprint untuk close gaps
+dengan severity-ordered: critical first (block public launch), polish last.
+
+### Sprint 37 — Critical pre-launch fixes ✅
+**Goal**: Unblock public launch — 4 critical items
+
+Sub-tasks:
+- Profile settings list updated: notification link → /profile/settings/
+  notifications (was "Soon — disabled"). Added new entries: Bantuan, Privacy,
+  TOS
+- Bottom nav: tab 4 swapped from Find → Leaderboard (matches spec/prototype).
+  Find moved to Home quick-actions
+- OTP attempt enforcement: extracted pure helpers
+  lib/auth/otp-attempts.ts (checkAttempt + recordFailedAttempt) with 10
+  unit tests. verifyOtpAction refactored to use them. Behavior verified
+  unchanged but now testable + auditable.
+- OTP cleanup cron /api/cron/clean-otp — deletes expired or verified rows
+  older than 24h, logs otp_cleanup_completed event
+- Legal pages shipped:
+  - /help — FAQ stub + contact (WA/email/IG), 4 baseline questions
+  - /privacy-policy — minimum viable disclosure compliant w/ UU PDP spirit
+  - /tos — 11 sections covering account, conduct, content license, stats
+    integrity, termination, disclaimer, governing law (RI / BANI)
+- LegalShell component for consistent layout
+- Login page TOS link fixed (was #tos / #privacy → /tos / /privacy-policy)
+
+**DoD**: Notification link clickable from profile, Leaderboard back in
+nav, OTP attempts enforced + tested, 3 legal pages live, cleanup cron
+configured.
+
+### Sprint 38 — Privacy settings page + data controls
+**Goal**: Compliance + data sovereignty
+
+Sub-tasks:
+- Dedicated `/profile/settings/privacy` page (matches prototype
+  `privacy-settings.html`)
+  - Profile visibility radio (Public/Friends/Private) — currently di EditProfileForm
+  - Per-field display toggles (city, stats, achievements)
+  - Friend request prefs (anyone/friends-of-friends/off)
+- Account delete action (soft-delete `users.deletedAt` + cascade to
+  participants/matches anonymize)
+- Data export action — generates JSON dump of user's sessions+matches+stats
+  via /api/me/export
+- Schema: `users.deletedAt`, `users.displayFlags` (JSONB)
+- Pure helper for display field filtering + tests
+
+**DoD**: Privacy page rendered, account delete works, data export downloadable.
+
+### Sprint 39 — Onboarding 3-step wizard
+**Goal**: Match prototype onboarding flow
+
+Sub-tasks:
+- Schema: `users.bio` (text, max 200), `users.onboardingStep` (int)
+- Refactor `/onboarding` → 3-step wizard:
+  - Step 1: Display name + Avatar upload
+  - Step 2: City + Bio
+  - Step 3: Welcome screen with tier intro
+- Progress indicator component
+- Skip "step 2" allowed (city optional)
+- Update Home empty-state to nudge onboarding completion
+
+**DoD**: New user flow matches prototype onboarding.html, complete % tracked.
+
+### Sprint 40 — UX polish (spec items deferred from earlier sprints)
+**Goal**: Polish spec-but-skipped items
+
+Sub-tasks:
+- Match History page (`/profile/matches`): add Win/Loss/Draw filter chip
+- Friends page: add "Discover" tab (friends-of-friends suggestions, +
+  recent session co-players)
+- Profile hero: tier ring conic-gradient avatar (% to next tier)
+- Help & Support: full FAQ page (replaces Sprint 37 stub) — accordion list,
+  contact form (WA link)
+- Match drag-drop generation as v1.5 polish — re-evaluate vs current swap-tap
+
+**DoD**: All deferred prototype items shipped OR formally cut (with reason).
+
+### Sprint 41 — Security hardening + production prep
+**Goal**: Defense-in-depth, perf, restore drill
+
+Sub-tasks:
+- Postgres RLS policies untuk all tables (defense-in-depth — currently
+  auth fully in Server Actions). Policies enforce `auth.uid()` match
+  via SET app.current_user_id from middleware.
+- Indexes: per-player FK indexes on `matches` (team1P1Id..team2P2Id) for
+  scale untuk "avoid repeat partners" query
+- OTP rate-limit consolidation (request rate + attempt rate via same
+  rate-limit ledger)
+- Sentry-style error sink (replace fire-and-forget /api/log/error with
+  structured client transport)
+- Restore drill: dry-run full DB restore on staging (per BACKUP_RESTORE.md)
+- Lighthouse audit on /home, /sessions, /leaderboard, /profile — target ≥90
+  mobile (Sprint 34 prep)
+- a11y audit: tab order, focus indicators, sr-only labels — Sprint 34 pass
+  was foundation only
+- Final pre-launch checklist (docs/LAUNCH_CHECKLIST.md): VAPID, Fonnte,
+  CRON_SECRET, DNS, backup activated, /admin admin user seeded
+
+**DoD**: RLS shipped, indexes added, Lighthouse ≥90, restore drill green,
+launch checklist signed off.
+
+---
+
+**Audit findings reference** (Sprint 36 retro):
+- ✅ 37 sprint shipped (Sprint 0-36)
+- 🔴 4 critical gaps surfaced (Sprint 37 covers)
+- 🟡 6 spec-skipped items (Sprint 38-40 covers)
+- 🟢 1 defense-in-depth area (Sprint 41)
+- 🆕 Built shipped 15+ items beyond original spec (Tournament, Mexicano,
+  Push, PWA, Admin, Backup, OG cards, Find Session, dll)

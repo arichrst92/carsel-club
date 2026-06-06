@@ -30,6 +30,10 @@ import {
   getSession,
 } from "@/lib/auth/session";
 import { checkOtpRequestRate } from "@/lib/auth/rate-limit";
+import {
+  checkAttempt,
+  recordFailedAttempt,
+} from "@/lib/auth/otp-attempts";
 import { event } from "@/lib/log";
 
 export type AuthActionState = { error?: string } | null;
@@ -126,25 +130,23 @@ export async function verifyOtpAction(
     };
   }
 
-  if (otp.attempts >= OTP_CONFIG.maxAttempts) {
+  // Sprint 37: pure-helper-backed attempt check (audited + tested)
+  const check = checkAttempt(otp.attempts, OTP_CONFIG.maxAttempts);
+  if (check.status === "locked_out") {
     return { error: "Terlalu banyak percobaan. Kirim ulang OTP." };
   }
 
   // Verify code
   if (!verifyOtpCode(code, otp.codeHash)) {
-    const newAttempts = otp.attempts + 1;
+    const failed = recordFailedAttempt(
+      otp.attempts,
+      OTP_CONFIG.maxAttempts
+    );
     await db
       .update(otpVerifications)
-      .set({ attempts: newAttempts })
+      .set({ attempts: failed.newAttempts })
       .where(eq(otpVerifications.id, otp.id));
-
-    const remaining = OTP_CONFIG.maxAttempts - newAttempts;
-    return {
-      error:
-        remaining > 0
-          ? `Kode salah. Sisa percobaan: ${remaining}`
-          : "Terlalu banyak percobaan. Kirim ulang OTP.",
-    };
+    return { error: failed.message };
   }
 
   // Mark verified

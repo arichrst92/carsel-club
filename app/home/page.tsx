@@ -157,7 +157,7 @@ export default async function HomePage() {
               <div className="qa-title">Create Session</div>
               <div className="qa-sub">Mulai session baru</div>
             </Link>
-            <Link href="/sessions" className="qa-btn">
+            <Link href="/find" className="qa-btn">
               <div className="qa-icon">
                 <svg
                   width="20"
@@ -169,12 +169,12 @@ export default async function HomePage() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
-                  <rect x="3" y="4" width="18" height="18" rx="2" />
-                  <path d="M16 2v4M8 2v4M3 10h18" />
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="M21 21l-4.35-4.35" />
                 </svg>
               </div>
-              <div className="qa-title">My Sessions</div>
-              <div className="qa-sub">Lihat session</div>
+              <div className="qa-title">Find Session</div>
+              <div className="qa-sub">Public sessions di kota</div>
             </Link>
           </div>
         </section>

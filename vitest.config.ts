@@ -80,6 +80,8 @@ export default defineConfig({
         "lib/stats/recompute.ts",
         // Sprint 36 — backup health
         "lib/backup/health.ts",
+        // Sprint 37 — OTP attempt enforcement
+        "lib/auth/otp-attempts.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

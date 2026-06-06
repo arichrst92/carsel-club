@@ -76,9 +76,9 @@ const TABS: Tab[] = [
     ),
   },
   {
-    href: "/find",
-    label: "Find",
-    matchPrefix: "/find",
+    href: "/leaderboard",
+    label: "Leaderboard",
+    matchPrefix: "/leaderboard",
     icon: (
       <svg
         width="22"
@@ -90,8 +90,10 @@ const TABS: Tab[] = [
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <circle cx="11" cy="11" r="8" />
-        <path d="M21 21l-4.35-4.35" />
+        <path d="M8 21h8" />
+        <path d="M12 17v4" />
+        <path d="M7 4h10v6a5 5 0 0 1-10 0V4z" />
+        <path d="M17 4h3v2a3 3 0 0 1-3 3M7 4H4v2a3 3 0 0 0 3 3" />
       </svg>
     ),
   },

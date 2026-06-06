@@ -639,12 +639,37 @@ export default async function ProfilePage() {
                 sub="Badge & milestones"
               />
             </Link>
-            <SettingsRow
-              icon="🔔"
-              title="Notifikasi"
-              sub="Soon — atur notifikasi"
-              disabled
-            />
+            <Link
+              href="/profile/settings/notifications"
+              style={{ textDecoration: "none" }}
+            >
+              <SettingsRow
+                icon="🔔"
+                title="Notifikasi"
+                sub="Channel, quiet hours, push, WA"
+              />
+            </Link>
+            <Link href="/help" style={{ textDecoration: "none" }}>
+              <SettingsRow
+                icon="❓"
+                title="Bantuan"
+                sub="FAQ, kontak support"
+              />
+            </Link>
+            <Link href="/privacy-policy" style={{ textDecoration: "none" }}>
+              <SettingsRow
+                icon="🔒"
+                title="Kebijakan privasi"
+                sub="Cara kami pakai data kamu"
+              />
+            </Link>
+            <Link href="/tos" style={{ textDecoration: "none" }}>
+              <SettingsRow
+                icon="📜"
+                title="Syarat & ketentuan"
+                sub="Aturan main"
+              />
+            </Link>
             <SettingsRow
               icon="🌐"
               title="Bahasa"

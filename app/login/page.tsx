@@ -98,8 +98,8 @@ export default function LoginPage() {
         <div className="auth-tos">
           Dengan lanjut, kamu setuju dengan
           <br />
-          <a href="#tos">Terms of Service</a> &{" "}
-          <a href="#privacy">Privacy Policy</a>
+          <a href="/tos">Syarat & Ketentuan</a> &{" "}
+          <a href="/privacy-policy">Kebijakan Privasi</a>
         </div>
       </section>
     </div>
