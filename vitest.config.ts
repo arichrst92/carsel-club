@@ -85,6 +85,8 @@ export default defineConfig({
         // Sprint 38 — privacy display flags + friend request policy
         "lib/privacy/display-flags.ts",
         "lib/privacy/friend-request-policy.ts",
+        // Sprint 39 — onboarding validation
+        "lib/auth/onboarding.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

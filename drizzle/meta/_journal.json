@@ -113,6 +113,13 @@
       "when": 1780732104305,
       "tag": "0015_sprint38_privacy_controls",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1780732437185,
+      "tag": "0016_sprint39_onboarding_bio",
+      "breakpoints": true
     }
   ]
 }

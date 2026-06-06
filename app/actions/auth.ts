@@ -34,6 +34,7 @@ import {
   checkAttempt,
   recordFailedAttempt,
 } from "@/lib/auth/otp-attempts";
+import { validateOnboardingInput } from "@/lib/auth/onboarding";
 import { event } from "@/lib/log";
 
 export type AuthActionState = { error?: string } | null;
@@ -257,18 +258,22 @@ export async function completeOnboardingAction(
   const displayName = String(formData.get("display_name") ?? "").trim();
   const cityRaw = String(formData.get("city") ?? "").trim();
   const city = cityRaw.length > 0 ? cityRaw : null;
+  const bioRaw = String(formData.get("bio") ?? "").trim();
+  const bio = bioRaw.length > 0 ? bioRaw : null;
 
-  if (displayName.length < 2 || displayName.length > 30) {
-    return { error: "Nama harus 2-30 karakter" };
-  }
-  if (city && city.length > 50) {
-    return { error: "Nama kota maksimal 50 karakter" };
-  }
+  const v = validateOnboardingInput({ displayName, city, bio });
+  if (!v.ok) return { error: v.error };
 
   try {
     await db
       .update(users)
-      .set({ displayName, city, updatedAt: new Date() })
+      .set({
+        displayName,
+        city,
+        bio,
+        onboardingStep: 3,
+        updatedAt: new Date(),
+      })
       .where(eq(users.id, session!.userId));
   } catch (e) {
     console.error("[completeOnboardingAction] update error:", e);

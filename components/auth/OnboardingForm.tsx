@@ -2,10 +2,17 @@
 
 import { useState, useTransition } from "react";
 import { completeOnboardingAction } from "@/app/actions/auth";
+import { AvatarUploader } from "@/components/profile/AvatarUploader";
+import {
+  canAdvanceStep,
+  BIO_MAX,
+} from "@/lib/auth/onboarding";
 
 type Props = {
   initialDisplayName?: string;
   initialCity?: string;
+  initialBio?: string;
+  initialAvatarUrl?: string | null;
 };
 
 const POPULAR_CITIES = [
@@ -22,10 +29,13 @@ const POPULAR_CITIES = [
 export function OnboardingForm({
   initialDisplayName = "",
   initialCity = "",
+  initialBio = "",
+  initialAvatarUrl = null,
 }: Props) {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [displayName, setDisplayName] = useState(initialDisplayName);
   const [city, setCity] = useState(initialCity);
+  const [bio, setBio] = useState(initialBio);
   const [customCity, setCustomCity] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -36,19 +46,13 @@ export function OnboardingForm({
 
   function nextStep() {
     setError(null);
-    if (step === 1) {
-      if (displayName.trim().length < 2) {
-        setError("Nama minimal 2 karakter");
-        return;
-      }
-      if (displayName.trim().length > 30) {
-        setError("Nama maksimal 30 karakter");
-        return;
-      }
-      setStep(2);
-    } else if (step === 2) {
-      // City optional
-      setStep(3);
+    const v = canAdvanceStep({ step, displayName, city, bio });
+    if (!v.ok) {
+      setError(v.error);
+      return;
+    }
+    if (step < TOTAL_STEPS) {
+      setStep((step + 1) as 1 | 2 | 3);
     } else {
       submit();
     }
@@ -56,7 +60,7 @@ export function OnboardingForm({
 
   function prevStep() {
     setError(null);
-    if (step > 1) setStep(step - 1);
+    if (step > 1) setStep((step - 1) as 1 | 2 | 3);
   }
 
   function submit() {
@@ -64,6 +68,7 @@ export function OnboardingForm({
       const fd = new FormData();
       fd.set("display_name", displayName.trim());
       fd.set("city", city.trim());
+      fd.set("bio", bio.trim());
       const result = await completeOnboardingAction(null, fd);
       if (result?.error) setError(result.error);
     });
@@ -103,21 +108,26 @@ export function OnboardingForm({
               displayName={displayName}
               onChange={setDisplayName}
               initial={initial}
+              currentAvatarUrl={initialAvatarUrl}
             />
           )}
           {step === 2 && (
-            <Step2City
+            <Step2CityBio
               city={city}
-              onChange={setCity}
+              onCityChange={setCity}
+              bio={bio}
+              onBioChange={setBio}
               customCity={customCity}
               onToggleCustom={setCustomCity}
             />
           )}
           {step === 3 && (
-            <Step3Preview
+            <Step3Welcome
               displayName={displayName}
               city={city}
+              bio={bio}
               initial={initial}
+              avatarUrl={initialAvatarUrl}
             />
           )}
         </div>
@@ -212,10 +222,12 @@ function Step1Name({
   displayName,
   onChange,
   initial,
+  currentAvatarUrl,
 }: {
   displayName: string;
   onChange: (v: string) => void;
   initial: string;
+  currentAvatarUrl: string | null;
 }) {
   return (
     <>
@@ -229,37 +241,14 @@ function Step1Name({
           marginBottom: "var(--s-4)",
         }}
       >
-        Ini akan jadi identitas kamu di Carsel Club. Bisa nama asli atau
-        nickname.
+        Pilih nama display + upload foto (opsional). Bisa diubah nanti.
       </p>
 
-      {/* Avatar preview */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: "var(--s-5)",
-        }}
-      >
-        <div
-          style={{
-            width: 96,
-            height: 96,
-            borderRadius: "50%",
-            background: "linear-gradient(135deg, #FB7185, #F43F5E)",
-            color: "#fff",
-            display: "grid",
-            placeItems: "center",
-            fontFamily: "var(--font-display)",
-            fontWeight: 800,
-            fontSize: 40,
-            boxShadow: "var(--shadow-md)",
-            border: "4px solid var(--bg)",
-          }}
-        >
-          {initial}
-        </div>
-      </div>
+      {/* Avatar uploader — uses existing avatar action */}
+      <AvatarUploader
+        currentAvatarUrl={currentAvatarUrl}
+        initial={initial}
+      />
 
       <section className="form-section">
         <div className="form-group">
@@ -288,14 +277,18 @@ function Step1Name({
 // Step 2 — City
 // ============================================================
 
-function Step2City({
+function Step2CityBio({
   city,
-  onChange,
+  onCityChange,
+  bio,
+  onBioChange,
   customCity,
   onToggleCustom,
 }: {
   city: string;
-  onChange: (v: string) => void;
+  onCityChange: (v: string) => void;
+  bio: string;
+  onBioChange: (v: string) => void;
   customCity: boolean;
   onToggleCustom: (v: boolean) => void;
 }) {
@@ -303,7 +296,7 @@ function Step2City({
 
   return (
     <>
-      <h2 className="wizard-step-title">Di mana kamu main?</h2>
+      <h2 className="wizard-step-title">Tentang kamu</h2>
       <p
         style={{
           color: "var(--text-500)",
@@ -313,8 +306,8 @@ function Step2City({
           marginBottom: "var(--s-4)",
         }}
       >
-        Pilih kota domisili — penting untuk Regional Leaderboard di v1.5
-        nanti. (Optional)
+        Kota untuk Regional Leaderboard, bio singkat untuk profil publik.
+        Keduanya optional — bisa skip.
       </p>
 
       <section className="form-section">
@@ -335,7 +328,7 @@ function Step2City({
                   type="button"
                   onClick={() => {
                     onToggleCustom(false);
-                    onChange(c.name);
+                    onCityChange(c.name);
                   }}
                   style={{
                     display: "flex",
@@ -376,7 +369,7 @@ function Step2City({
             type="button"
             onClick={() => {
               onToggleCustom(true);
-              if (isPopular) onChange("");
+              if (isPopular) onCityChange("");
             }}
             style={{
               width: "100%",
@@ -403,11 +396,31 @@ function Step2City({
               className="form-input"
               placeholder="Ketik nama kota kamu"
               value={city}
-              onChange={(e) => onChange(e.target.value)}
+              onChange={(e) => onCityChange(e.target.value)}
               maxLength={50}
               autoFocus
             />
           )}
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Bio singkat</label>
+          <textarea
+            className="form-input"
+            placeholder="Contoh: Padel addict. Weekend warrior. Banding sama AI gabakal sebagus aku."
+            value={bio}
+            onChange={(e) => onBioChange(e.target.value)}
+            maxLength={BIO_MAX}
+            rows={3}
+            style={{
+              resize: "vertical",
+              fontFamily: "inherit",
+              lineHeight: 1.5,
+            }}
+          />
+          <p className="form-help">
+            {bio.length}/{BIO_MAX} karakter · ditampilkan di profil publik
+          </p>
         </div>
       </section>
     </>
@@ -418,18 +431,35 @@ function Step2City({
 // Step 3 — Preview / Confirm
 // ============================================================
 
-function Step3Preview({
+// ============================================================
+// Step 3 — Welcome + Tier intro
+// ============================================================
+
+const TIER_INTRO = [
+  { emoji: "🥚", name: "Rookie", desc: "0 poin · starting tier" },
+  { emoji: "🥉", name: "Bronze", desc: "150 pts, 25 match" },
+  { emoji: "🥈", name: "Silver", desc: "350 pts, 60 match" },
+  { emoji: "🥇", name: "Gold", desc: "600 pts, 110 match" },
+  { emoji: "💎", name: "Platinum", desc: "850 pts, 170 match" },
+  { emoji: "👑", name: "Master", desc: "1000 pts, 200+ match" },
+];
+
+function Step3Welcome({
   displayName,
   city,
+  bio,
   initial,
+  avatarUrl,
 }: {
   displayName: string;
   city: string;
+  bio: string;
   initial: string;
+  avatarUrl: string | null;
 }) {
   return (
     <>
-      <h2 className="wizard-step-title">Ready to play! 🎾</h2>
+      <h2 className="wizard-step-title">Welcome! 🎾</h2>
       <p
         style={{
           color: "var(--text-500)",
@@ -439,10 +469,10 @@ function Step3Preview({
           marginBottom: "var(--s-4)",
         }}
       >
-        Cek profil kamu di bawah. Tap Back kalau mau ubah, atau Mulai Main.
+        Profil siap. Naik tier dengan main + menang — semua tracked otomatis.
       </p>
 
-      {/* Preview card */}
+      {/* Profile preview card */}
       <section
         style={{
           background:
@@ -461,7 +491,10 @@ function Step3Preview({
             height: 96,
             margin: "0 auto var(--s-3)",
             borderRadius: "50%",
-            background: "rgba(255,255,255,0.22)",
+            background: avatarUrl
+              ? `url(${avatarUrl}) center/cover no-repeat`
+              : "rgba(255,255,255,0.22)",
+            color: "#fff",
             display: "grid",
             placeItems: "center",
             fontFamily: "var(--font-display)",
@@ -470,7 +503,7 @@ function Step3Preview({
             border: "4px solid rgba(255,255,255,0.4)",
           }}
         >
-          {initial}
+          {!avatarUrl && initial}
         </div>
         <div
           style={{
@@ -482,15 +515,24 @@ function Step3Preview({
         >
           {displayName}
         </div>
-        <div
-          style={{
-            fontSize: 13,
-            opacity: 0.9,
-            fontWeight: 600,
-          }}
-        >
+        <div style={{ fontSize: 13, opacity: 0.9, fontWeight: 600 }}>
           {city ? `📍 ${city}` : "Belum set kota"}
         </div>
+        {bio && (
+          <div
+            style={{
+              fontSize: 12,
+              opacity: 0.85,
+              fontWeight: 600,
+              marginTop: 6,
+              fontStyle: "italic",
+              maxWidth: 280,
+              margin: "6px auto 0",
+            }}
+          >
+            "{bio}"
+          </div>
+        )}
         <div
           style={{
             marginTop: "var(--s-3)",
@@ -506,6 +548,55 @@ function Step3Preview({
         </div>
       </section>
 
+      {/* Tier ladder intro */}
+      <section
+        style={{
+          background: "var(--bg-card)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--r-lg)",
+          padding: "var(--s-3) var(--s-4)",
+          marginBottom: "var(--s-3)",
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "var(--font-display)",
+            fontWeight: 800,
+            fontSize: 13,
+            color: "var(--text-900)",
+            marginBottom: "var(--s-2)",
+          }}
+        >
+          🏆 Tier ladder
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {TIER_INTRO.map((t, i) => (
+            <div
+              key={t.name}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "var(--s-2)",
+                fontSize: 12,
+                fontWeight: 600,
+                color:
+                  i === 0 ? "var(--text-900)" : "var(--text-500)",
+              }}
+            >
+              <span style={{ fontSize: 16, width: 22, textAlign: "center" }}>
+                {t.emoji}
+              </span>
+              <span style={{ fontWeight: i === 0 ? 800 : 600 }}>
+                {t.name}
+              </span>
+              <span style={{ marginLeft: "auto", fontSize: 11 }}>
+                {t.desc}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <div
         style={{
           padding: "var(--s-3)",
@@ -518,8 +609,8 @@ function Step3Preview({
           lineHeight: 1.5,
         }}
       >
-        💡 Tip: Setelah klik &quot;Mulai Main&quot;, kamu bisa langsung create
-        session padel pertama atau join via invite link teman.
+        💡 Tap &quot;Mulai Main&quot; → buka home. Bisa langsung create
+        session, atau gabung via invite link teman.
       </div>
     </>
   );

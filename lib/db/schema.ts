@@ -164,6 +164,9 @@ export const users = pgTable(
       () => tierDefinitions.id
     ).default(1),
     isAdmin: boolean("is_admin").notNull().default(false),
+    // Sprint 39: short bio + onboarding step tracking
+    bio: text("bio"),
+    onboardingStep: integer("onboarding_step").notNull().default(0),
     // Sprint 24: privacy untuk public profile view
     profileVisibility: profileVisibilityEnum("profile_visibility")
       .notNull()

@@ -1048,18 +1048,33 @@ Sub-tasks:
 
 **DoD**: Privacy page rendered, account delete works, data export downloadable.
 
-### Sprint 39 — Onboarding 3-step wizard
+### Sprint 39 — Onboarding 3-step wizard ✅
 **Goal**: Match prototype onboarding flow
 
 Sub-tasks:
-- Schema: `users.bio` (text, max 200), `users.onboardingStep` (int)
-- Refactor `/onboarding` → 3-step wizard:
-  - Step 1: Display name + Avatar upload
-  - Step 2: City + Bio
-  - Step 3: Welcome screen with tier intro
-- Progress indicator component
-- Skip "step 2" allowed (city optional)
-- Update Home empty-state to nudge onboarding completion
+- Schema additions on users:
+  - bio text (nullable, max 200 chars enforced in app)
+  - onboarding_step int default 0 (set to 3 on completion)
+- Pure helper (100% cov): lib/auth/onboarding.ts
+  - validateOnboardingInput — full submission gate (displayName 2-30,
+    city ≤ 50, bio ≤ 200)
+  - canAdvanceStep — per-step gate (step 1 needs valid name; step 2+3
+    accept whatever)
+  - Constants exported untuk UI (DISPLAY_NAME_MIN/MAX, CITY_MAX, BIO_MAX)
+  - 17 unit tests
+- Action update (completeOnboardingAction):
+  - Accepts bio form field
+  - Calls validateOnboardingInput (single source of truth)
+  - Persists bio + sets onboardingStep=3
+- UI refactor (OnboardingForm + onboarding/page.tsx):
+  - Step 1: Name + AvatarUploader integration (existing component reused —
+    upload uses updateAvatarAction immediately, persists during onboarding)
+  - Step 2: City picker (8 popular + custom) + Bio textarea w/ counter
+    (was: city only)
+  - Step 3: Welcome screen with profile preview + tier ladder intro
+    (6 tiers w/ thresholds, current tier highlighted)
+  - Step gating uses canAdvanceStep pure helper
+  - Avatar URL prefetched server-side untuk welcome preview consistency
 
 **DoD**: New user flow matches prototype onboarding.html, complete % tracked.
 
