@@ -388,6 +388,34 @@ export const notifications = pgTable(
 );
 
 // ============================================================
+// PUSH SUBSCRIPTIONS — Sprint 27
+// ============================================================
+
+export const pushSubscriptions = pgTable(
+  "push_subscriptions",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    endpoint: text("endpoint").notNull(),
+    p256dh: text("p256dh").notNull(),
+    auth: text("auth").notNull(),
+    userAgent: text("user_agent"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    unique("push_sub_endpoint_unique").on(t.endpoint),
+    index("idx_push_sub_user").on(t.userId),
+  ]
+);
+
+// ============================================================
 // USER BLOCKS + FOLLOWS — Sprint 23
 // ============================================================
 

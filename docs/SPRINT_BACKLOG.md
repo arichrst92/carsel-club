@@ -584,18 +584,24 @@ deferred ke Sprint 27/28 — toggles disimpan untuk dipakai nanti.
 
 ---
 
-### Sprint 27 — Web Push notifications
+### Sprint 27 — Web Push notifications ✅
 **Goal**: Browser push subscription
 
 Sub-tasks:
-- Generate VAPID keys (env var)
-- Service worker `public/sw.js` — push handler + notification show
-- Client subscribe flow (permission prompt smart timing)
-- Table `push_subscriptions` (userId, endpoint, keys)
-- `web-push` library
-- Backend: send push saat notification triggered (if user pref enable push)
+- Schema: `push_subscriptions` (userId, endpoint UNIQUE, p256dh, auth, userAgent, createdAt, lastSeenAt)
+- ENV: VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT
+- Pure helpers (100% cov):
+  - `lib/push/subscriptions.ts` — parsePushSubscription (validates shape + https + size bounds), sanitizeUserAgent
+  - `lib/push/payload.ts` — buildPushPayload (collapse vs unique tag strategy per type)
+- Server-only:
+  - `lib/push/send.ts` — web-push wrapper, lazy VAPID config, fan-out per user, auto-cleanup 404/410
+- API endpoint: `/api/push/vapid-public-key` (public key fetch)
+- Service worker: `public/sw.js` (push handler + notificationclick: focus or open)
+- Actions: `savePushSubscriptionAction` (upsert by endpoint), `removePushSubscriptionAction`
+- UI: `<PushToggle />` di /profile/settings/notifications — handles permission, SW register, subscribe, save
+- Wire ke `createNotification`: after insert, dispatch push if `shouldDeliver("push")` passes (uses prefs + quiet hours)
 
-**DoD**: Subscribe → trigger notification → browser push muncul.
+**DoD**: Subscribe → trigger notification → browser push muncul. Push gated by prefs + quiet hours; auto-cleanup expired subs; in_app still always works.
 
 ---
 

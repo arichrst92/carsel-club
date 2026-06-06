@@ -71,6 +71,13 @@
       "when": 1780723961358,
       "tag": "0009_sprint26_notification_prefs",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1780724296879,
+      "tag": "0010_sprint27_push_subscriptions",
+      "breakpoints": true
     }
   ]
 }

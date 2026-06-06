@@ -10,6 +10,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth/get-current-user";
 import { getNotificationPrefs } from "@/lib/db/queries/notifications";
 import { NotificationPrefsForm } from "@/components/notifications/NotificationPrefsForm";
+import { PushToggle } from "@/components/notifications/PushToggle";
 
 export const metadata = {
   title: "Notification preferences",
@@ -46,8 +47,12 @@ export default async function NotificationPrefsPage() {
         className="app-content"
         style={{
           padding: "var(--s-3) var(--s-4) var(--s-8)",
+          display: "flex",
+          flexDirection: "column",
+          gap: "var(--s-4)",
         }}
       >
+        <PushToggle />
         <NotificationPrefsForm
           initialSettings={prefs.settings}
           initialQuietStart={prefs.quietStartHour}

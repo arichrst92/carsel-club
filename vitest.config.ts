@@ -59,6 +59,9 @@ export default defineConfig({
         // Sprint 26 — prefs + grouping
         "lib/notifications/prefs.ts",
         "lib/notifications/group.ts",
+        // Sprint 27 — push helpers
+        "lib/push/subscriptions.ts",
+        "lib/push/payload.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

@@ -26,20 +26,57 @@ import type {
   JoinApprovedPayload,
   JoinRejectedPayload,
 } from "./types";
+import { formatNotification } from "./format";
+import { shouldDeliver } from "./prefs";
+import { getNotificationPrefs } from "@/lib/db/queries/notifications";
+import { buildPushPayload } from "@/lib/push/payload";
+import { sendToUser } from "@/lib/push/send";
 
 async function createNotification<T extends NotificationType>(
   userId: string,
   type: T,
   payload: NotificationPayloadByType[T]
 ): Promise<void> {
+  let notificationId: string | null = null;
   try {
-    await db.insert(notifications).values({
-      userId,
-      type,
-      payload: payload as unknown as Record<string, unknown>,
-    });
+    const [row] = await db
+      .insert(notifications)
+      .values({
+        userId,
+        type,
+        payload: payload as unknown as Record<string, unknown>,
+      })
+      .returning({ id: notifications.id });
+    notificationId = row?.id ?? null;
   } catch (e) {
-    console.error(`[notify:${type}] failed:`, e);
+    console.error(`[notify:${type}] insert failed:`, e);
+    return;
+  }
+  if (!notificationId) return;
+
+  // Sprint 27: dispatch web push if user pref allows + outside quiet hours
+  try {
+    const prefs = await getNotificationPrefs(userId);
+    const currentHour = new Date().getHours();
+    if (
+      shouldDeliver(
+        prefs.settings,
+        type,
+        "push",
+        currentHour,
+        prefs.quietStartHour,
+        prefs.quietEndHour
+      )
+    ) {
+      const fmt = formatNotification(
+        type,
+        payload as unknown as Record<string, unknown>
+      );
+      const pushPayload = buildPushPayload(type, notificationId, fmt);
+      await sendToUser(userId, pushPayload);
+    }
+  } catch (e) {
+    console.error(`[notify:${type}] push dispatch failed:`, e);
   }
 }
 
