@@ -72,6 +72,8 @@ export default defineConfig({
         // Sprint 32 — leaderboard v2
         "lib/leaderboard/sort.ts",
         "lib/leaderboard/period.ts",
+        // Sprint 33 — PWA
+        "lib/pwa/install-prompt.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

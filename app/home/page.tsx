@@ -8,6 +8,7 @@ import {
 import { getTierById } from "@/lib/db/queries/public-profile";
 import { BottomNav } from "@/components/nav/BottomNav";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { InstallPromptBanner } from "@/components/pwa/InstallPromptBanner";
 import { TierUpModal } from "@/components/home/TierUpModal";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
 import { getPendingCelebration } from "@/lib/db/queries/achievements";
@@ -85,6 +86,13 @@ export default async function HomePage() {
           description={pendingDef.description}
         />
       )}
+
+      {/* Sprint 33: PWA install prompt (smart-timed) */}
+      <InstallPromptBanner
+        hostedCount={0}
+        totalMatches={user.totalMatches}
+      />
+      {/* hostedCount placeholder — pass via separate query later kalau perlu */}
 
       {/* HEADER */}
       <header className="app-header">

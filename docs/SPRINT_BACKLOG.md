@@ -781,15 +781,31 @@ Sub-tasks:
 
 ## Production Readiness (Sprint 33-36)
 
-### Sprint 33 — PWA: manifest + service worker
+### Sprint 33 — PWA: manifest + service worker ✅
 **Goal**: Installable + offline shell
 
 Sub-tasks:
-- `app/manifest.ts` (Next.js metadata API)
-- Icons (192, 512, maskable)
-- Service worker: precache app shell, runtime cache for API
-- Install prompt banner — smart timing (setelah 2 session created atau 3 match completed)
-- Push integration finalize (linked dengan SW dari Sprint 27)
+- app/manifest.ts (Next.js metadata API) — standalone display, brand colors,
+  start_url=/home, icons array
+- Icon routes (next/og generated):
+  - /icon-192.png + /icon-512.png — orange gradient + "CC" mark
+  - /icon-maskable-512.png — 60% safe area for Android masking
+  - /badge-72.png — small mono badge for push
+- Pure helper (100% cov): lib/pwa/install-prompt.ts — shouldShowInstallPrompt
+  + engagement signals (hostedCount≥2 OR totalMatches≥3), guards (installed,
+  dismissed, unsupported)
+- Service worker (public/sw.js) extended:
+  - install: precache /offline, manifest, icons (best-effort)
+  - activate: cleanup stale caches
+  - fetch handler: navigation = network-first w/ /offline fallback; static
+    assets = cache-first; bypass for /api/, /uploads/, /login, /_next/data/
+- Components:
+  - RegisterServiceWorker (client) — registers /sw.js on mount (prod only)
+  - InstallPromptBanner (client) — Android beforeinstallprompt capture +
+    iOS Safari manual hint; dismissal persisted in localStorage
+- /offline page — static fallback w/ retry button
+- Layout: themeColor #F97316, appleWebApp metadata, icon links updated,
+  RegisterServiceWorker mounted, InstallPromptBanner rendered di /home
 
 **DoD**: Installable ke home screen iOS/Android, offline minimal shell.
 

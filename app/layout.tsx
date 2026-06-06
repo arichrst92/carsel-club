@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Quicksand, Nunito } from "next/font/google";
 import "./globals.css";
 import "./shared.css";
+import { RegisterServiceWorker } from "@/components/pwa/RegisterServiceWorker";
 
 const quicksand = Quicksand({
   subsets: ["latin"],
@@ -44,11 +45,17 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/logo-icon.png", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
       { url: "/favicon.ico" },
     ],
-    apple: "/logo-icon.png",
-    shortcut: "/logo-icon.png",
+    apple: "/icon-192.png",
+    shortcut: "/icon-192.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Carsel Club",
   },
 };
 
@@ -56,7 +63,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#14b8a6",
+  themeColor: "#F97316",
 };
 
 export default function RootLayout({
@@ -69,7 +76,10 @@ export default function RootLayout({
       lang="id"
       className={`${quicksand.variable} ${nunito.variable} h-full antialiased`}
     >
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        {children}
+        <RegisterServiceWorker />
+      </body>
     </html>
   );
 }
