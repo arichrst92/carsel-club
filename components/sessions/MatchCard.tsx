@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import type { Match } from "@/lib/db/types";
 import {
   updateMatchScoreAction,
@@ -209,6 +210,35 @@ export function MatchCard({
           >
             {status.label}
           </span>
+          <Link
+            href={`/sessions/${sessionId}/matches/${match.id}`}
+            aria-label="Lihat detail match"
+            title="Lihat detail match"
+            style={{
+              display: "grid",
+              placeItems: "center",
+              width: 28,
+              height: 28,
+              borderRadius: "var(--r-full)",
+              background: "var(--bg-soft)",
+              color: "var(--text-700)",
+              textDecoration: "none",
+              border: "1px solid var(--border-light)",
+            }}
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </Link>
         </div>
       </div>
 
