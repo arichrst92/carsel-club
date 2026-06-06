@@ -20,6 +20,8 @@ import type {
   sessionGroupPhotos,
   sessionJoinRequests,
   friendRequests,
+  userBlocks,
+  follows,
 } from "./schema";
 
 // Select types (rows yang di-fetch dari DB)
@@ -35,6 +37,8 @@ export type AppLog = InferSelectModel<typeof appLogs>;
 export type SessionGroupPhoto = InferSelectModel<typeof sessionGroupPhotos>;
 export type SessionJoinRequest = InferSelectModel<typeof sessionJoinRequests>;
 export type FriendRequest = InferSelectModel<typeof friendRequests>;
+export type UserBlock = InferSelectModel<typeof userBlocks>;
+export type Follow = InferSelectModel<typeof follows>;
 
 // Insert types (rows yang di-create)
 export type NewUser = InferInsertModel<typeof users>;
@@ -48,3 +52,5 @@ export type NewAppLog = InferInsertModel<typeof appLogs>;
 export type NewSessionGroupPhoto = InferInsertModel<typeof sessionGroupPhotos>;
 export type NewSessionJoinRequest = InferInsertModel<typeof sessionJoinRequests>;
 export type NewFriendRequest = InferInsertModel<typeof friendRequests>;
+export type NewUserBlock = InferInsertModel<typeof userBlocks>;
+export type NewFollow = InferInsertModel<typeof follows>;

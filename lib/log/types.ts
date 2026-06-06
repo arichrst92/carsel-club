@@ -30,6 +30,10 @@ export type EventName =
   | "friend_request_sent" // Sprint 22
   | "friend_request_accepted" // Sprint 22
   | "friend_request_rejected" // Sprint 22
+  | "user_blocked" // Sprint 23
+  | "user_unblocked" // Sprint 23
+  | "user_followed" // Sprint 23
+  | "user_unfollowed" // Sprint 23
   | "match_started" // Sprint 4
   | "match_completed"
   | "match_reverted" // Sprint 4

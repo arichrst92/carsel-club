@@ -10,6 +10,13 @@ import Link from "next/link";
 import { getPublicProfile } from "@/lib/db/queries/public-profile";
 import { winRate, toAbsoluteUrl } from "@/lib/utils";
 import { getSession } from "@/lib/auth/session";
+import {
+  isFollowing,
+  isUserBlocked,
+  countFollowers,
+  countFollowing,
+} from "@/lib/db/queries/social";
+import { FollowBlockActions } from "@/components/social/FollowBlockActions";
 
 export const dynamic = "force-dynamic";
 
@@ -53,6 +60,16 @@ export default async function PublicProfilePage({ params }: Props) {
   const wr = winRate(profile.totalWins, profile.totalMatches);
   const avatarUrl = toAbsoluteUrl(profile.avatarUrl);
   const initial = (profile.displayName.trim()[0] ?? "?").toUpperCase();
+
+  // Sprint 23: social state
+  const [followers, following, viewerFollowing, viewerBlocked] =
+    await Promise.all([
+      countFollowers(userId),
+      countFollowing(userId),
+      session ? isFollowing(session.userId, userId) : Promise.resolve(false),
+      session ? isUserBlocked(session.userId, userId) : Promise.resolve(false),
+    ]);
+  const isOwnProfile = session?.userId === userId;
 
   return (
     <div className="app-shell">
@@ -136,7 +153,71 @@ export default async function PublicProfilePage({ params }: Props) {
               📍 {profile.city}
             </div>
           )}
+
+          {/* Follower / Following counts */}
+          <div
+            style={{
+              display: "flex",
+              gap: 16,
+              justifyContent: "center",
+              marginTop: 12,
+            }}
+          >
+            <div>
+              <span
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 800,
+                  fontSize: 14,
+                  color: "var(--text-900)",
+                }}
+              >
+                {followers}
+              </span>{" "}
+              <span
+                style={{
+                  fontSize: 11,
+                  color: "var(--text-500)",
+                  fontWeight: 600,
+                }}
+              >
+                Followers
+              </span>
+            </div>
+            <div>
+              <span
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 800,
+                  fontSize: 14,
+                  color: "var(--text-900)",
+                }}
+              >
+                {following}
+              </span>{" "}
+              <span
+                style={{
+                  fontSize: 11,
+                  color: "var(--text-500)",
+                  fontWeight: 600,
+                }}
+              >
+                Following
+              </span>
+            </div>
+          </div>
         </section>
+
+        {/* Follow / Block — kalau auth + bukan profile sendiri */}
+        {session && !isOwnProfile && (
+          <section style={{ marginBottom: "var(--s-3)" }}>
+            <FollowBlockActions
+              targetUserId={userId}
+              isFollowing={viewerFollowing}
+              isBlocked={viewerBlocked}
+            />
+          </section>
+        )}
 
         {/* Stats grid */}
         <section

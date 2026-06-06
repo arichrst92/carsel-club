@@ -43,6 +43,13 @@
       "when": 1780722385360,
       "tag": "0005_yellow_dazzler",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1780722630385,
+      "tag": "0006_burly_mephistopheles",
+      "breakpoints": true
     }
   ]
 }

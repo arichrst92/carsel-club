@@ -317,6 +317,50 @@ export const matchRoundSets = pgTable(
 );
 
 // ============================================================
+// USER BLOCKS + FOLLOWS — Sprint 23
+// ============================================================
+
+export const userBlocks = pgTable(
+  "user_blocks",
+  {
+    blockerId: uuid("blocker_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    blockedId: uuid("blocked_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    unique("uq_user_blocks").on(t.blockerId, t.blockedId),
+    index("idx_user_blocks_blocked").on(t.blockedId),
+    check("no_self_block", sql`${t.blockerId} <> ${t.blockedId}`),
+  ]
+);
+
+export const follows = pgTable(
+  "follows",
+  {
+    followerId: uuid("follower_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    followingId: uuid("following_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    unique("uq_follows").on(t.followerId, t.followingId),
+    index("idx_follows_following").on(t.followingId),
+    check("no_self_follow", sql`${t.followerId} <> ${t.followingId}`),
+  ]
+);
+
+// ============================================================
 // FRIEND REQUESTS — Sprint 22
 // ============================================================
 
