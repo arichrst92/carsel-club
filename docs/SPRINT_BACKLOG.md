@@ -747,15 +747,33 @@ schema-ready (UI deferred).
 
 ---
 
-### Sprint 32 — Leaderboard v2: regional + time-based
+### Sprint 32 — Leaderboard v2: regional + time-based ✅
 **Goal**: Filter by city + time window
 
 Sub-tasks:
-- Query: filter by city (default user's city)
-- Filter: All-time / Monthly / Weekly
-- Top performers callout (significant climbers)
-- Tab UI: Global / Regional
-- Leaderboard share card (top 10 image card)
+- Pure helpers (100% cov, lib/leaderboard/):
+  - sort.ts: computeWinRate, getSortValue (winrate requires ≥5 matches),
+    sortAndRank (stable tiebreak by id), findEntry, topClimbers (rank-delta
+    detection), distinctCities
+  - period.ts: periodSinceDate (weekly=-7d, monthly=-30d, all_time=null),
+    periodLabel
+- Query (lib/db/queries/leaderboard-v2.ts):
+  - getLeaderboardV2({sort, period, city})
+  - all_time path: read users pre-aggregated columns + tier join + city filter
+  - weekly/monthly path: aggregate completed matches in window via
+    sessionParticipants join (per-team outcome counts in SQL → merge JS),
+    compute points from SCORING.WIN/LOSS/DRAW
+- UI:
+  - components/leaderboard/LeaderboardFilterBar (client) — scope segmented +
+    period + city dropdowns, syncs URL params
+  - components/leaderboard/LeaderboardShareButton — Web Share API + clipboard
+    fallback
+  - app/leaderboard/page.tsx rewritten — scope/period/city query param parsing,
+    parallel fetch (current + city options for regional), hero adapts to scope,
+    filter bar + sort tabs preserve query params
+- OG image: /api/og/leaderboard 1200×1200, top 10 list, gradient hero
+- Default behavior: scope=global, period=all_time. Regional auto-fills user's
+  city when toggled.
 
 **DoD**: User filter LB by city + time, share top 10.
 

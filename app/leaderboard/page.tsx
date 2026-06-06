@@ -1,15 +1,32 @@
+/**
+ * Leaderboard v2 (Sprint 32) — global/regional + period filter + share.
+ *
+ * Refs:
+ * - DB: lib/db/queries/leaderboard-v2.ts
+ * - Pure: lib/leaderboard/sort.ts + period.ts
+ * - GUI: docs/CarselClubPrototype/leaderboard.html
+ */
+
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/get-current-user";
-import {
-  getLeaderboard,
-  findMyEntry,
-  type LeaderboardSort,
-} from "@/lib/db/queries/leaderboard";
 import { BottomNav } from "@/components/nav/BottomNav";
+import { getLeaderboardV2 } from "@/lib/db/queries/leaderboard-v2";
+import { distinctCities, findEntry } from "@/lib/leaderboard/sort";
+import { periodLabel } from "@/lib/leaderboard/period";
+import { LeaderboardFilterBar } from "@/components/leaderboard/LeaderboardFilterBar";
+import { LeaderboardShareButton } from "@/components/leaderboard/LeaderboardShareButton";
+import type {
+  LeaderboardPeriod,
+  LeaderboardScope,
+  LeaderboardSort,
+  RankedEntry,
+} from "@/lib/leaderboard/types";
 
 export const metadata = {
   title: "Leaderboard",
 };
+
+export const dynamic = "force-dynamic";
 
 const TIER_EMOJI: Record<string, string> = {
   Rookie: "🥚",
@@ -20,17 +37,27 @@ const TIER_EMOJI: Record<string, string> = {
   Master: "👑",
 };
 
-const AVATAR_CLASSES = ["host", "cohost", "member-1", "member-2", "member-3"] as const;
+const AVATAR_CLASSES = [
+  "host",
+  "cohost",
+  "member-1",
+  "member-2",
+  "member-3",
+] as const;
 
 function avatarClass(id: string): string {
-  // Stable hash → consistent color per user
   let h = 0;
   for (let i = 0; i < id.length; i++) h = (h << 5) - h + id.charCodeAt(i);
   return AVATAR_CLASSES[Math.abs(h) % AVATAR_CLASSES.length];
 }
 
 type PageProps = {
-  searchParams: Promise<{ sort?: string }>;
+  searchParams: Promise<{
+    sort?: string;
+    scope?: string;
+    period?: string;
+    city?: string;
+  }>;
 };
 
 export default async function LeaderboardPage({ searchParams }: PageProps) {
@@ -40,12 +67,32 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
     params.sort === "winrate" || params.sort === "match"
       ? params.sort
       : "point";
+  const scope: LeaderboardScope =
+    params.scope === "regional" ? "regional" : "global";
+  const period: LeaderboardPeriod =
+    params.period === "weekly" || params.period === "monthly"
+      ? params.period
+      : "all_time";
+  const cityParam = params.city ?? null;
+  const city = scope === "regional" ? cityParam ?? me.city : null;
 
-  const rows = await getLeaderboard(sort);
-  const myEntry = findMyEntry(rows, me.id);
+  // Pull all entries to derive city list + main rows.
+  // For regional, we still pull global once for city options.
+  const [rows, globalForCities] = await Promise.all([
+    getLeaderboardV2({ sort, period, city }),
+    scope === "regional"
+      ? getLeaderboardV2({ sort: "point", period: "all_time", city: null })
+      : Promise.resolve([] as RankedEntry[]),
+  ]);
+  const cities =
+    scope === "regional" ? distinctCities(globalForCities) : [];
+
+  const myEntry = findEntry(rows, me.id);
 
   const top3 = rows.slice(0, 3);
   const rest = rows.slice(3, 100);
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://carsel.club";
 
   return (
     <div className="app-shell">
@@ -82,22 +129,34 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
               marginBottom: 2,
             }}
           >
-            Global Leaderboard
+            {scope === "regional"
+              ? `${city ?? "Regional"} Leaderboard`
+              : "Global Leaderboard"}
           </div>
           <div
             style={{
               fontSize: 12,
               opacity: 0.85,
               fontWeight: 600,
-              marginBottom: "var(--s-4)",
+              marginBottom: "var(--s-3)",
             }}
           >
-            Pemain padel Indonesia · {rows.length} pemain aktif
+            {periodLabel(period)} · {rows.length} pemain
+          </div>
+
+          <div style={{ display: "flex", gap: "var(--s-2)", flexWrap: "wrap" }}>
+            <LeaderboardShareButton
+              scope={scope}
+              period={period}
+              city={city}
+              appUrl={appUrl}
+            />
           </div>
 
           {myEntry && (
             <div
               style={{
+                marginTop: "var(--s-3)",
                 display: "flex",
                 alignItems: "center",
                 gap: "var(--s-3)",
@@ -157,11 +216,23 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
           )}
         </section>
 
+        {/* FILTER BAR */}
+        <LeaderboardFilterBar
+          scope={scope}
+          period={period}
+          city={city}
+          cities={cities}
+          myCity={me.city ?? null}
+        />
+
         {/* SORT TABS */}
         <section className="leaderboard-tabs">
           <SortTab
             current={sort}
             target="point"
+            scope={scope}
+            period={period}
+            city={city}
             emoji="🏆"
             label="Point"
             sub="Total poin"
@@ -169,6 +240,9 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
           <SortTab
             current={sort}
             target="winrate"
+            scope={scope}
+            period={period}
+            city={city}
             emoji="📈"
             label="Win Rate"
             sub="% menang"
@@ -176,13 +250,15 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
           <SortTab
             current={sort}
             target="match"
+            scope={scope}
+            period={period}
+            city={city}
             emoji="🎯"
             label="Match"
             sub="Total main"
           />
         </section>
 
-        {/* TOP 3 PODIUM */}
         {top3.length === 3 && (
           <section>
             <div className="section-head">
@@ -192,7 +268,6 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
           </section>
         )}
 
-        {/* RANK 4+ */}
         {rest.length > 0 && (
           <section>
             <div className="section-head">
@@ -216,7 +291,9 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
             <div className="empty-state-icon">🎾</div>
             <div className="empty-state-title">Leaderboard masih kosong</div>
             <div className="empty-state-text">
-              Mulai main session pertama kamu untuk masuk leaderboard.
+              {period !== "all_time"
+                ? "Belum ada match selesai di periode ini."
+                : "Mulai main session pertama kamu untuk masuk leaderboard."}
             </div>
           </div>
         )}
@@ -227,30 +304,41 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
   );
 }
 
-function SortTab({
-  current,
-  target,
-  emoji,
-  label,
-  sub,
-}: {
+function buildHref(
+  sort: LeaderboardSort,
+  scope: LeaderboardScope,
+  period: LeaderboardPeriod,
+  city: string | null
+): string {
+  const sp = new URLSearchParams();
+  sp.set("sort", sort);
+  if (scope === "regional") sp.set("scope", "regional");
+  if (period !== "all_time") sp.set("period", period);
+  if (city) sp.set("city", city);
+  return `/leaderboard?${sp.toString()}`;
+}
+
+function SortTab(props: {
   current: LeaderboardSort;
   target: LeaderboardSort;
+  scope: LeaderboardScope;
+  period: LeaderboardPeriod;
+  city: string | null;
   emoji: string;
   label: string;
   sub: string;
 }) {
-  const active = current === target;
+  const active = props.current === props.target;
   return (
     <Link
-      href={`/leaderboard?sort=${target}`}
+      href={buildHref(props.target, props.scope, props.period, props.city)}
       className={`lb-tab ${active ? "active" : ""}`}
       style={{ textDecoration: "none" }}
     >
       <span>
-        {emoji} {label}
+        {props.emoji} {props.label}
       </span>
-      <span className="lb-tab-sub">{sub}</span>
+      <span className="lb-tab-sub">{props.sub}</span>
     </Link>
   );
 }
@@ -259,19 +347,15 @@ function Podium({
   top3,
   sort,
 }: {
-  top3: ReturnType<typeof getLeaderboard> extends Promise<infer R>
-    ? R
-    : never;
+  top3: RankedEntry[];
   sort: LeaderboardSort;
 }) {
-  // Order: 2 (left), 1 (center, raised), 3 (right)
   const [first, second, third] = top3;
   const SLOTS = [
     { player: second, medal: "🥈", rank: 2 },
     { player: first, medal: "🥇", rank: 1 },
     { player: third, medal: "🥉", rank: 3 },
   ];
-
   return (
     <div
       style={{
@@ -300,7 +384,7 @@ function PodiumSlot({
   rank,
   sort,
 }: {
-  player: any;
+  player: RankedEntry;
   medal: string;
   rank: number;
   sort: LeaderboardSort;
@@ -312,7 +396,6 @@ function PodiumSlot({
       : sort === "winrate"
         ? `${Math.round(player.winRate)}% WR`
         : `${player.totalMatches} match`;
-
   return (
     <div
       style={{
@@ -332,12 +415,7 @@ function PodiumSlot({
       </div>
       <div
         className={`lb-avatar ${avatarClass(player.id)}`}
-        style={{
-          width: 48,
-          height: 48,
-          margin: "0 auto 8px",
-          fontSize: 18,
-        }}
+        style={{ width: 48, height: 48, margin: "0 auto 8px", fontSize: 18 }}
       >
         {(player.displayName.trim()[0] ?? "?").toUpperCase()}
       </div>
@@ -386,7 +464,7 @@ function LbItem({
   isMe,
   sort,
 }: {
-  row: any;
+  row: RankedEntry;
   isMe: boolean;
   sort: LeaderboardSort;
 }) {
@@ -444,3 +522,4 @@ function LbItem({
     </div>
   );
 }
+

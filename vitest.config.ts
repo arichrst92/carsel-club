@@ -69,6 +69,9 @@ export default defineConfig({
         "lib/stats/advanced.ts",
         // Sprint 31 — tournament bracket
         "lib/match/bracket.ts",
+        // Sprint 32 — leaderboard v2
+        "lib/leaderboard/sort.ts",
+        "lib/leaderboard/period.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [
