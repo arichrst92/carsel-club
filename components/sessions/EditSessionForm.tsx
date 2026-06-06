@@ -27,6 +27,7 @@ type Props = {
     scheduledEndAt: Date | null;
     description: string | null;
     visibility: "private" | "public";
+    joinPolicy: "auto_join" | "need_approval";
     maxRounds: number | null;
     format: "americano" | "mexicano" | "tournament";
     playType: "freeplay" | "tournament";
@@ -57,6 +58,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
   );
   const [description, setDescription] = useState(initial.description ?? "");
   const [visibility, setVisibility] = useState(initial.visibility);
+  const [joinPolicy, setJoinPolicy] = useState(initial.joinPolicy);
   const [maxRounds, setMaxRounds] = useState(
     initial.maxRounds ? String(initial.maxRounds) : ""
   );
@@ -97,6 +99,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
       }
       if (description.trim()) fd.set("description", description.trim());
       fd.set("visibility", visibility);
+      fd.set("join_policy", joinPolicy);
       if (maxRounds) fd.set("max_rounds", maxRounds);
       // Match config — server check lock rule
       fd.set("format", format);
@@ -219,7 +222,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
           </div>
         </section>
 
-        {/* Visibility */}
+        {/* Visibility + Join Policy */}
         <section className="form-section">
           <div className="form-group">
             <label className="form-label">Visibility</label>
@@ -242,6 +245,30 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
               </button>
             </div>
           </div>
+
+          {visibility === "public" && (
+            <div className="form-group">
+              <label className="form-label">Join Policy</label>
+              <div className="segmented">
+                <button
+                  type="button"
+                  className={`segmented-option ${joinPolicy === "auto_join" ? "active" : ""}`}
+                  onClick={() => setJoinPolicy("auto_join")}
+                >
+                  <span>✅ Auto-join</span>
+                  <span className="seg-sub">Langsung join</span>
+                </button>
+                <button
+                  type="button"
+                  className={`segmented-option ${joinPolicy === "need_approval" ? "active" : ""}`}
+                  onClick={() => setJoinPolicy("need_approval")}
+                >
+                  <span>📩 Approval</span>
+                  <span className="seg-sub">Host review</span>
+                </button>
+              </div>
+            </div>
+          )}
         </section>
 
         {/* Match config — lock kalau hasRounds */}

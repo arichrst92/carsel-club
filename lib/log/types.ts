@@ -24,6 +24,9 @@ export type EventName =
   | "match_swap" // Sprint 15
   | "session_edited" // Sprint 18
   | "guest_joined" // Sprint 19
+  | "join_requested" // Sprint 20
+  | "join_approved" // Sprint 20
+  | "join_rejected" // Sprint 20
   | "match_started" // Sprint 4
   | "match_completed"
   | "match_reverted" // Sprint 4

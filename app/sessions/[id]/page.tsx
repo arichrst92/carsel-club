@@ -20,6 +20,11 @@ import { SessionStatusTimeline } from "@/components/sessions/SessionStatusTimeli
 import { CoverPhotoUploader } from "@/components/sessions/CoverPhotoUploader";
 import { GroupPhotoGallery } from "@/components/sessions/GroupPhotoGallery";
 import { listGroupPhotos } from "@/lib/db/queries/session-photos";
+import { JoinRequestInbox } from "@/components/sessions/JoinRequestInbox";
+import {
+  listPendingJoinRequests,
+  getRequestStatusForUser,
+} from "@/lib/db/queries/join-requests";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -58,6 +63,10 @@ export default async function SessionDetailPage({ params }: PageProps) {
   const rounds = await getRoundsWithMatches(id);
   const groupPhotos = await listGroupPhotos(id);
   const isParticipant = participants.some((p) => p.userId === user.id);
+  const pendingRequests = staff ? await listPendingJoinRequests(id) : [];
+  const myRequestStatus = !isParticipant
+    ? await getRequestStatusForUser(id, user.id)
+    : null;
   const canJoinPublic =
     !isParticipant &&
     session.visibility === "public" &&
@@ -278,7 +287,11 @@ export default async function SessionDetailPage({ params }: PageProps) {
                 Kamu belum join session ini. Tap di bawah untuk langsung join
                 sebagai pemain.
               </p>
-              <JoinPublicSessionButton sessionId={session.id} />
+              <JoinPublicSessionButton
+              sessionId={session.id}
+              joinPolicy={session.joinPolicy}
+              existingRequestStatus={myRequestStatus}
+            />
             </div>
           </section>
         )}
@@ -591,6 +604,11 @@ export default async function SessionDetailPage({ params }: PageProps) {
             </Link>
           )}
         </section>
+
+        {/* JOIN REQUESTS INBOX — staff only */}
+        {staff && pendingRequests.length > 0 && (
+          <JoinRequestInbox requests={pendingRequests} />
+        )}
 
         {/* GROUP PHOTOS — visible to anyone who can view session */}
         <GroupPhotoGallery

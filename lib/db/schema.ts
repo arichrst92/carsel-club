@@ -67,6 +67,17 @@ export const generationMethodEnum = pgEnum("generation_method", [
   "manual_drag",
 ]);
 
+export const joinPolicyEnum = pgEnum("join_policy", [
+  "auto_join",
+  "need_approval",
+]);
+
+export const joinRequestStatusEnum = pgEnum("join_request_status", [
+  "pending",
+  "accepted",
+  "rejected",
+]);
+
 export const logTypeEnum = pgEnum("log_type", ["log", "event"]);
 export const logLevelEnum = pgEnum("log_level", [
   "info",
@@ -197,6 +208,7 @@ export const sessions = pgTable(
     format: sessionFormatEnum("format").notNull().default("americano"),
     playType: sessionPlayTypeEnum("play_type").notNull().default("freeplay"),
     visibility: sessionVisibilityEnum("visibility").notNull().default("private"),
+    joinPolicy: joinPolicyEnum("join_policy").notNull().default("auto_join"),
     numCourts: integer("num_courts").notNull().default(1),
     status: sessionStatusEnum("status").notNull().default("upcoming"),
     fixPartners: boolean("fix_partners").notNull().default(false),
@@ -375,6 +387,37 @@ export const matches = pgTable(
       "scores_non_negative",
       sql`${t.team1Score} >= 0 AND ${t.team2Score} >= 0`
     ),
+  ]
+);
+
+// ============================================================
+// SESSION JOIN REQUESTS — Sprint 20 (approval flow untuk public session)
+// ============================================================
+
+export const sessionJoinRequests = pgTable(
+  "session_join_requests",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    sessionId: uuid("session_id")
+      .notNull()
+      .references(() => sessions.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    status: joinRequestStatusEnum("status").notNull().default("pending"),
+    requestedAt: timestamp("requested_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewedByUserId: uuid("reviewed_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    message: text("message"), // optional note dari requester
+  },
+  (t) => [
+    index("idx_join_req_session_status").on(t.sessionId, t.status),
+    index("idx_join_req_user").on(t.userId),
+    unique("uq_join_req_session_user_pending").on(t.sessionId, t.userId),
   ]
 );
 

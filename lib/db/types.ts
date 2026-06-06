@@ -18,6 +18,7 @@ import type {
   referrals,
   appLogs,
   sessionGroupPhotos,
+  sessionJoinRequests,
 } from "./schema";
 
 // Select types (rows yang di-fetch dari DB)
@@ -31,6 +32,7 @@ export type OtpVerification = InferSelectModel<typeof otpVerifications>;
 export type Referral = InferSelectModel<typeof referrals>;
 export type AppLog = InferSelectModel<typeof appLogs>;
 export type SessionGroupPhoto = InferSelectModel<typeof sessionGroupPhotos>;
+export type SessionJoinRequest = InferSelectModel<typeof sessionJoinRequests>;
 
 // Insert types (rows yang di-create)
 export type NewUser = InferInsertModel<typeof users>;
@@ -42,3 +44,4 @@ export type NewOtpVerification = InferInsertModel<typeof otpVerifications>;
 export type NewReferral = InferInsertModel<typeof referrals>;
 export type NewAppLog = InferInsertModel<typeof appLogs>;
 export type NewSessionGroupPhoto = InferInsertModel<typeof sessionGroupPhotos>;
+export type NewSessionJoinRequest = InferInsertModel<typeof sessionJoinRequests>;

@@ -191,6 +191,7 @@ const EditSessionSchema = z.object({
     ),
   description: z.string().trim().max(500).optional(),
   visibility: z.enum(["private", "public"]),
+  joinPolicy: z.enum(["auto_join", "need_approval"]).optional(),
   maxRounds: z.coerce.number().int().min(1).max(50).optional(),
   // Locked-after-round1 fields (server-validate kalau dikirim)
   format: z.enum(["americano", "mexicano", "tournament"]).optional(),
@@ -239,6 +240,7 @@ export async function editSessionAction(
     scheduledEndAt: s("scheduled_end_at"),
     description: s("description"),
     visibility: s("visibility") ?? "private",
+    joinPolicy: s("join_policy"),
     maxRounds: s("max_rounds"),
     format: s("format"),
     playType: s("play_type"),
@@ -308,6 +310,9 @@ export async function editSessionAction(
     maxRounds: input.maxRounds ?? null,
     updatedAt: new Date(),
   };
+  if (input.joinPolicy !== undefined) {
+    updates.joinPolicy = input.joinPolicy;
+  }
 
   // Match config bisa di-update kalau belum ada round
   if (!hasRounds) {
