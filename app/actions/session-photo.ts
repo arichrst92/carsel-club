@@ -66,7 +66,10 @@ export async function updateCoverPhotoAction(
     return { error: "Gagal baca file." };
   }
 
-  const key = `sessions/${sessionId}/cover.webp`;
+  // Sprint 50 fix: unique filename per upload supaya browser tidak
+  // serve stale cached image. Sebelumnya fixed `cover.webp` →
+  // nginx + browser cache hold old image walaupun DB url di-update.
+  const key = `sessions/${sessionId}/cover-${nanoid(10)}.webp`;
   let savedUrl: string;
   try {
     const saved = await saveImage(buffer, "cover", key);
