@@ -1,29 +1,38 @@
 "use client";
 
 /**
- * QR Scan modal untuk add friend via QR code.
+ * QR Scan modal — reusable utk scan QR profil Carsel.
  *
  * Sprint 50: pakai `jsQR` (pure JS decoder) — works di Safari iOS,
- * Chrome iOS (WebKit), Chrome Android, Firefox, semua browser modern.
+ * Chrome iOS, Chrome Android, Firefox, semua browser modern.
  *
- * Initial implementasi pakai native BarcodeDetector tapi ternyata
- * Safari iOS & Chrome iOS belum support — jadi ganti ke jsQR universal.
+ * Caller pass `onScan(userId)` callback — modal extract userId dari
+ * URL `/u/{uuid}` lalu hand off ke caller. Tetap akan call `onClose`
+ * setelah handler selesai.
  *
- * Flow:
- * 1. getUserMedia (rear camera kalau ada)
- * 2. Tiap ~150ms: draw video frame ke offscreen canvas → extract
- *    ImageData → jsQR.decode()
- * 3. Kalau cocok URL `/u/{uuid}` → navigate ke profil
+ * Caller examples:
+ * - AddFriendActions → router.push(`/u/${userId}`)
+ * - ScanMemberButton → addMemberAction(sessionId, userId)
  */
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import jsQR from "jsqr";
 
-type Props = { onClose: () => void };
+type Props = {
+  onScan: (userId: string) => void | Promise<void>;
+  onClose: () => void;
+  /** Judul header — default "Pindai QR Teman". */
+  title?: string;
+  /** Subtitle deskriptif — default petunjuk standar. */
+  subtitle?: string;
+};
 
-export function QRScanModal({ onClose }: Props) {
-  const router = useRouter();
+export function QRScanModal({
+  onScan,
+  onClose,
+  title = "Pindai QR Teman",
+  subtitle = "Arahkan kamera ke QR Code di halaman Profil teman kamu.",
+}: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -96,10 +105,13 @@ export function QRScanModal({ onClose }: Props) {
               setMatched(userId);
               streamRef.current?.getTracks().forEach((t) => t.stop());
               streamRef.current = null;
-              setTimeout(() => {
-                router.push(`/u/${userId}`);
-                onClose();
-              }, 600);
+              setTimeout(async () => {
+                try {
+                  await onScan(userId);
+                } finally {
+                  onClose();
+                }
+              }, 500);
             }
           }
         }
@@ -174,7 +186,7 @@ export function QRScanModal({ onClose }: Props) {
               color: "var(--text-900)",
             }}
           >
-            Pindai QR Teman
+            {title}
           </div>
           <button
             type="button"
@@ -204,7 +216,7 @@ export function QRScanModal({ onClose }: Props) {
             lineHeight: 1.4,
           }}
         >
-          Arahkan kamera ke QR Code di halaman Profil teman kamu.
+          {subtitle}
         </div>
 
         <div
@@ -271,7 +283,7 @@ export function QRScanModal({ onClose }: Props) {
                 fontSize: 16,
               }}
             >
-              ✓ Profil ditemukan
+              ✓ Terdeteksi
             </div>
           )}
         </div>

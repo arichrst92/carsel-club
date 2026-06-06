@@ -10,10 +10,12 @@
  */
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { AddFriendForm } from "./AddFriendForm";
 import { QRScanModal } from "./QRScanModal";
 
 export function AddFriendActions() {
+  const router = useRouter();
   const [scanOpen, setScanOpen] = useState(false);
 
   return (
@@ -66,7 +68,12 @@ export function AddFriendActions() {
         </button>
       </div>
 
-      {scanOpen && <QRScanModal onClose={() => setScanOpen(false)} />}
+      {scanOpen && (
+        <QRScanModal
+          onScan={(userId) => router.push(`/u/${userId}`)}
+          onClose={() => setScanOpen(false)}
+        />
+      )}
     </>
   );
 }

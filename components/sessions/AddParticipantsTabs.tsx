@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { AddMemberSearch } from "./AddMemberSearch";
 import { AddGuestForm } from "./AddGuestForm";
+import { ScanMemberButton } from "./ScanMemberButton";
 
 type Tab = "member" | "guest";
 
@@ -100,9 +101,9 @@ export function AddParticipantsTabs({
             className="form-help"
             style={{ marginBottom: "var(--s-3)" }}
           >
-            Cari member dengan nomor WhatsApp mereka. Member sudah terdaftar di
-            Carsel Club.
+            Cari member via nomor WhatsApp atau pindai QR profil mereka.
           </p>
+          <ScanMemberButton sessionId={sessionId} />
           <AddMemberSearch sessionId={sessionId} />
         </section>
 
