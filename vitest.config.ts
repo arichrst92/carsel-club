@@ -90,6 +90,8 @@ export default defineConfig({
         // Sprint 40 — history filter + tier progress
         "lib/match/history-filter.ts",
         "lib/tier/progress.ts",
+        // Sprint 41 — rate-limit policy
+        "lib/auth/rate-limit-policy.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

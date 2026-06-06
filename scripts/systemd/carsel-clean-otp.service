@@ -1,0 +1,11 @@
+[Unit]
+Description=Carsel Club daily OTP cleanup
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/curl -fsS -X POST \
+  -H "Authorization: Bearer ${CRON_SECRET}" \
+  https://carsel.club/api/cron/clean-otp
+EnvironmentFile=/etc/carsel-cron.env

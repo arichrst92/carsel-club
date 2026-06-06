@@ -616,6 +616,12 @@ export const matches = pgTable(
       t.bracketRound,
       t.bracketSlot
     ),
+    // Sprint 41: per-player FK indexes for stats recompute + avoid-repeat-
+    // partners lookup at scale. Pre-existing queries scanned matches table.
+    index("idx_matches_t1p1").on(t.team1P1Id),
+    index("idx_matches_t1p2").on(t.team1P2Id),
+    index("idx_matches_t2p1").on(t.team2P1Id),
+    index("idx_matches_t2p2").on(t.team2P2Id),
     check(
       "distinct_players",
       sql`

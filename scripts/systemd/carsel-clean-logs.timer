@@ -1,0 +1,10 @@
+[Unit]
+Description=Carsel Club log cleanup weekly (Sundays 03:00 WIB)
+
+[Timer]
+OnCalendar=Sun *-*-* 20:00:00
+Persistent=true
+Unit=carsel-clean-logs.service
+
+[Install]
+WantedBy=timers.target

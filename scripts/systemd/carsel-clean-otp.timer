@@ -1,0 +1,10 @@
+[Unit]
+Description=Carsel Club OTP cleanup daily (03:30 WIB)
+
+[Timer]
+OnCalendar=*-*-* 20:30:00
+Persistent=true
+Unit=carsel-clean-otp.service
+
+[Install]
+WantedBy=timers.target
