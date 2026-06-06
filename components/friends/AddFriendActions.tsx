@@ -62,7 +62,7 @@ export function AddFriendActions() {
             <rect x="3" y="14" width="7" height="7" rx="1" />
             <path d="M14 14h3M20 14h1M14 17v3M14 21h7M21 17v4" />
           </svg>
-          Scan QR Teman
+          Pindai QR Teman
         </button>
       </div>
 

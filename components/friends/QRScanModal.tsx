@@ -3,40 +3,29 @@
 /**
  * QR Scan modal untuk add friend via QR code.
  *
- * Pakai native BarcodeDetector API (Chrome Android, Safari iOS 16+).
- * Tanpa external lib supaya bundle kecil. Fallback message kalau browser
- * tidak support — minta user pakai mobile.
+ * Sprint 50: pakai `jsQR` (pure JS decoder) — works di Safari iOS,
+ * Chrome iOS (WebKit), Chrome Android, Firefox, semua browser modern.
+ *
+ * Initial implementasi pakai native BarcodeDetector tapi ternyata
+ * Safari iOS & Chrome iOS belum support — jadi ganti ke jsQR universal.
  *
  * Flow:
- * 1. Request camera (getUserMedia)
- * 2. Polling tiap ~250ms — detect QR di frame
- * 3. QR berisi URL → kalau path `/u/{userId}` → router.push ke profil
- * 4. User klik Add Friend di profil utk send request
+ * 1. getUserMedia (rear camera kalau ada)
+ * 2. Tiap ~150ms: draw video frame ke offscreen canvas → extract
+ *    ImageData → jsQR.decode()
+ * 3. Kalau cocok URL `/u/{uuid}` → navigate ke profil
  */
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import jsQR from "jsqr";
 
 type Props = { onClose: () => void };
-
-type DetectedBarcode = { rawValue: string };
-type BarcodeDetectorCtor = new (options?: {
-  formats?: string[];
-}) => {
-  detect: (image: ImageBitmapSource) => Promise<DetectedBarcode[]>;
-};
-
-function getBarcodeDetector(): BarcodeDetectorCtor | null {
-  if (typeof window === "undefined") return null;
-  const ctor = (
-    window as Window & { BarcodeDetector?: BarcodeDetectorCtor }
-  ).BarcodeDetector;
-  return ctor ?? null;
-}
 
 export function QRScanModal({ onClose }: Props) {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(true);
@@ -44,18 +33,18 @@ export function QRScanModal({ onClose }: Props) {
 
   useEffect(() => {
     let mounted = true;
-    let pollId: ReturnType<typeof setInterval> | null = null;
-    const Detector = getBarcodeDetector();
+    let rafId: number | null = null;
+    let lastScanTs = 0;
 
     async function start() {
-      if (!Detector) {
-        setError(
-          "Browser ini belum mendukung pemindai QR. Coba pakai HP (Safari/Chrome terbaru)."
-        );
-        setBusy(false);
-        return;
-      }
       try {
+        if (!navigator.mediaDevices?.getUserMedia) {
+          setError(
+            "Browser ini tidak mendukung akses kamera. Coba update browser kamu."
+          );
+          setBusy(false);
+          return;
+        }
         const stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: { ideal: "environment" } },
           audio: false,
@@ -71,40 +60,62 @@ export function QRScanModal({ onClose }: Props) {
         await video.play();
         setBusy(false);
 
-        const detector = new Detector({ formats: ["qr_code"] });
+        // Offscreen canvas untuk frame extraction
+        const canvas = document.createElement("canvas");
+        canvasRef.current = canvas;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (!ctx) {
+          setError("Browser tidak mendukung Canvas 2D.");
+          return;
+        }
 
-        pollId = setInterval(async () => {
-          if (!mounted || !video.videoWidth) return;
-          try {
-            const codes = await detector.detect(video);
-            for (const c of codes) {
-              const userId = parseFriendUrl(c.rawValue);
-              if (userId) {
-                setMatched(userId);
-                if (pollId) clearInterval(pollId);
-                // Stop camera
-                streamRef.current?.getTracks().forEach((t) => t.stop());
-                streamRef.current = null;
-                // Navigate
-                setTimeout(() => {
-                  router.push(`/u/${userId}`);
-                  onClose();
-                }, 600);
-                return;
-              }
+        function scan() {
+          if (!mounted) return;
+          rafId = requestAnimationFrame(scan);
+          if (!video || video.videoWidth === 0) return;
+          const now = performance.now();
+          if (now - lastScanTs < 150) return; // throttle ~6-7 fps
+          lastScanTs = now;
+
+          // Downscale untuk speed — jsQR cukup pakai 640px lebar max
+          const targetW = Math.min(video.videoWidth, 640);
+          const scale = targetW / video.videoWidth;
+          const targetH = Math.round(video.videoHeight * scale);
+          canvas.width = targetW;
+          canvas.height = targetH;
+          ctx!.drawImage(video, 0, 0, targetW, targetH);
+          const imgData = ctx!.getImageData(0, 0, targetW, targetH);
+
+          const code = jsQR(imgData.data, imgData.width, imgData.height, {
+            inversionAttempts: "dontInvert",
+          });
+          if (code && code.data) {
+            const userId = parseFriendUrl(code.data);
+            if (userId) {
+              if (rafId) cancelAnimationFrame(rafId);
+              setMatched(userId);
+              streamRef.current?.getTracks().forEach((t) => t.stop());
+              streamRef.current = null;
+              setTimeout(() => {
+                router.push(`/u/${userId}`);
+                onClose();
+              }, 600);
             }
-          } catch {
-            // ignore intermittent detect errors
           }
-        }, 250);
+        }
+        rafId = requestAnimationFrame(scan);
       } catch (e) {
         const err = e as Error;
         if (err.name === "NotAllowedError") {
           setError(
-            "Akses kamera ditolak. Izinkan kamera di setting browser untuk scan QR."
+            "Akses kamera ditolak. Izinkan kamera di setting browser, lalu coba lagi."
           );
         } else if (err.name === "NotFoundError") {
           setError("Kamera tidak ditemukan di perangkat ini.");
+        } else if (err.name === "NotReadableError") {
+          setError(
+            "Kamera sedang dipakai aplikasi lain. Tutup aplikasi tsb lalu coba lagi."
+          );
         } else {
           setError(err.message || "Gagal membuka kamera.");
         }
@@ -115,7 +126,7 @@ export function QRScanModal({ onClose }: Props) {
     start();
     return () => {
       mounted = false;
-      if (pollId) clearInterval(pollId);
+      if (rafId) cancelAnimationFrame(rafId);
       streamRef.current?.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
     };
@@ -163,7 +174,7 @@ export function QRScanModal({ onClose }: Props) {
               color: "var(--text-900)",
             }}
           >
-            Scan QR Teman
+            Pindai QR Teman
           </div>
           <button
             type="button"
@@ -193,10 +204,9 @@ export function QRScanModal({ onClose }: Props) {
             lineHeight: 1.4,
           }}
         >
-          Arahkan kamera ke QR Code teman di halaman Profil mereka.
+          Arahkan kamera ke QR Code di halaman Profil teman kamu.
         </div>
 
-        {/* Camera viewport */}
         <div
           style={{
             position: "relative",
@@ -311,7 +321,6 @@ export function QRScanModal({ onClose }: Props) {
  * - https://carsel.club/u/{uuid}
  * - http://carsel.club/u/{uuid}
  * - /u/{uuid}
- * Return userId atau null kalau bukan profile link Carsel.
  */
 export function parseFriendUrl(raw: string): string | null {
   if (!raw) return null;
