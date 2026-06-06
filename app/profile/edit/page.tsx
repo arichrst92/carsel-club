@@ -4,7 +4,7 @@ import { EditProfileForm } from "@/components/profile/EditProfileForm";
 import { AvatarUploader } from "@/components/profile/AvatarUploader";
 
 export const metadata = {
-  title: "Edit Profile",
+  title: "Ubah Profil",
 };
 
 export default async function EditProfilePage() {
@@ -28,7 +28,7 @@ export default async function EditProfilePage() {
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
         </Link>
-        <h2 className="subscreen-title">Edit Profile</h2>
+        <h2 className="subscreen-title">Ubah Profil</h2>
         <div style={{ width: 40 }} />
       </header>
 

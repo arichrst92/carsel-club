@@ -14,7 +14,7 @@ import { sessions, matchRoundSets } from "@/lib/db/schema";
 import { isSessionStaff } from "@/lib/db/queries/sessions";
 import { EditSessionForm } from "@/components/sessions/EditSessionForm";
 
-export const metadata = { title: "Edit Session" };
+export const metadata = { title: "Ubah Sesi" };
 
 type PageProps = { params: Promise<{ id: string }> };
 
@@ -64,7 +64,7 @@ export default async function EditSessionPage({ params }: PageProps) {
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
         </Link>
-        <h2 className="subscreen-title">Edit Session</h2>
+        <h2 className="subscreen-title">Ubah Sesi</h2>
         <div style={{ width: 40 }} />
       </header>
 

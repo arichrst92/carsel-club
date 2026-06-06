@@ -1,5 +1,5 @@
 /**
- * Match History page (Sprint 49 alignment).
+ * Riwayat Pertandingan page (Sprint 49 alignment).
  *
  * Sesuai prototype `docs/CarselClubPrototype/match-history.html` —
  * `history-item` style dgn result-badge (W/L + points), score di hi-head,
@@ -24,7 +24,7 @@ import {
 } from "@/lib/match/history-filter";
 
 export const metadata = {
-  title: "Match History",
+  title: "Riwayat Pertandingan",
 };
 
 export const dynamic = "force-dynamic";
@@ -119,7 +119,7 @@ export default async function MatchHistoryPage({
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
         </Link>
-        <h2 className="subscreen-title">Match History</h2>
+        <h2 className="subscreen-title">Riwayat Pertandingan</h2>
         <div style={{ width: 40 }} />
       </header>
 

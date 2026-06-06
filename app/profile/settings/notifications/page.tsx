@@ -1,5 +1,5 @@
 /**
- * Notification preferences page (Sprint 26).
+ * Preferensi Notifikasi page (Sprint 26).
  *
  * Refs:
  * - DB: user_notification_prefs
@@ -13,7 +13,7 @@ import { NotificationPrefsForm } from "@/components/notifications/NotificationPr
 import { PushToggle } from "@/components/notifications/PushToggle";
 
 export const metadata = {
-  title: "Notification preferences",
+  title: "Preferensi Notifikasi",
 };
 
 export const dynamic = "force-dynamic";

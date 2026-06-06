@@ -45,8 +45,8 @@ const STATUS_LABEL: Record<
   "upcoming" | "live" | "completed" | "cancelled",
   { label: string; icon: string }
 > = {
-  upcoming: { label: "Upcoming", icon: "📅" },
-  live: { label: "Live", icon: "🔴" },
+  upcoming: { label: "Mendatang", icon: "📅" },
+  live: { label: "Berlangsung", icon: "🔴" },
   completed: { label: "Selesai", icon: "✅" },
   cancelled: { label: "Dibatalkan", icon: "❌" },
 };
@@ -111,13 +111,13 @@ export default async function SessionDetailPage({ params }: PageProps) {
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
         </Link>
-        <h2 className="subscreen-title">Session Detail</h2>
+        <h2 className="subscreen-title">Detail Sesi</h2>
         {staff && !isTerminal ? (
           <Link
             href={`/sessions/${session.id}/edit`}
             className="subscreen-action"
-            aria-label="Edit Session"
-            title="Edit Session"
+            aria-label="Ubah Sesi"
+            title="Ubah Sesi"
             style={{
               fontFamily: "var(--font-display)",
               fontWeight: 700,

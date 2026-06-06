@@ -207,7 +207,7 @@ export function PadelCourtVisual(props: PadelCourtVisualProps) {
               className="btn-primary-lg"
               style={{ width: "100%" }}
             >
-              {isPending ? "Saving..." : "End Match"}
+              {isPending ? "Menyimpan…" : "End Match"}
             </button>
           )}
 
@@ -249,7 +249,7 @@ export function PadelCourtVisual(props: PadelCourtVisualProps) {
                 className="btn-primary"
                 style={{ flex: 1 }}
               >
-                {isPending ? "Saving..." : "Save Edit"}
+                {isPending ? "Menyimpan…" : "Simpan Perubahan"}
               </button>
             </div>
           )}

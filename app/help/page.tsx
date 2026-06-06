@@ -97,7 +97,7 @@ const FAQ_SECTIONS: { title: string; items: { q: string; a: string }[] }[] = [
     ],
   },
   {
-    title: "Notifications",
+    title: "Notifikasi",
     items: [
       {
         q: "Notif apa saja yang aku terima?",
@@ -118,7 +118,7 @@ const FAQ_SECTIONS: { title: string; items: { q: string; a: string }[] }[] = [
     items: [
       {
         q: "Siapa yang bisa lihat profil aku?",
-        a: "Default Public (siapa saja yang punya link). Bisa diset Friends (cuma friend) atau Private (cuma kamu) di Profile → Edit Profile.",
+        a: "Default Public (siapa saja yang punya link). Bisa diset Friends (cuma friend) atau Private (cuma kamu) di Profile → Ubah Profil.",
       },
       {
         q: "Cara matikan friend request dari orang asing?",

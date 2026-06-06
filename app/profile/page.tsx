@@ -480,7 +480,7 @@ export default async function ProfilePage() {
             <StatCard
               variant="teal"
               value={profile.totalMatches}
-              label="Match Played"
+              label="Total Main"
               icon="🎯"
             />
             <StatCard
