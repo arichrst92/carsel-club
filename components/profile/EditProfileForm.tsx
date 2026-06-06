@@ -7,6 +7,7 @@ import { updateProfileAction } from "@/app/actions/profile";
 type Props = {
   initialDisplayName: string;
   initialCity: string;
+  initialVisibility?: "public" | "friends" | "private";
 };
 
 const POPULAR_CITIES = [
@@ -23,10 +24,12 @@ const POPULAR_CITIES = [
 export function EditProfileForm({
   initialDisplayName,
   initialCity,
+  initialVisibility = "public",
 }: Props) {
   const router = useRouter();
   const [displayName, setDisplayName] = useState(initialDisplayName);
   const [city, setCity] = useState(initialCity);
+  const [visibility, setVisibility] = useState(initialVisibility);
   const [customCity, setCustomCity] = useState(
     !!initialCity && !POPULAR_CITIES.some((c) => c.name === initialCity)
   );
@@ -45,6 +48,7 @@ export function EditProfileForm({
       const fd = new FormData();
       fd.set("display_name", displayName.trim());
       fd.set("city", city.trim());
+      fd.set("profile_visibility", visibility);
       const result = await updateProfileAction(null, fd);
       if (result?.error) {
         setError(result.error);
@@ -167,6 +171,37 @@ export function EditProfileForm({
                 maxLength={50}
               />
             )}
+          </div>
+        </section>
+
+        {/* Privacy (Sprint 24) */}
+        <section className="form-section">
+          <div className="form-group">
+            <label className="form-label">Privacy Profile</label>
+            <div className="segmented" style={{ flexWrap: "wrap" }}>
+              {(
+                [
+                  { v: "public", label: "🌍 Public", sub: "Siapa pun" },
+                  { v: "friends", label: "👥 Friends", sub: "Friend saja" },
+                  { v: "private", label: "🔒 Private", sub: "Hanya kamu" },
+                ] as const
+              ).map((opt) => (
+                <button
+                  key={opt.v}
+                  type="button"
+                  className={`segmented-option ${
+                    visibility === opt.v ? "active" : ""
+                  }`}
+                  onClick={() => setVisibility(opt.v)}
+                >
+                  <span>{opt.label}</span>
+                  <span className="seg-sub">{opt.sub}</span>
+                </button>
+              ))}
+            </div>
+            <p className="form-help">
+              Atur siapa yang bisa lihat profile kamu di /u/[id].
+            </p>
           </div>
         </section>
 

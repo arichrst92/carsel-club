@@ -34,6 +34,7 @@ export type EventName =
   | "user_unblocked" // Sprint 23
   | "user_followed" // Sprint 23
   | "user_unfollowed" // Sprint 23
+  | "profile_visibility_changed" // Sprint 24
   | "match_started" // Sprint 4
   | "match_completed"
   | "match_reverted" // Sprint 4

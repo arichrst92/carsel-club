@@ -26,6 +26,7 @@ export type PublicProfile = {
   tierColor: string | null;
   tierOrder: number | null;
   hostedCount: number;
+  profileVisibility: "public" | "friends" | "private";
 };
 
 export async function getPublicProfile(
@@ -45,6 +46,7 @@ export async function getPublicProfile(
       tierName: tierDefinitions.name,
       tierColor: tierDefinitions.color,
       tierOrder: tierDefinitions.displayOrder,
+      profileVisibility: users.profileVisibility,
     })
     .from(users)
     .leftJoin(tierDefinitions, eq(tierDefinitions.id, users.currentTierId))

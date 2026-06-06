@@ -7,6 +7,7 @@ import { logoutAction } from "@/app/actions/auth";
 import { winRate } from "@/lib/utils";
 import { ReferralShare } from "@/components/profile/ReferralShare";
 import { ProfileShareButton } from "@/components/profile/ProfileShareButton";
+import { ProfileQRButton } from "@/components/profile/ProfileQRButton";
 import {
   ACHIEVEMENTS,
   getUnlockedCount,
@@ -515,12 +516,25 @@ export default async function ProfilePage() {
         </section>
 
         {/* PROFILE SHARE */}
-        <section style={{ marginBottom: "var(--s-2)" }}>
-          <ProfileShareButton
+        <section
+          style={{
+            display: "flex",
+            gap: 8,
+            marginBottom: "var(--s-2)",
+            alignItems: "center",
+          }}
+        >
+          <div style={{ flex: 1 }}>
+            <ProfileShareButton
+              userId={profile.id}
+              displayName={profile.displayName}
+              tierName={profile.tierName}
+              totalPoints={profile.totalPoints}
+            />
+          </div>
+          <ProfileQRButton
             userId={profile.id}
             displayName={profile.displayName}
-            tierName={profile.tierName}
-            totalPoints={profile.totalPoints}
           />
         </section>
 

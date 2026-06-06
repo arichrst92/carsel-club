@@ -16,6 +16,7 @@ import {
   countFollowers,
   countFollowing,
 } from "@/lib/db/queries/social";
+import { areFriends } from "@/lib/db/queries/friends";
 import { FollowBlockActions } from "@/components/social/FollowBlockActions";
 
 export const dynamic = "force-dynamic";
@@ -57,6 +58,22 @@ export default async function PublicProfilePage({ params }: Props) {
   if (!profile) notFound();
 
   const session = await getSession();
+  const isOwnProfile = session?.userId === userId;
+
+  // Sprint 24: privacy enforcement
+  const isFriend =
+    session && !isOwnProfile
+      ? await areFriends(session.userId, userId)
+      : false;
+  const canViewProfile =
+    isOwnProfile ||
+    profile.profileVisibility === "public" ||
+    (profile.profileVisibility === "friends" && isFriend);
+
+  if (!canViewProfile) {
+    return <PrivateProfileView displayName={profile.displayName} />;
+  }
+
   const wr = winRate(profile.totalWins, profile.totalMatches);
   const avatarUrl = toAbsoluteUrl(profile.avatarUrl);
   const initial = (profile.displayName.trim()[0] ?? "?").toUpperCase();
@@ -69,7 +86,6 @@ export default async function PublicProfilePage({ params }: Props) {
       session ? isFollowing(session.userId, userId) : Promise.resolve(false),
       session ? isUserBlocked(session.userId, userId) : Promise.resolve(false),
     ]);
-  const isOwnProfile = session?.userId === userId;
 
   return (
     <div className="app-shell">
@@ -281,6 +297,40 @@ export default async function PublicProfilePage({ params }: Props) {
             {session ? "Buka App" : "Daftar Sekarang"}
           </Link>
         </section>
+      </main>
+    </div>
+  );
+}
+
+function PrivateProfileView({ displayName }: { displayName: string }) {
+  return (
+    <div className="app-shell">
+      <main className="app-content">
+        <div className="empty-state" style={{ marginTop: "var(--s-6)" }}>
+          <div className="empty-state-icon">🔒</div>
+          <div className="empty-state-title">Profile Private</div>
+          <div className="empty-state-text">
+            {displayName} memilih untuk tidak menampilkan profile-nya secara
+            publik.
+          </div>
+          <Link
+            href="/"
+            style={{
+              marginTop: "var(--s-3)",
+              display: "inline-block",
+              padding: "10px 18px",
+              borderRadius: "var(--r-full)",
+              background: "var(--primary)",
+              color: "#fff",
+              fontFamily: "var(--font-display)",
+              fontWeight: 800,
+              fontSize: 12,
+              textDecoration: "none",
+            }}
+          >
+            Beranda
+          </Link>
+        </div>
       </main>
     </div>
   );

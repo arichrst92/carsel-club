@@ -84,6 +84,12 @@ export const friendRequestStatusEnum = pgEnum("friend_request_status", [
   "rejected",
 ]);
 
+export const profileVisibilityEnum = pgEnum("profile_visibility", [
+  "public",
+  "friends",
+  "private",
+]);
+
 export const logTypeEnum = pgEnum("log_type", ["log", "event"]);
 export const logLevelEnum = pgEnum("log_level", [
   "info",
@@ -132,6 +138,10 @@ export const users = pgTable(
       () => tierDefinitions.id
     ).default(1),
     isAdmin: boolean("is_admin").notNull().default(false),
+    // Sprint 24: privacy untuk public profile view
+    profileVisibility: profileVisibilityEnum("profile_visibility")
+      .notNull()
+      .default("public"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

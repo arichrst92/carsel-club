@@ -50,6 +50,13 @@
       "when": 1780722630385,
       "tag": "0006_burly_mephistopheles",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1780722897117,
+      "tag": "0007_overjoyed_scrambler",
+      "breakpoints": true
     }
   ]
 }

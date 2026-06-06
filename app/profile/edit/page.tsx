@@ -40,6 +40,7 @@ export default async function EditProfilePage() {
       <EditProfileForm
         initialDisplayName={user.displayName}
         initialCity={user.city ?? ""}
+        initialVisibility={user.profileVisibility}
       />
     </div>
   );
