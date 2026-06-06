@@ -25,14 +25,13 @@ type BeforeInstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
-export type InstallPromptBannerProps = {
-  hostedCount: number;
-  totalMatches: number;
-};
-
 type Mode = "hidden" | "android" | "ios";
 
-export function InstallPromptBanner(props: InstallPromptBannerProps) {
+/**
+ * Sprint 50: drop engagement-gate signals. Always-on (kecuali dismissed
+ * atau already installed). Bisa di-render di layout / multi page.
+ */
+export function InstallPromptBanner() {
   const [mode, setMode] = useState<Mode>("hidden");
   const [promptEvent, setPromptEvent] =
     useState<BeforeInstallPromptEvent | null>(null);
@@ -48,14 +47,12 @@ export function InstallPromptBanner(props: InstallPromptBannerProps) {
       window.localStorage?.getItem(INSTALL_DISMISS_KEY) === "1";
 
     const isIos = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    // iOS Safari → manual instruction path
+    // iOS Safari → manual instruction path (no beforeinstallprompt event)
     if (isIos) {
       const decision = shouldShowInstallPrompt({
-        hostedCount: props.hostedCount,
-        totalMatches: props.totalMatches,
         alreadyInstalled: false,
         previouslyDismissed: dismissed,
-        installSupported: true, // we surface manual hint
+        installSupported: true,
       });
       if (decision.show) setMode("ios");
       return;
@@ -65,8 +62,6 @@ export function InstallPromptBanner(props: InstallPromptBannerProps) {
       e.preventDefault();
       const evt = e as BeforeInstallPromptEvent;
       const decision = shouldShowInstallPrompt({
-        hostedCount: props.hostedCount,
-        totalMatches: props.totalMatches,
         alreadyInstalled: false,
         previouslyDismissed: dismissed,
         installSupported: true,
@@ -85,7 +80,7 @@ export function InstallPromptBanner(props: InstallPromptBannerProps) {
         "beforeinstallprompt",
         handleBeforeInstall as EventListener
       );
-  }, [props.hostedCount, props.totalMatches]);
+  }, []);
 
   function dismiss() {
     try {
@@ -143,7 +138,7 @@ export function InstallPromptBanner(props: InstallPromptBannerProps) {
             color: "var(--text-900)",
           }}
         >
-          Install Carsel Club
+          Pasang Carsel Club
         </div>
         <div
           style={{
@@ -154,8 +149,8 @@ export function InstallPromptBanner(props: InstallPromptBannerProps) {
           }}
         >
           {mode === "ios"
-            ? "Tap Share → Add to Home Screen"
-            : "Akses lebih cepat dari home screen"}
+            ? "Tap ikon Bagikan → Tambahkan ke Layar Awal"
+            : "Akses cepat dari layar utama, seperti app asli."}
         </div>
       </div>
       <div style={{ display: "flex", gap: "var(--s-1)" }}>
@@ -169,7 +164,7 @@ export function InstallPromptBanner(props: InstallPromptBannerProps) {
               fontSize: 12,
             }}
           >
-            Install
+            Pasang
           </button>
         )}
         <button

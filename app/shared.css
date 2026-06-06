@@ -5986,3 +5986,18 @@ h4 { font-size: 15px; line-height: 1.4; }
   background: var(--primary);
   border-color: var(--primary);
 }
+
+/* ============================================================
+   LIFECYCLE ACTIONS (Sprint 50) — grid 2 kolom utk primary + cancel
+   ========================================================== */
+.lifecycle-actions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: stretch;
+}
+.lifecycle-actions > *:first-child { width: 100%; }
+.lifecycle-actions .danger-link {
+  white-space: nowrap;
+  padding: 10px 14px;
+}

@@ -1,28 +1,28 @@
 /**
- * Smart timing heuristic untuk "install as PWA" prompt (Sprint 33).
+ * Smart timing heuristic untuk "install as PWA" prompt.
  *
- * Decision: surface install prompt setelah user menunjukkan engagement —
- * 2+ sessions di-host ATAU 3+ matches completed. Avoid annoying brand new
- * users dengan modal di sign-in pertama.
+ * Sprint 50: drop engagement gate — user yg buka app pertama kali
+ * langsung diberi tawaran install. Rasionalnya: install PWA punya
+ * value dari hari pertama (offline, home-screen icon, full-screen
+ * mode). Engagement gate Sprint 33 terlalu konservatif.
  *
- * Once dismissed atau installed, never show again (localStorage flag in client).
+ * Once dismissed atau installed, never show again (localStorage flag).
  *
  * Pure — testable inputs only.
  */
 
 export type InstallPromptSignals = {
-  hostedCount: number;
-  totalMatches: number;
+  /** Sudah ter-install sebagai PWA / standalone? */
   alreadyInstalled: boolean;
-  /** Has user dismissed di session lain? (passed in from localStorage by client) */
+  /** Has user dismissed di session lain? (passed in from localStorage) */
   previouslyDismissed: boolean;
-  /** Browser supports beforeinstallprompt? */
+  /** Browser supports beforeinstallprompt? (Android Chrome / Edge) */
   installSupported: boolean;
 };
 
 export type InstallPromptDecision =
-  | { show: true; reason: "engaged" }
-  | { show: false; reason: "installed" | "dismissed" | "unsupported" | "not_engaged" };
+  | { show: true; reason: "eligible" }
+  | { show: false; reason: "installed" | "dismissed" | "unsupported" };
 
 export function shouldShowInstallPrompt(
   signals: InstallPromptSignals
@@ -31,9 +31,7 @@ export function shouldShowInstallPrompt(
   if (signals.previouslyDismissed) return { show: false, reason: "dismissed" };
   if (!signals.installSupported)
     return { show: false, reason: "unsupported" };
-  const engaged = signals.hostedCount >= 2 || signals.totalMatches >= 3;
-  if (!engaged) return { show: false, reason: "not_engaged" };
-  return { show: true, reason: "engaged" };
+  return { show: true, reason: "eligible" };
 }
 
 /** localStorage key untuk dismissal flag */

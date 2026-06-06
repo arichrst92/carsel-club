@@ -646,32 +646,45 @@ export default async function SessionDetailPage({ params }: PageProps) {
 
         {/* LIFECYCLE ACTIONS — host/co-host only */}
         {staff && (
-          <section
-            style={{
-              marginTop: "var(--s-2)",
-              display: "flex",
-              flexDirection: "column",
-              gap: 8,
-            }}
-          >
+          <section className="form-section" style={{ marginTop: "var(--s-2)" }}>
+            <div className="form-section-head">
+              <div className="sec-icon" aria-hidden>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v6l4 2" />
+                </svg>
+              </div>
+              <h3>Status Sesi</h3>
+            </div>
+
             <SessionStatusTimeline current={session.status} />
 
+            {/* Primary action + Batal di grid 2 kolom — lebih hemat ruang */}
             {session.status === "upcoming" && (
-              <>
+              <div className="lifecycle-actions">
                 <StartSessionButton sessionId={session.id} />
                 <CancelSessionButton sessionId={session.id} />
-              </>
+              </div>
             )}
 
             {session.status === "live" && (
-              <>
+              <div className="lifecycle-actions">
                 <EndSessionButton
                   sessionId={session.id}
                   completedMatches={completedMatches}
                   pendingMatches={pendingMatches}
                 />
                 <CancelSessionButton sessionId={session.id} />
-              </>
+              </div>
             )}
 
             {isTerminal && (

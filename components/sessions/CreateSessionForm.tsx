@@ -298,12 +298,12 @@ function Step1Info({
 }) {
   return (
     <>
-      <h2 className="wizard-step-title">Info Session</h2>
+      <h2 className="wizard-step-title">Info Sesi</h2>
 
       <section className="form-section">
         <div className="form-group">
           <label className="form-label">
-            Nama Session <span className="req">*</span>
+            Nama Sesi <span className="req">*</span>
           </label>
           <input
             type="text"
@@ -314,7 +314,7 @@ function Step1Info({
             maxLength={60}
           />
           <p className="form-help">
-            Beri nama yang mudah diingat untuk session kamu.
+            Beri nama yang mudah diingat untuk sesi kamu.
           </p>
         </div>
 
@@ -411,6 +411,24 @@ function Step2Location({
       <h2 className="wizard-step-title">Lokasi & Waktu</h2>
 
       <section className="form-section">
+        <div className="form-section-head">
+          <div className="sec-icon" aria-hidden>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+          </div>
+          <h3>Venue & Jadwal</h3>
+        </div>
         <div className="form-group">
           <label className="form-label">
             Venue / Lapangan <span className="req">*</span>

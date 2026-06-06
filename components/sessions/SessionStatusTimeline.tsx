@@ -30,28 +30,14 @@ export function SessionStatusTimeline({
         display: "flex",
         flexDirection: "column",
         gap: 8,
-        padding: "var(--s-3)",
-        background: "var(--bg-soft)",
-        borderRadius: "var(--r-md)",
-        border: "1px solid var(--border-light)",
       }}
     >
-      <div
-        style={{
-          fontSize: 10,
-          fontWeight: 800,
-          color: "var(--text-500)",
-          textTransform: "uppercase",
-          letterSpacing: "0.06em",
-        }}
-      >
-        Status Session
-      </div>
       <div
         style={{
           display: "flex",
           alignItems: "center",
           gap: 4,
+          padding: "var(--s-3) var(--s-2)",
         }}
       >
         {linearStages.map((stage, idx) => {

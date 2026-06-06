@@ -135,9 +135,27 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
 
         {/* Info */}
         <section className="form-section">
+          <div className="form-section-head">
+            <div className="sec-icon" aria-hidden>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+              </svg>
+            </div>
+            <h3>Info Sesi</h3>
+          </div>
           <div className="form-group">
             <label className="form-label">
-              Nama Session <span className="req">*</span>
+              Nama Sesi <span className="req">*</span>
             </label>
             <input
               type="text"
@@ -221,8 +239,26 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
 
         {/* Visibility + Join Policy */}
         <section className="form-section">
+          <div className="form-section-head">
+            <div className="sec-icon" aria-hidden>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="11" width="18" height="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </div>
+            <h3>Akses & Visibilitas</h3>
+          </div>
           <div className="form-group">
-            <label className="form-label">Visibility</label>
+            <label className="form-label">Visibilitas</label>
             <div className="segmented">
               <button
                 type="button"

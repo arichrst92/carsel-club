@@ -20,14 +20,12 @@ function buildText({
   team2Names,
   team1Score,
   team2Score,
-  url,
 }: {
   sessionTitle: string;
   team1Names: string[];
   team2Names: string[];
   team1Score: number;
   team2Score: number;
-  url: string;
 }): string {
   const team1 = team1Names.filter(Boolean).join(" & ");
   const team2 = team2Names.filter(Boolean).join(" & ");
@@ -42,7 +40,6 @@ function buildText({
     text += `🤝 *${team1}* seri ${team1Score} - ${team2Score} vs *${team2}*\n`;
   }
 
-  text += `\n🔗 Live score & leaderboard:\n${url}\n`;
   text += `\nvia Carsel Club ⚡`;
   return text;
 }
@@ -57,33 +54,36 @@ export function ShareMatchButton({
 }: Props) {
   async function handleShare() {
     const url = `${getAppUrl()}/s/match/${matchId}`;
-    const text = buildText({
+    // Sprint 50: body text WITHOUT URL — supaya tidak duplikat saat
+    // navigator.share gabungkan text + url. URL diteruskan via param
+    // tunggal navigator.share({url}). Untuk fallback WA, URL ditempel
+    // di akhir text.
+    const bodyText = buildText({
       sessionTitle,
       team1Names,
       team2Names,
       team1Score,
       team2Score,
-      url,
     });
 
-    // Try Web Share API first (best UX on mobile)
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
           title: `${sessionTitle} — Hasil Pertandingan`,
-          text,
+          text: bodyText, // tanpa URL
           url,
         });
         return;
       } catch (e) {
-        // User cancelled, that's fine
         if ((e as Error).name === "AbortError") return;
         console.warn("Share API failed, falling back to WA:", e);
       }
     }
 
-    // Fallback: WhatsApp
-    const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    // Fallback: WhatsApp — gabungkan text + url di sini karena wa.me
+    // cuma terima 1 parameter text.
+    const waText = `${bodyText}\n\n🔗 Live score & leaderboard:\n${url}`;
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(waText)}`;
     window.open(waUrl, "_blank", "noopener,noreferrer");
   }
 

@@ -89,12 +89,8 @@ export default async function HomePage() {
         />
       )}
 
-      {/* Sprint 33: PWA install prompt (smart-timed) */}
-      <InstallPromptBanner
-        hostedCount={0}
-        totalMatches={user.totalMatches}
-      />
-      {/* hostedCount placeholder — pass via separate query later kalau perlu */}
+      {/* Sprint 50: PWA install prompt — always-on (no engagement gate) */}
+      <InstallPromptBanner />
 
       {/* HEADER */}
       <header className="app-header">
