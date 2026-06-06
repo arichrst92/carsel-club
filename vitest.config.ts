@@ -87,6 +87,9 @@ export default defineConfig({
         "lib/privacy/friend-request-policy.ts",
         // Sprint 39 — onboarding validation
         "lib/auth/onboarding.ts",
+        // Sprint 40 — history filter + tier progress
+        "lib/match/history-filter.ts",
+        "lib/tier/progress.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

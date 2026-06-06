@@ -5,17 +5,19 @@ import {
   listIncomingFriendRequests,
   listOutgoingFriendRequests,
 } from "@/lib/db/queries/friend-requests";
+import { listDiscoverSuggestions } from "@/lib/db/queries/friend-discover";
 import { AddFriendForm } from "@/components/friends/AddFriendForm";
 import { FriendRow } from "@/components/friends/FriendRow";
 import { FriendRequestRowItem } from "@/components/friends/FriendRequestRow";
+import { DiscoverRow } from "@/components/friends/DiscoverRow";
 
 export const metadata = { title: "Friends" };
 
 type SearchParams = { tab?: string };
-type FriendTab = "friends" | "incoming" | "outgoing";
+type FriendTab = "friends" | "incoming" | "outgoing" | "discover";
 
 function parseTab(v: string | undefined): FriendTab {
-  if (v === "incoming" || v === "outgoing") return v;
+  if (v === "incoming" || v === "outgoing" || v === "discover") return v;
   return "friends";
 }
 
@@ -25,13 +27,17 @@ export default async function FriendsPage({
   searchParams: Promise<SearchParams>;
 }) {
   const user = await requireUser();
-  const [friends, incoming, outgoing] = await Promise.all([
+  const params = await searchParams;
+  const tab = parseTab(params.tab);
+  // Fetch core 3 always (used for tab counters); discover only when active
+  const [friends, incoming, outgoing, discover] = await Promise.all([
     listFriendsForUser(user.id),
     listIncomingFriendRequests(user.id),
     listOutgoingFriendRequests(user.id),
+    tab === "discover"
+      ? listDiscoverSuggestions(user.id)
+      : Promise.resolve([]),
   ]);
-  const params = await searchParams;
-  const tab = parseTab(params.tab);
 
   return (
     <div className="app-shell">
@@ -61,7 +67,7 @@ export default async function FriendsPage({
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
+            gridTemplateColumns: "repeat(4, 1fr)",
             gap: 6,
             marginBottom: "var(--s-3)",
           }}
@@ -85,7 +91,45 @@ export default async function FriendsPage({
             count={outgoing.length}
             active={tab === "outgoing"}
           />
+          <TabLink
+            href="/friends?tab=discover"
+            label="Discover"
+            count={null}
+            active={tab === "discover"}
+          />
         </div>
+
+        {tab === "discover" && (
+          <section>
+            <div className="section-head">
+              <h3>Suggested ({discover.length})</h3>
+            </div>
+            {discover.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-state-icon">🔍</div>
+                <div className="empty-state-title">
+                  Belum ada suggestion
+                </div>
+                <div className="empty-state-text">
+                  Suggestion muncul dari friend-of-friend dan teman main
+                  session. Main bareng dulu untuk seed datanya.
+                </div>
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "var(--s-2)",
+                }}
+              >
+                {discover.map((s) => (
+                  <DiscoverRow key={s.id} row={s} />
+                ))}
+              </div>
+            )}
+          </section>
+        )}
 
         {tab === "friends" && (
           <section>
@@ -202,7 +246,7 @@ function TabLink({
 }: {
   href: string;
   label: string;
-  count: number;
+  count: number | null;
   active: boolean;
   highlight?: boolean;
 }) {
@@ -227,7 +271,9 @@ function TabLink({
       }}
     >
       <span>{label}</span>
-      <span style={{ fontSize: 10, opacity: 0.85 }}>{count}</span>
+      {count !== null && (
+        <span style={{ fontSize: 10, opacity: 0.85 }}>{count}</span>
+      )}
       {highlight && !active && (
         <span
           style={{

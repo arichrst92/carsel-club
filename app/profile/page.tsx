@@ -13,6 +13,7 @@ import {
   getUnlockedCount,
   type UserStatsForAchievement,
 } from "@/lib/achievements";
+import { computeTierProgress } from "@/lib/tier/progress";
 import { db } from "@/lib/db/client";
 import { eq } from "drizzle-orm";
 import { users } from "@/lib/db/schema";
@@ -114,6 +115,12 @@ export default async function ProfilePage() {
   const wr = winRate(profile.totalWins, profile.totalMatches);
   const initial = (profile.displayName.trim()[0] ?? "U").toUpperCase();
   const tierName = profile.tierName ?? "Rookie";
+  // Sprint 40: tier progress ring
+  const tierProgress = computeTierProgress(
+    profile.currentTierId ?? 1,
+    profile.totalPoints,
+    profile.totalMatches
+  );
 
   // Next tier
   const nextTier = profile.allTiers.find(
@@ -180,15 +187,35 @@ export default async function ProfilePage() {
           <div
             style={{
               position: "relative",
-              width: 96,
-              height: 96,
+              width: 112,
+              height: 112,
               margin: "0 auto var(--s-3)",
             }}
           >
+            {/* Sprint 40: conic-gradient tier progress ring */}
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                inset: 0,
+                borderRadius: "50%",
+                background: `conic-gradient(var(--primary-600) ${tierProgress.percent * 3.6}deg, var(--border-light) 0deg)`,
+                padding: 4,
+              }}
+            >
+              <div
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: "50%",
+                  background: "var(--bg-card)",
+                }}
+              />
+            </div>
             <div
               style={{
-                width: 96,
-                height: 96,
+                position: "absolute",
+                inset: 8,
                 borderRadius: "50%",
                 background: profile.avatarUrl
                   ? `url(${profile.avatarUrl}) center/cover no-repeat`
@@ -199,8 +226,6 @@ export default async function ProfilePage() {
                 fontFamily: "var(--font-display)",
                 fontWeight: 800,
                 fontSize: 36,
-                boxShadow: "var(--shadow-md)",
-                border: "4px solid var(--bg)",
               }}
             >
               {!profile.avatarUrl && initial}

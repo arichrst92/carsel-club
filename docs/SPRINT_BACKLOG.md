@@ -1078,17 +1078,39 @@ Sub-tasks:
 
 **DoD**: New user flow matches prototype onboarding.html, complete % tracked.
 
-### Sprint 40 — UX polish (spec items deferred from earlier sprints)
+### Sprint 40 — UX polish (spec items deferred from earlier sprints) ✅
 **Goal**: Polish spec-but-skipped items
 
 Sub-tasks:
-- Match History page (`/profile/matches`): add Win/Loss/Draw filter chip
-- Friends page: add "Discover" tab (friends-of-friends suggestions, +
-  recent session co-players)
-- Profile hero: tier ring conic-gradient avatar (% to next tier)
-- Help & Support: full FAQ page (replaces Sprint 37 stub) — accordion list,
-  contact form (WA link)
-- Match drag-drop generation as v1.5 polish — re-evaluate vs current swap-tap
+- Pure helpers (100% cov):
+  - lib/match/history-filter.ts — parseHistoryFilter, applyHistoryFilter,
+    VALID_HISTORY_FILTERS, HISTORY_FILTER_LABELS (4 filters: all/win/loss/draw)
+  - lib/tier/progress.ts — computeTierProgress: dual-criteria fraction
+    (min of points + matches progress), handles Master max + clamping
+- Match History (/profile/matches):
+  - URL-driven filter chips with counts per chip
+  - Empty state adapts per filter
+- Friends Discover tab:
+  - lib/db/queries/friend-discover.ts — listDiscoverSuggestions
+    (friends-of-friends + 30-day co-players, excludes self/friends/pending/
+    blocks/deleted/policy=off)
+  - Ordering: mutualFriendCount desc, then coPlayerSessionCount desc, then name
+  - components/friends/DiscoverRow with avatar + tier/city + mutual stats
+    + Add button via existing sendFriendRequestAction
+  - 4-tab nav grid expanded; Discover tab without count
+- Profile tier ring:
+  - Avatar wrapped in conic-gradient (primary-600 to border-light) showing
+    % progress to next tier
+  - Master tier shows 100% solid ring
+- Help page (replaces Sprint 37 stub):
+  - 6 sections × ~4 questions = 22 FAQ items
+  - Topics: Getting Started, Hosting, Match/Scoring, Tier/Achievements,
+    Notifications, Privacy/Data
+  - Each FAQ uses native <details> for accordion (no JS)
+  - Legal links section at bottom
+- Drag-drop match generation: formally cut. Existing tap-swap UI (Sprint 15)
+  works well on mobile; drag-drop would require additional touch-handling
+  library + accessibility work for marginal UX gain. Decision logged.
 
 **DoD**: All deferred prototype items shipped OR formally cut (with reason).
 
