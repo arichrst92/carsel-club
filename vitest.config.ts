@@ -92,6 +92,8 @@ export default defineConfig({
         "lib/tier/progress.ts",
         // Sprint 41 — rate-limit policy
         "lib/auth/rate-limit-policy.ts",
+        // Sprint 42 — Wablas migration
+        "lib/wablas/format.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

@@ -27,7 +27,9 @@
 
 - [ ] `.env.local` populated:
   - [ ] `DATABASE_URL` — production string with strong password
-  - [ ] `FONNTE_TOKEN` — real Fonnte device token
+  - [ ] `WABLAS_TOKEN` — real Wablas API token
+  - [ ] `WABLAS_API_URL` — per-account endpoint (contoh `https://solo.wablas.com/api/send-message`)
+  - [ ] `FONNTE_TOKEN` — optional, legacy fallback gateway (Sprint 42 transisi; drop di Sprint 43)
   - [ ] `AUTH_SESSION_SECRET` — `openssl rand -base64 32`
   - [ ] `NEXT_PUBLIC_APP_URL` — `https://carsel.club`
   - [ ] `UPLOAD_DIR` — `/var/www/carsel-uploads`
@@ -64,9 +66,10 @@
 
 ## 6. External services
 
-- [ ] Fonnte account active, balance topped up (~50k IDR initial)
-- [ ] Fonnte device shows as connected
+- [ ] Wablas account active, paket aktif + saldo cukup
+- [ ] Wablas device shows as connected di dashboard
 - [ ] OTP test: send to admin's WA → receive within 30s
+- [ ] Failover test: temporarily invalidate Wablas token → trigger OTP → confirm Fonnte fallback bekerja → restore Wablas
 - [ ] VAPID keys validated: `/api/push/vapid-public-key` returns key
 - [ ] Push test: subscribe via `/profile/settings/notifications`, trigger sample notification
 

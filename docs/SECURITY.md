@@ -13,9 +13,10 @@
 | Unauthorized session access | medium | private session leak | `isSessionStaff` / `canUserViewSession` gates in Server Actions, no client DB |
 | Spam friend requests | medium | UX degradation | per-target policy (anyone/friends-of-friends/off — Sprint 38) |
 | Stat manipulation | low | leaderboard pollution | host-only score input, admin recompute (Sprint 35), event log audit (`/monitor`) |
-| Account takeover via WA porting | low | account takeover | rely on telco-level WA verification + Fonnte authenticity |
+| Account takeover via WA porting | low | account takeover | rely on telco-level WA verification + Wablas/Fonnte authenticity |
+| WhatsApp gateway downtime | medium | OTP delivery blocked | Wablas primary + Fonnte failover (Sprint 42); admin manual OTP fallback via `/admin` |
 | Data exfiltration | low | privacy breach | per-user query scoping, no raw SQL exposed, export endpoint scoped to self |
-| Spam bot signup | low | resource drain | OTP requirement + Fonnte cost per send |
+| Spam bot signup | low | resource drain | OTP requirement + gateway cost per send |
 
 ## Layers of defense (today)
 
@@ -118,7 +119,7 @@ Pure helper `lib/auth/rate-limit-policy.ts` provides single decision combining:
 - Request rate (DB-backed, 3 / 10 min default)
 - Per-code attempt rate (DB column on `otp_verifications.attempts`, 5 max)
 
-Priority: requests > attempts (avoid Fonnte spend before checking attempt counter).
+Priority: requests > attempts (avoid Wablas/Fonnte spend before checking attempt counter).
 
 ## Logging & monitoring
 
@@ -130,7 +131,7 @@ Priority: requests > attempts (avoid Fonnte spend before checking attempt counte
 ## Incident response
 
 1. **Suspected compromise of admin account**: revoke via `users.isAdmin = false` SQL, rotate `AUTH_SESSION_SECRET`, force re-login (invalidates all cookies)
-2. **Mass spam signups**: enable temporary Fonnte rate-limit at gateway, drop suspicious phone prefixes via SQL `DELETE FROM otp_verifications WHERE whatsapp_number LIKE 'PATTERN%'`
+2. **Mass spam signups**: enable temporary rate-limit at Wablas/Fonnte gateway, drop suspicious phone prefixes via SQL `DELETE FROM otp_verifications WHERE whatsapp_number LIKE 'PATTERN%'`
 3. **DB corruption**: see `docs/BACKUP_RESTORE.md` restore drill (RTO < 1 hour)
 4. **Service outage**: monitoring via systemd `OnFailure=`; backup runs decoupled from app
 

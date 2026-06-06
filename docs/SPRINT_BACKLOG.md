@@ -1172,6 +1172,48 @@ Comprehensive FAQ + legal pages
 
 ---
 
+### Sprint 42 — Wablas migration (Fonnte → Wablas dengan failover) ✅
+**Goal**: Switch primary WhatsApp gateway dari Fonnte (sering down) ke Wablas (lebih reliable), tetap pertahankan Fonnte sebagai fallback selama transisi 2 minggu.
+
+Sub-tasks:
+- Pure helper (100% cov, lib/wablas/format.ts):
+  - normalizeWablasPhone — handle 08/+62/8/62 prefix + strip non-digits +
+    safe defaults (null/empty/non-string)
+  - buildWablasPayload — URL-encoded `phone` + `message`
+  - parseWablasResponse — defensive parser (status as bool or string,
+    message vs reason fallback, safe null defaults)
+  - 26 unit tests covering edge cases (empty input, garbage, special chars,
+    encoding roundtrip, status coercion)
+- Server-only client (lib/wablas/client.ts):
+  - sendWhatsApp({target, message}) — 8s timeout via AbortController
+  - sendOtp(phone, code) — dev console fallback when WABLAS_TOKEN missing
+  - Throws on HTTP non-2xx / API status=false / network error
+- Failover dispatcher (lib/whatsapp/dispatch.ts):
+  - sendWhatsApp + sendOtp public API
+  - Try Wablas primary → catch any error → fallback Fonnte → return ok flag
+  - Returns DispatchResult { provider, ok, error? } untuk observability
+  - Both providers tidak configured → returns ok=false dengan reason
+- Caller switch:
+  - app/actions/auth.ts sendOtpAction — pakai dispatcher, baca ok flag
+  - lib/notifications/generate.ts dispatchWa — pakai dispatcher, log
+    provider yang sukses untuk monitoring
+- Env updates (.env.example + DEPLOYMENT.md + LAUNCH_CHECKLIST.md):
+  - WABLAS_TOKEN baru
+  - WABLAS_API_URL baru (default https://wablas.com/api/send-message, override per akun seperti solo.wablas.com)
+  - FONNTE_TOKEN tetap (legacy fallback)
+- LAUNCH_CHECKLIST.md: tambah failover test step
+- SECURITY.md: threat model row baru untuk WA gateway downtime + Sprint 42
+  mitigasi (Wablas + Fonnte failover)
+
+Sprint 43 (planned): drop Fonnte total setelah 2 minggu monitoring Wablas
+stabil — hapus lib/fonnte/ + FONNTE_TOKEN dari env + simplify
+dispatcher ke single-provider.
+
+**DoD**: Wablas primary live, Fonnte fallback active, gateway uptime composite
+≥99% target. Token rotated post-leak (lihat catatan keamanan internal).
+
+---
+
 **Audit findings reference** (Sprint 36 retro):
 - ✅ 37 sprint shipped (Sprint 0-36)
 - 🔴 4 critical gaps surfaced (Sprint 37 covers)

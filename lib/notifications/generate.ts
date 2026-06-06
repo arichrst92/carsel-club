@@ -33,7 +33,7 @@ import { buildWaMessage } from "./wa-template";
 import { getNotificationPrefs } from "@/lib/db/queries/notifications";
 import { buildPushPayload } from "@/lib/push/payload";
 import { sendToUser } from "@/lib/push/send";
-import { sendWhatsApp } from "@/lib/fonnte/client";
+import { sendWhatsApp } from "@/lib/whatsapp/dispatch";
 import { db as dbClient } from "@/lib/db/client";
 import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
@@ -116,7 +116,14 @@ async function dispatchWa<T extends NotificationType>(
   if (!u || !u.phone) return;
   try {
     const message = buildWaMessage(type, payload, { appUrl });
-    await sendWhatsApp({ target: u.phone, message });
+    // Sprint 42: dispatcher tries Wablas → Fonnte; returns ok flag (no throw)
+    const r = await sendWhatsApp({ target: u.phone, message });
+    if (!r.ok) {
+      console.error(
+        `[notify:wa:${type}] all providers failed:`,
+        r.error
+      );
+    }
   } catch (e) {
     console.error(`[notify:wa:${type}] send failed:`, e);
   }

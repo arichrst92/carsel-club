@@ -23,7 +23,7 @@ import {
   computeOtpExpiry,
   OTP_CONFIG,
 } from "@/lib/auth/otp";
-import { sendOtp } from "@/lib/fonnte/client";
+import { sendOtp } from "@/lib/whatsapp/dispatch";
 import {
   createSession,
   destroySession,
@@ -75,18 +75,16 @@ export async function sendOtpAction(
     return { error: "Gagal menyimpan OTP. Coba lagi." };
   }
 
-  // Send via Fonnte (or dev fallback to console)
-  try {
-    const res = await sendOtp(phone, code);
-    if (!res.status) {
-      console.error("[sendOtpAction] Fonnte returned status=false:", res);
-      return {
-        error: "Gagal kirim OTP ke WhatsApp. Pastikan nomor benar & aktif.",
-      };
-    }
-  } catch (e) {
-    console.error("[sendOtpAction] Fonnte exception:", e);
-    return { error: "Gagal kirim OTP. Coba lagi sebentar." };
+  // Sprint 42: Wablas primary, Fonnte fallback via dispatcher
+  const res = await sendOtp(phone, code);
+  if (!res.ok) {
+    console.error(
+      "[sendOtpAction] all WhatsApp providers failed:",
+      res.error
+    );
+    return {
+      error: "Gagal kirim OTP ke WhatsApp. Pastikan nomor benar & aktif.",
+    };
   }
 
   redirect(`/login/verify?phone=${encodeURIComponent(phone)}`);

@@ -171,7 +171,9 @@ Defer ke Sprint 2 (Observability) — Sentry + PostHog. Belum di-setup di Sprint
 |---|---|---|
 | `DATABASE_URL` | `postgres://carsel:devpass@localhost:5432/carsel_club` | `postgres://carsel_app:STRONGPASS@localhost:5432/carsel_club` |
 | `AUTH_SESSION_SECRET` | 32+ char (generate sekali) | 32+ char (separate dari dev) |
-| `FONNTE_TOKEN` | (kosong → dev fallback ke console log) | Real token dari Fonnte dashboard |
+| `WABLAS_TOKEN` | (kosong → dev fallback ke console log) | Real token dari Wablas dashboard |
+| `WABLAS_API_URL` | `https://wablas.com/api/send-message` | Per-account endpoint, contoh `https://solo.wablas.com/api/send-message` |
+| `FONNTE_TOKEN` | (kosong) | Legacy fallback (Sprint 42 transisi) |
 | `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` | `https://carsel.club` |
 | `UPLOAD_DIR` | `./uploads` | `/var/www/carsel-uploads` |
 | `NEXT_PUBLIC_UPLOAD_URL_BASE` | `/uploads` | `/uploads` (atau CDN URL) |
