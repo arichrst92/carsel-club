@@ -649,6 +649,16 @@ export default async function ProfilePage() {
                 sub="Channel, quiet hours, push, WA"
               />
             </Link>
+            <Link
+              href="/profile/settings/privacy"
+              style={{ textDecoration: "none" }}
+            >
+              <SettingsRow
+                icon="🔐"
+                title="Privacy"
+                sub="Display + friend req + data export"
+              />
+            </Link>
             <Link href="/help" style={{ textDecoration: "none" }}>
               <SettingsRow
                 icon="❓"

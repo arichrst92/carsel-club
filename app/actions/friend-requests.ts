@@ -28,6 +28,10 @@ import {
 } from "@/lib/auth/otp";
 import { event } from "@/lib/log";
 import {
+  checkFriendRequestPolicy,
+  denialMessage,
+} from "@/lib/privacy/friend-request-policy";
+import {
   notifyFriendRequest,
   notifyFriendAccepted,
 } from "@/lib/notifications/generate";
@@ -84,11 +88,60 @@ export async function sendFriendRequestAction(
 
   // Target user exists?
   const [target] = await db
-    .select({ id: users.id, displayName: users.displayName })
+    .select({
+      id: users.id,
+      displayName: users.displayName,
+      friendRequestPolicy: users.friendRequestPolicy,
+    })
     .from(users)
     .where(eq(users.id, toUserId))
     .limit(1);
   if (!target) return { error: "User tidak ditemukan" };
+
+  // Sprint 38: enforce target's friend request policy
+  if (target.friendRequestPolicy === "off") {
+    return { error: denialMessage("off") };
+  }
+  if (target.friendRequestPolicy === "friends_of_friends") {
+    // Count mutual friends via friendships table — check overlap
+    const myFriends = await db
+      .select({
+        lo: friendships.userIdLo,
+        hi: friendships.userIdHi,
+      })
+      .from(friendships)
+      .where(
+        or(
+          eq(friendships.userIdLo, me.id),
+          eq(friendships.userIdHi, me.id)
+        )
+      );
+    const myFriendIds = new Set(
+      myFriends.map((f) => (f.lo === me.id ? f.hi : f.lo))
+    );
+    const targetFriends = await db
+      .select({
+        lo: friendships.userIdLo,
+        hi: friendships.userIdHi,
+      })
+      .from(friendships)
+      .where(
+        or(
+          eq(friendships.userIdLo, toUserId),
+          eq(friendships.userIdHi, toUserId)
+        )
+      );
+    const mutual = targetFriends.filter((f) =>
+      myFriendIds.has(f.lo === toUserId ? f.hi : f.lo)
+    );
+    const check = checkFriendRequestPolicy(
+      "friends_of_friends",
+      mutual.length
+    );
+    if (!check.allowed) {
+      return { error: denialMessage("no_mutual_friends") };
+    }
+  }
 
   // Already friends?
   const [lo, hi] = canonicalPair(me.id, toUserId);

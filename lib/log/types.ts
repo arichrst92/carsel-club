@@ -45,6 +45,8 @@ export type EventName =
   | "admin_stats_recomputed" // Sprint 35
   | "backup_completed" // Sprint 36
   | "otp_cleanup_completed" // Sprint 37
+  | "privacy_prefs_updated" // Sprint 38
+  | "account_deleted" // Sprint 38
   | "referral_claimed"
   | "upload_success";
 

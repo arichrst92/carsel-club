@@ -96,6 +96,12 @@ export const tournamentSeedingEnum = pgEnum("tournament_seeding", [
   "random",
 ]);
 
+export const friendRequestPolicyEnum = pgEnum("friend_request_policy", [
+  "anyone",
+  "friends_of_friends",
+  "off",
+]);
+
 export const notificationTypeEnum = pgEnum("notification_type", [
   "session_invite",
   "session_reminder",
@@ -165,6 +171,14 @@ export const users = pgTable(
     // Sprint 29: streak tracking
     currentWinStreak: integer("current_win_streak").notNull().default(0),
     bestWinStreak: integer("best_win_streak").notNull().default(0),
+    // Sprint 38: granular privacy controls
+    displayFlags: jsonb("display_flags")
+      .notNull()
+      .default(sql`'{}'::jsonb`),
+    friendRequestPolicy: friendRequestPolicyEnum("friend_request_policy")
+      .notNull()
+      .default("anyone"),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

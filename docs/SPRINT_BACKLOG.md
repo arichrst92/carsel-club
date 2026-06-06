@@ -1007,21 +1007,44 @@ Sub-tasks:
 nav, OTP attempts enforced + tested, 3 legal pages live, cleanup cron
 configured.
 
-### Sprint 38 — Privacy settings page + data controls
+### Sprint 38 — Privacy settings page + data controls ✅
 **Goal**: Compliance + data sovereignty
 
 Sub-tasks:
-- Dedicated `/profile/settings/privacy` page (matches prototype
-  `privacy-settings.html`)
-  - Profile visibility radio (Public/Friends/Private) — currently di EditProfileForm
-  - Per-field display toggles (city, stats, achievements)
-  - Friend request prefs (anyone/friends-of-friends/off)
-- Account delete action (soft-delete `users.deletedAt` + cascade to
-  participants/matches anonymize)
-- Data export action — generates JSON dump of user's sessions+matches+stats
-  via /api/me/export
-- Schema: `users.deletedAt`, `users.displayFlags` (JSONB)
-- Pure helper for display field filtering + tests
+- Schema additions on users: display_flags JSONB (default `{}`),
+  friend_request_policy enum (anyone/friends_of_friends/off, default anyone),
+  deleted_at timestamptz nullable
+- New enum: friend_request_policy
+- Pure helpers (100% cov):
+  - lib/privacy/display-flags.ts — resolveDisplayFlags + sanitize +
+    applyDisplayMask (self-bypass), 4 fields tracked (showCity, showStats,
+    showAchievements, showMatches)
+  - lib/privacy/friend-request-policy.ts — checkFriendRequestPolicy
+    (anyone/off direct, friends_of_friends needs mutualFriendCount > 0),
+    denialMessage, FRIEND_REQUEST_POLICY_LABELS
+- Server actions (app/actions/privacy.ts):
+  - updatePrivacyPrefsAction — useActionState compatible, sanitizes flags
+    + validates policy enum
+  - deleteAccountAction — typed "HAPUS" confirmation, soft-deletes
+    (deletedAt set, displayName → "[Akun dihapus]", avatar/city nulled,
+    visibility → private, friend req → off), logs account_deleted, calls
+    logoutAction
+- Data export endpoint /api/me/export — requireUser, returns JSON dump:
+  profile + hosted sessions + participations + completed match outcomes
+  (anonymized to slot role) + earned achievements; Content-Disposition
+  attachment
+- UI:
+  - components/profile/PrivacyPrefsForm — toggle rows for 4 flags + radio
+    group for 3 policies
+  - components/profile/DeleteAccountForm — danger styling, typed
+    confirmation input
+  - app/profile/settings/privacy/page.tsx — wires all + data export download
+    button + info banner pointing to EditProfileForm untuk visibility level
+  - profile menu: added 🔐 Privacy row pointing here
+- friend-requests.ts: sendFriendRequestAction now reads target's policy,
+  rejects with localized message; for friends_of_friends path counts mutual
+  friendships via 2 reads + Set intersection
+- Event log: privacy_prefs_updated + account_deleted
 
 **DoD**: Privacy page rendered, account delete works, data export downloadable.
 

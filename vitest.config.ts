@@ -82,6 +82,9 @@ export default defineConfig({
         "lib/backup/health.ts",
         // Sprint 37 — OTP attempt enforcement
         "lib/auth/otp-attempts.ts",
+        // Sprint 38 — privacy display flags + friend request policy
+        "lib/privacy/display-flags.ts",
+        "lib/privacy/friend-request-policy.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [
