@@ -7,6 +7,11 @@
  *
  * Berbeda dari `/api/og/session/[id]` yang 1200×630 untuk WA link preview.
  *
+ * Catatan teknis next/og (Satori):
+ * - `backdrop-filter` TIDAK didukung → jangan dipakai (crash 500).
+ * - `<img src>` butuh URL yang fully-qualified & dapat di-fetch oleh
+ *   Satori. Lebih aman: fetch sendiri jadi data URL.
+ *
  * Refs:
  * - DB: getPublicSessionView + listSessionLeaderboard
  */
@@ -39,14 +44,43 @@ function formatTimeID(d: Date | string): string {
   }).format(date);
 }
 
-function resolveCoverUrl(rawUrl: string | null): string | null {
+/**
+ * Resolve cover URL ke absolute URL berdasarkan request host
+ * (lebih reliable daripada env var di dev).
+ */
+function resolveCoverAbsolute(
+  rawUrl: string | null,
+  req: Request
+): string | null {
   if (!rawUrl) return null;
-  // Relative path like /uploads/xxx → prepend app URL
   if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://"))
     return rawUrl;
-  const base =
-    process.env.NEXT_PUBLIC_APP_URL ?? "https://carsel.club";
-  return `${base.replace(/\/+$/, "")}${rawUrl.startsWith("/") ? rawUrl : `/${rawUrl}`}`;
+  const reqUrl = new URL(req.url);
+  const origin =
+    process.env.NEXT_PUBLIC_APP_URL ?? `${reqUrl.protocol}//${reqUrl.host}`;
+  return `${origin.replace(/\/+$/, "")}${
+    rawUrl.startsWith("/") ? rawUrl : `/${rawUrl}`
+  }`;
+}
+
+/**
+ * Fetch cover image as data URL — Satori-safe.
+ * Returns null kalau gagal (fallback ke gradient).
+ */
+async function fetchAsDataUrl(url: string): Promise<string | null> {
+  try {
+    const r = await fetch(url, {
+      // 5s safety timeout via AbortSignal
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!r.ok) return null;
+    const buf = await r.arrayBuffer();
+    const ct = r.headers.get("content-type") ?? "image/jpeg";
+    const b64 = Buffer.from(buf).toString("base64");
+    return `data:${ct};base64,${b64}`;
+  } catch {
+    return null;
+  }
 }
 
 const STATUS_BG: Record<string, string> = {
@@ -63,7 +97,7 @@ const STATUS_LABEL: Record<string, string> = {
   cancelled: "❌ Dibatalkan",
 };
 
-export async function GET(_req: Request, { params }: Props) {
+export async function GET(req: Request, { params }: Props) {
   const { id } = await params;
   const data = await getPublicSessionView(id);
   if (!data) return new Response("Not found", { status: 404 });
@@ -75,7 +109,13 @@ export async function GET(_req: Request, { params }: Props) {
     .sort((a, b) => b.sessionPoints - a.sessionPoints)
     .slice(0, 5);
 
-  const coverUrl = resolveCoverUrl(session.coverPhotoUrl ?? null);
+  const absoluteCover = resolveCoverAbsolute(
+    session.coverPhotoUrl ?? null,
+    req
+  );
+  const coverDataUrl = absoluteCover
+    ? await fetchAsDataUrl(absoluteCover)
+    : null;
   const completedMatches = data.currentMatches.filter(
     (m) => m.status === "completed"
   ).length;
@@ -106,10 +146,10 @@ export async function GET(_req: Request, { params }: Props) {
             overflow: "hidden",
           }}
         >
-          {coverUrl ? (
+          {coverDataUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={coverUrl}
+              src={coverDataUrl}
               alt="cover"
               width="1080"
               height="672"
@@ -144,7 +184,7 @@ export async function GET(_req: Request, { params }: Props) {
               bottom: 0,
               height: 200,
               background:
-                "linear-gradient(180deg, transparent 0%, rgba(15,118,110,0.95) 100%)",
+                "linear-gradient(180deg, rgba(15,118,110,0) 0%, rgba(15,118,110,0.95) 100%)",
               display: "flex",
             }}
           />
@@ -180,9 +220,8 @@ export async function GET(_req: Request, { params }: Props) {
               gap: 16,
               padding: "12px 20px",
               borderRadius: 14,
-              background: "rgba(255,255,255,0.22)",
-              backdropFilter: "blur(8px)",
-              border: "1px solid rgba(255,255,255,0.3)",
+              background: "rgba(255,255,255,0.28)",
+              border: "1px solid rgba(255,255,255,0.4)",
             }}
           >
             <div
@@ -237,7 +276,7 @@ export async function GET(_req: Request, { params }: Props) {
             {session.title}
           </div>
 
-          {/* Meta row */}
+          {/* Meta */}
           <div
             style={{
               display: "flex",
@@ -245,30 +284,28 @@ export async function GET(_req: Request, { params }: Props) {
               fontSize: 30,
               opacity: 0.92,
               fontWeight: 600,
-              marginBottom: 20,
+              marginBottom: 14,
             }}
           >
             <span style={{ display: "flex" }}>
-              📅 {formatDateID(session.scheduledAt)}
+              {formatDateID(session.scheduledAt)}
             </span>
           </div>
           <div
             style={{
               display: "flex",
               gap: 28,
-              fontSize: 28,
+              fontSize: 26,
               opacity: 0.85,
               fontWeight: 600,
               marginBottom: 36,
             }}
           >
             <span style={{ display: "flex" }}>
-              ⏰ {formatTimeID(session.scheduledAt)}
+              {formatTimeID(session.scheduledAt)} WIB
             </span>
             {session.venueName && (
-              <span style={{ display: "flex" }}>
-                📍 {session.venueName}
-              </span>
+              <span style={{ display: "flex" }}>· {session.venueName}</span>
             )}
           </div>
 
@@ -280,13 +317,12 @@ export async function GET(_req: Request, { params }: Props) {
               marginBottom: 36,
             }}
           >
-            <StatTile label="Pemain" value={top.length || lb.length} />
-            <StatTile label="Match" value={completedMatches} />
             <StatTile
-              label="Format"
-              value={session.format}
-              text
+              label="Pemain"
+              value={String(top.length || lb.length)}
             />
+            <StatTile label="Match" value={String(completedMatches)} />
+            <StatTile label="Format" value={session.format} text />
           </div>
 
           {/* Leaderboard */}
@@ -309,10 +345,10 @@ export async function GET(_req: Request, { params }: Props) {
                   alignItems: "center",
                 }}
               >
-                🏆 Leaderboard
+                Leaderboard
               </div>
               {top.map((p, i) => {
-                const medals = ["🥇", "🥈", "🥉"];
+                const medals = ["1.", "2.", "3."];
                 return (
                   <div
                     key={p.participantId}
@@ -328,21 +364,21 @@ export async function GET(_req: Request, { params }: Props) {
                       borderRadius: 16,
                       border:
                         i === 0
-                          ? "2px solid rgba(255,255,255,0.45)"
+                          ? "2px solid rgba(255,255,255,0.5)"
                           : "1px solid rgba(255,255,255,0.18)",
                     }}
                   >
                     <div
                       style={{
                         width: 60,
-                        textAlign: "center",
-                        fontSize: i < 3 ? 42 : 32,
+                        fontSize: i < 3 ? 36 : 30,
                         fontWeight: 900,
                         display: "flex",
                         justifyContent: "center",
+                        color: i === 0 ? "#FACC15" : "#fff",
                       }}
                     >
-                      {i < 3 ? medals[i] : `#${i + 1}`}
+                      {i < 3 ? medals[i] : `${i + 1}.`}
                     </div>
                     <div
                       style={{
@@ -397,7 +433,6 @@ export async function GET(_req: Request, { params }: Props) {
                 fontSize: 28,
                 fontWeight: 700,
                 opacity: 0.85,
-                textAlign: "center",
                 display: "flex",
                 justifyContent: "center",
               }}
@@ -425,14 +460,13 @@ export async function GET(_req: Request, { params }: Props) {
                 display: "flex",
               }}
             >
-              🎾 Live score & info
+              Live score & info
             </div>
             <div
               style={{
                 fontSize: 26,
                 fontWeight: 800,
                 display: "flex",
-                textTransform: "lowercase",
               }}
             >
               carsel.club/s/{id.slice(0, 8)}
@@ -454,18 +488,17 @@ function StatTile({
   text,
 }: {
   label: string;
-  value: string | number;
+  value: string;
   text?: boolean;
 }) {
   return (
     <div
       style={{
         flex: 1,
-        background: "rgba(255,255,255,0.15)",
-        backdropFilter: "blur(6px)",
+        background: "rgba(255,255,255,0.18)",
         borderRadius: 18,
         padding: "20px 16px",
-        border: "1px solid rgba(255,255,255,0.18)",
+        border: "1px solid rgba(255,255,255,0.22)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -473,7 +506,7 @@ function StatTile({
     >
       <div
         style={{
-          fontSize: text ? 32 : 48,
+          fontSize: text ? 30 : 48,
           fontWeight: 900,
           lineHeight: 1,
           textTransform: text ? "capitalize" : undefined,
