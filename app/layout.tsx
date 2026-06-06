@@ -77,6 +77,9 @@ export default function RootLayout({
       className={`${quicksand.variable} ${nunito.variable} h-full antialiased`}
     >
       <body className="min-h-full">
+        <a href="#main-content" className="skip-link">
+          Skip to content
+        </a>
         {children}
         <RegisterServiceWorker />
       </body>

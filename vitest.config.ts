@@ -74,6 +74,8 @@ export default defineConfig({
         "lib/leaderboard/period.ts",
         // Sprint 33 — PWA
         "lib/pwa/install-prompt.ts",
+        // Sprint 34 — error parsing
+        "lib/errors/friendly.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

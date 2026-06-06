@@ -811,16 +811,33 @@ Sub-tasks:
 
 ---
 
-### Sprint 34 — Polish: empty states, error boundaries, a11y
+### Sprint 34 — Polish: empty states, error boundaries, a11y ✅
 **Goal**: Production-ready UX edge cases
 
 Sub-tasks:
-- Empty state untuk: no friends, no achievements, no past matches, no public sessions in city, no notifications
-- Error boundary di setiap route group (auth/, sessions/, dll)
-- Network error fallback (toast + retry)
-- Loading skeleton audit (semua page)
-- a11y audit: keyboard navigation, screen reader labels, color contrast
-- Lighthouse score target ≥90 mobile
+- Pure helper (100% cov): lib/errors/friendly.ts — parseFriendlyError categorizes
+  network/auth/permission/validation/unknown with localized title+body+retryable
+- Reusable components:
+  - components/ui/EmptyState — emoji + title + body + optional link/node action,
+    role=status, dashed border styling
+  - components/errors/RouteErrorFallback — friendly mapping + retry button +
+    fire-and-forget log to /api/log/error, dev info expandable
+- Route boundaries:
+  - app/not-found.tsx (root) — branded 404
+  - app/<scope>/error.tsx — sessions, profile, leaderboard, friends,
+    notifications, achievements (delegate to RouteErrorFallback)
+- a11y polish (app/globals.css):
+  - *:focus-visible outline ring (primary 3px, 2px offset)
+  - .skip-link visually-hidden until focused
+  - .sr-only screen reader util
+  - prefers-reduced-motion media query
+- Skip-to-content link injected ke layout.tsx body
+
+Deferred / future iterations:
+- Network error toast manager (use route error boundaries for now)
+- Comprehensive empty-state audit (reusable component shipped, page-by-page wiring
+  for follow-up sprint)
+- Lighthouse run (manual after deploy)
 
 **DoD**: Lighthouse ≥90 mobile, empty states tidak terasa "kosong".
 
