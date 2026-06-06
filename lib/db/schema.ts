@@ -65,6 +65,7 @@ export const generationMethodEnum = pgEnum("generation_method", [
   "auto_random",
   "auto_mexicano",
   "manual_drag",
+  "tournament", // Sprint 31: bracket-generated round
 ]);
 
 export const joinPolicyEnum = pgEnum("join_policy", [
@@ -88,6 +89,11 @@ export const profileVisibilityEnum = pgEnum("profile_visibility", [
   "public",
   "friends",
   "private",
+]);
+
+export const tournamentSeedingEnum = pgEnum("tournament_seeding", [
+  "by_join_order",
+  "random",
 ]);
 
 export const notificationTypeEnum = pgEnum("notification_type", [
@@ -579,12 +585,20 @@ export const matches = pgTable(
     status: matchStatusEnum("status").notNull().default("pending"),
     startedAt: timestamp("started_at", { withTimezone: true }),
     endedAt: timestamp("ended_at", { withTimezone: true }),
+    // Sprint 31: bracket position (only set untuk tournament matches)
+    bracketRound: integer("bracket_round"),
+    bracketSlot: integer("bracket_slot"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
   },
   (t) => [
     index("idx_matches_round").on(t.matchRoundSetId, t.matchPosition),
+    index("idx_matches_bracket").on(
+      t.matchRoundSetId,
+      t.bracketRound,
+      t.bracketSlot
+    ),
     check(
       "distinct_players",
       sql`
@@ -602,6 +616,36 @@ export const matches = pgTable(
     ),
   ]
 );
+
+// ============================================================
+// TOURNAMENT BRACKETS — Sprint 31
+// ============================================================
+
+/**
+ * One row per tournament-format session. Drives bracket layout + sponsor
+ * branding. Round 1 matches inserted upfront; subsequent rounds inserted
+ * lazily on prior-round completion (auto-advance).
+ */
+export const tournamentBrackets = pgTable("tournament_brackets", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: uuid("session_id")
+    .notNull()
+    .unique()
+    .references(() => sessions.id, { onDelete: "cascade" }),
+  seedingMethod: tournamentSeedingEnum("seeding_method")
+    .notNull()
+    .default("by_join_order"),
+  totalRounds: integer("total_rounds").notNull(),
+  currentRound: integer("current_round").notNull().default(1),
+  sponsorName: text("sponsor_name"),
+  sponsorLogoUrl: text("sponsor_logo_url"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
 
 // ============================================================
 // SESSION JOIN REQUESTS — Sprint 20 (approval flow untuk public session)

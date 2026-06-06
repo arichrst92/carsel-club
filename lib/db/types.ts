@@ -26,6 +26,7 @@ import type {
   userNotificationPrefs,
   pushSubscriptions,
   userAchievements,
+  tournamentBrackets,
 } from "./schema";
 
 // Select types (rows yang di-fetch dari DB)
@@ -47,6 +48,7 @@ export type Notification = InferSelectModel<typeof notifications>;
 export type UserNotificationPrefs = InferSelectModel<typeof userNotificationPrefs>;
 export type PushSubscription = InferSelectModel<typeof pushSubscriptions>;
 export type UserAchievement = InferSelectModel<typeof userAchievements>;
+export type TournamentBracket = InferSelectModel<typeof tournamentBrackets>;
 
 // Insert types (rows yang di-create)
 export type NewUser = InferInsertModel<typeof users>;
@@ -66,3 +68,4 @@ export type NewNotification = InferInsertModel<typeof notifications>;
 export type NewUserNotificationPrefs = InferInsertModel<typeof userNotificationPrefs>;
 export type NewPushSubscription = InferInsertModel<typeof pushSubscriptions>;
 export type NewUserAchievement = InferInsertModel<typeof userAchievements>;
+export type NewTournamentBracket = InferInsertModel<typeof tournamentBrackets>;

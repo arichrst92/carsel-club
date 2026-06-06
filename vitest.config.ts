@@ -67,6 +67,8 @@ export default defineConfig({
         "lib/notifications/reminder-window.ts",
         // Sprint 30 — advanced stats
         "lib/stats/advanced.ts",
+        // Sprint 31 — tournament bracket
+        "lib/match/bracket.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

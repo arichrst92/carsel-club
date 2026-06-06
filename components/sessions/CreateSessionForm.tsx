@@ -10,7 +10,7 @@ import { createSessionAction } from "@/app/actions/sessions";
 
 type FormData = {
   name: string;
-  format: "americano" | "mexicano";
+  format: "americano" | "mexicano" | "tournament";
   playType: "freeplay" | "tournament";
   venueName: string;
   mapsUrl: string;
@@ -339,6 +339,14 @@ function Step1Info({
             >
               <span>Mexicano</span>
               <span className="seg-sub">Ranking pairing</span>
+            </button>
+            <button
+              type="button"
+              className={`segmented-option ${data.format === "tournament" ? "active" : ""}`}
+              onClick={() => setField("format", "tournament")}
+            >
+              <span>Tournament</span>
+              <span className="seg-sub">Single elim</span>
             </button>
           </div>
         </div>
@@ -857,7 +865,12 @@ function Step5Review({
             <div className="review-value">{data.name || "—"}</div>
             <div className="review-value-list" style={{ marginTop: 4 }}>
               <span>
-                {data.format === "americano" ? "Americano" : "Mexicano"} ·{" "}
+                {data.format === "americano"
+                  ? "Americano"
+                  : data.format === "mexicano"
+                    ? "Mexicano"
+                    : "Tournament"}{" "}
+                ·{" "}
                 {data.playType === "freeplay" ? "Freeplay" : "Tournament"}
               </span>
             </div>

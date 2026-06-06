@@ -92,6 +92,20 @@
       "when": 1780726620674,
       "tag": "0012_sprint29_achievements_v2",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1780727718326,
+      "tag": "0013_sprint31_tournament_bracket",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1780728001377,
+      "tag": "0014_sprint31_tournament_gen_method",
+      "breakpoints": true
     }
   ]
 }

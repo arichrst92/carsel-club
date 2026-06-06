@@ -40,6 +40,8 @@ export type EventName =
   | "match_reverted" // Sprint 4
   | "tier_up" // Sprint 12
   | "session_reminder_sent" // Sprint 28
+  | "bracket_generated" // Sprint 31
+  | "bracket_advanced" // Sprint 31
   | "referral_claimed"
   | "upload_success";
 

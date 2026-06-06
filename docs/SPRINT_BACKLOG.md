@@ -705,19 +705,45 @@ Sub-tasks:
 
 ## Tournament + Leaderboard v2 (Sprint 31-32)
 
-### Sprint 31 — Tournament format: bracket
+### Sprint 31 — Tournament format: bracket ✅
 **Goal**: Tournament play type behavior
 
 Sub-tasks:
-- Schema: table `tournament_brackets` (sessionId, format, seedingMethod, currentRound)
-- Bracket logic: single elimination (start scope)
-- UI: bracket visualizer (mobile-friendly tree)
-- Tournament generate: seed players → first round matches
-- Auto-advance winners ke next round saat match completed
-- Sponsor fields (sponsorName, sponsorLogoUrl) — optional
-- Enable Tournament option di create form
+- Decision D4: single-elimination only (group stage + double-elim deferred)
+- Schema:
+  - `tournament_brackets` (sessionId UNIQUE, seedingMethod enum,
+    totalRounds, currentRound, sponsorName, sponsorLogoUrl)
+  - matches.bracket_round + matches.bracket_slot (nullable, only set for
+    tournament matches) + idx_matches_bracket
+  - tournament_seeding enum (by_join_order | random)
+- Pure helpers (100% cov, lib/match/bracket.ts):
+  - computeBracketSize (next pow-2), computeTotalRounds (log2),
+    matchesInRound, nextRoundSlot, sisterSlot
+  - buildFirstRoundPairings (sequential pairing, byes at end)
+  - buildNextRoundPairing, bracketWinner
+  - validateTeamCount (2-64), validateTeams (no duplicate players)
+  - seedTeams (by_join_order = identity; random = Fisher-Yates w/ injected
+    RNG for testability)
+- Server action: generateBracketAction(sessionId, seeding) — host-only,
+  pairs participants (2 per team), validates, creates bracket row + round 1
+  matchRoundSet + round 1 matches (skip byes)
+- Auto-advance (lib/match/bracket-advance.ts):
+  - tryAdvanceBracket(matchId) called from stats-sync after match completed
+  - Checks sister match status, creates next-round match when both done
+  - Atomic via idempotency check (existingNext lookup)
+  - Bye handling: sister null → wait until paired via other path
+  - Updates tournament_brackets.currentRound when entire round done
+- UI:
+  - components/tournament/BracketView (server, horizontal scroll columns
+    per round, label Final/Semi-Final/Round N, winner highlighting)
+  - GenerateBracketButton (client, seeding selector)
+  - Wired ke app/sessions/[id]/page.tsx — shows bracket when format=tournament
+    and bracket exists, else generate button for staff
+- Create form: enabled Tournament option in segmented + review screen label
+- Event log: bracket_generated, bracket_advanced
 
-**DoD**: Tournament session generate bracket, advance otomatis.
+**DoD**: Tournament session generate bracket, advance otomatis. Sponsor fields
+schema-ready (UI deferred).
 
 ---
 

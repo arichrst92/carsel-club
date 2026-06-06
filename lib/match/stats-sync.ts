@@ -26,6 +26,7 @@ import {
   syncAchievementsAfterMatch,
   type FreshOutcome,
 } from "./achievement-sync";
+import { tryAdvanceBracket } from "./bracket-advance";
 
 /**
  * Main entry: change match score + status, sync stats atomically.
@@ -203,5 +204,14 @@ export async function applyMatchScoreChange(
   // Sprint 29: streak + achievement sync (outside tx — best-effort, errors logged)
   if (freshOutcomes.length > 0) {
     await syncAchievementsAfterMatch(freshOutcomes);
+  }
+
+  // Sprint 31: tournament bracket auto-advance
+  if (newStatus === "completed") {
+    try {
+      await tryAdvanceBracket(matchId);
+    } catch (e) {
+      console.error("[bracket-advance]", e);
+    }
   }
 }

@@ -7,6 +7,9 @@ import {
   isSessionStaff,
 } from "@/lib/db/queries/sessions";
 import { getRoundsWithMatches } from "@/lib/db/queries/matches";
+import { getBracketForSession } from "@/lib/db/queries/bracket";
+import { BracketView } from "@/components/tournament/BracketView";
+import { GenerateBracketButton } from "@/components/tournament/GenerateBracketButton";
 import { formatDate, formatTimeRange } from "@/lib/utils";
 import { ParticipantRow } from "@/components/sessions/ParticipantRow";
 import { CancelSessionButton } from "@/components/sessions/CancelSessionButton";
@@ -61,6 +64,11 @@ export default async function SessionDetailPage({ params }: PageProps) {
   const { session, participants } = result;
   const staff = await isSessionStaff(id, user.id);
   const rounds = await getRoundsWithMatches(id);
+  // Sprint 31: tournament bracket data
+  const bracketData =
+    result.session.format === "tournament"
+      ? await getBracketForSession(id)
+      : null;
   const groupPhotos = await listGroupPhotos(id);
   const isParticipant = participants.some((p) => p.userId === user.id);
   const pendingRequests = staff ? await listPendingJoinRequests(id) : [];
@@ -507,6 +515,15 @@ export default async function SessionDetailPage({ params }: PageProps) {
             </div>
           </div>
         </section>
+
+        {/* SPRINT 31: TOURNAMENT BRACKET */}
+        {session.format === "tournament" && bracketData && (
+          <BracketView data={bracketData} />
+        )}
+        {session.format === "tournament" &&
+          !bracketData &&
+          staff &&
+          !isTerminal && <GenerateBracketButton sessionId={session.id} />}
 
         {/* MATCH STATUS */}
         <section>
