@@ -10,11 +10,15 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/get-current-user";
-import { canUserViewSession } from "@/lib/db/queries/sessions";
+import {
+  canUserViewSession,
+  isSessionStaff,
+} from "@/lib/db/queries/sessions";
 import { getMatchDetail } from "@/lib/db/queries/match-detail";
 import { MatchDetailHero } from "@/components/sessions/MatchDetailHero";
 import { MatchPlayerCard } from "@/components/sessions/MatchPlayerCard";
 import { MatchTimer } from "@/components/sessions/MatchTimer";
+import { MatchDetailScoring } from "@/components/sessions/MatchDetailScoring";
 import { ShareMatchButton } from "@/components/sessions/ShareMatchButton";
 
 export const dynamic = "force-dynamic";
@@ -43,6 +47,7 @@ export default async function MatchDetailPage({ params }: PageProps) {
   if (!detail || detail.session.id !== id) notFound();
 
   const { match, round, session, players } = detail;
+  const canManage = await isSessionStaff(id, user.id);
 
   const team1 = players.filter((p) => p.side === "team1");
   const team2 = players.filter((p) => p.side === "team2");
@@ -82,6 +87,17 @@ export default async function MatchDetailPage({ params }: PageProps) {
           match={match}
           team1Names={team1Names}
           team2Names={team2Names}
+        />
+
+        {/* Sprint 46: scoring controls — start/score +/-/end/edit/revert */}
+        <MatchDetailScoring
+          matchId={match.id}
+          team1Score={match.team1Score}
+          team2Score={match.team2Score}
+          status={match.status}
+          canManage={canManage}
+          team1Label={team1Names.join(" · ")}
+          team2Label={team2Names.join(" · ")}
         />
 
         {/* Meta info */}
