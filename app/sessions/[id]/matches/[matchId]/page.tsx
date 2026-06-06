@@ -19,6 +19,7 @@ import { MatchDetailHero } from "@/components/sessions/MatchDetailHero";
 import { MatchPlayerCard } from "@/components/sessions/MatchPlayerCard";
 import { MatchTimer } from "@/components/sessions/MatchTimer";
 import { MatchDetailScoring } from "@/components/sessions/MatchDetailScoring";
+import { PadelCourtVisual } from "@/components/sessions/PadelCourtVisual";
 import { ShareMatchButton } from "@/components/sessions/ShareMatchButton";
 
 export const dynamic = "force-dynamic";
@@ -99,6 +100,20 @@ export default async function MatchDetailPage({ params }: PageProps) {
           team1Label={team1Names.join(" · ")}
           team2Label={team2Names.join(" · ")}
         />
+
+        {/* Sprint 46: padel court visual — denah lapangan + posisi pemain */}
+        <section>
+          <div className="section-head">
+            <h3>Lineup</h3>
+          </div>
+          <PadelCourtVisual
+            team1={team1}
+            team2={team2}
+            team1Score={match.team1Score}
+            team2Score={match.team2Score}
+            showScore={isLive || isCompleted}
+          />
+        </section>
 
         {/* Meta info */}
         <section>
