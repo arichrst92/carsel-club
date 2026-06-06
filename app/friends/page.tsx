@@ -6,10 +6,10 @@ import {
   listOutgoingFriendRequests,
 } from "@/lib/db/queries/friend-requests";
 import { listDiscoverSuggestions } from "@/lib/db/queries/friend-discover";
-import { AddFriendForm } from "@/components/friends/AddFriendForm";
 import { FriendRow } from "@/components/friends/FriendRow";
 import { FriendRequestRowItem } from "@/components/friends/FriendRequestRow";
 import { DiscoverRow } from "@/components/friends/DiscoverRow";
+import { AddFriendActions } from "@/components/friends/AddFriendActions";
 
 export const metadata = { title: "Friends" };
 
@@ -61,7 +61,7 @@ export default async function FriendsPage({
       </header>
 
       <main className="app-content subscreen">
-        <AddFriendForm />
+        <AddFriendActions />
 
         {/* Tab bar */}
         <div

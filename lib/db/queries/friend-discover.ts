@@ -19,7 +19,7 @@
  *   match_round_sets, sessions
  */
 
-import { and, eq, gte, ne, notInArray, or, sql } from "drizzle-orm";
+import { and, eq, gte, inArray, ne, notInArray, or, sql } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
   friendships,
@@ -43,6 +43,18 @@ export type DiscoverSuggestion = {
 export async function listDiscoverSuggestions(
   userId: string,
   limit = 20
+): Promise<DiscoverSuggestion[]> {
+  try {
+    return await _listDiscoverSuggestionsImpl(userId, limit);
+  } catch (e) {
+    console.error("[listDiscoverSuggestions] error:", e);
+    return []; // resilient: kalau query gagal, return empty bukan crash page
+  }
+}
+
+async function _listDiscoverSuggestionsImpl(
+  userId: string,
+  limit: number
 ): Promise<DiscoverSuggestion[]> {
   // Build exclusion set: self + friends + pending reqs + blocks
   const excluded = new Set<string>([userId]);
@@ -100,7 +112,10 @@ export async function listDiscoverSuggestions(
       })
       .from(friendships)
       .where(
-        sql`${friendships.userIdLo} = ANY(${myFriendIds}) OR ${friendships.userIdHi} = ANY(${myFriendIds})`
+        or(
+          inArray(friendships.userIdLo, myFriendIds),
+          inArray(friendships.userIdHi, myFriendIds)
+        )
       );
     for (const f of fofRows) {
       // The "other side" relative to my friend
@@ -139,7 +154,7 @@ export async function listDiscoverSuggestions(
       .from(sessionParticipants)
       .where(
         and(
-          sql`${sessionParticipants.sessionId} = ANY(${mySessionIds})`,
+          inArray(sessionParticipants.sessionId, mySessionIds),
           ne(sessionParticipants.userId, userId),
           sql`${sessionParticipants.userId} IS NOT NULL`
         )
