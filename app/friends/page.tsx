@@ -11,7 +11,7 @@ import { FriendRequestRowItem } from "@/components/friends/FriendRequestRow";
 import { DiscoverRow } from "@/components/friends/DiscoverRow";
 import { AddFriendActions } from "@/components/friends/AddFriendActions";
 
-export const metadata = { title: "Friends" };
+export const metadata = { title: "Teman" };
 
 type SearchParams = { tab?: string };
 type FriendTab = "friends" | "incoming" | "outgoing" | "discover";
@@ -56,7 +56,7 @@ export default async function FriendsPage({
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
         </Link>
-        <h2 className="subscreen-title">Friends</h2>
+        <h2 className="subscreen-title">Teman</h2>
         <div style={{ width: 40 }} />
       </header>
 
@@ -74,26 +74,26 @@ export default async function FriendsPage({
         >
           <TabLink
             href="/friends?tab=friends"
-            label="Friends"
+            label="Teman"
             count={friends.length}
             active={tab === "friends"}
           />
           <TabLink
             href="/friends?tab=incoming"
-            label="Incoming"
+            label="Masuk"
             count={incoming.length}
             active={tab === "incoming"}
             highlight={incoming.length > 0}
           />
           <TabLink
             href="/friends?tab=outgoing"
-            label="Outgoing"
+            label="Keluar"
             count={outgoing.length}
             active={tab === "outgoing"}
           />
           <TabLink
             href="/friends?tab=discover"
-            label="Discover"
+            label="Jelajah"
             count={null}
             active={tab === "discover"}
           />
@@ -102,13 +102,13 @@ export default async function FriendsPage({
         {tab === "discover" && (
           <section>
             <div className="section-head">
-              <h3>Suggested ({discover.length})</h3>
+              <h3>Saran ({discover.length})</h3>
             </div>
             {discover.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-state-icon">🔍</div>
                 <div className="empty-state-title">
-                  Belum ada suggestion
+                  Belum ada saran
                 </div>
                 <div className="empty-state-text">
                   Suggestion muncul dari friend-of-friend dan teman main
@@ -134,12 +134,12 @@ export default async function FriendsPage({
         {tab === "friends" && (
           <section>
             <div className="section-head">
-              <h3>Daftar Friends ({friends.length})</h3>
+              <h3>Daftar Teman ({friends.length})</h3>
             </div>
             {friends.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-state-icon">👥</div>
-                <div className="empty-state-title">Belum ada friends</div>
+                <div className="empty-state-title">Belum ada teman</div>
                 <div className="empty-state-text">
                   Search & kirim request via nomor WhatsApp di atas.
                 </div>
@@ -166,7 +166,7 @@ export default async function FriendsPage({
         {tab === "incoming" && (
           <section>
             <div className="section-head">
-              <h3>Incoming Requests ({incoming.length})</h3>
+              <h3>Permintaan Masuk ({incoming.length})</h3>
             </div>
             {incoming.length === 0 ? (
               <div className="empty-state">
@@ -201,7 +201,7 @@ export default async function FriendsPage({
         {tab === "outgoing" && (
           <section>
             <div className="section-head">
-              <h3>Outgoing Requests ({outgoing.length})</h3>
+              <h3>Permintaan Keluar ({outgoing.length})</h3>
             </div>
             {outgoing.length === 0 ? (
               <div className="empty-state">

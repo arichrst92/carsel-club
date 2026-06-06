@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { endSessionAction } from "@/app/actions/sessions";
 import { Toast } from "@/components/ui/Toast";
 
@@ -16,23 +17,30 @@ export function EndSessionButton({
   completedMatches = 0,
   pendingMatches = 0,
 }: Props) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
   function handleClick() {
     const warning =
       pendingMatches > 0
-        ? `Masih ada ${pendingMatches} match yang belum selesai. Mereka tidak akan di-score. `
+        ? `Masih ada ${pendingMatches} match yang belum selesai. Mereka tidak akan di-skor. `
         : "";
+    // Sprint 50: wording lebih jelas — "Selesaikan" (sukses, dihitung)
+    // vs "Batalkan" (gagal, di-skip). Hindari ambiguitas End vs Cancel.
     const msg =
-      `End session sekarang?\n\n${warning}` +
-      `${completedMatches} match selesai akan tetap dihitung.\n\n` +
-      `Status berubah ke SELESAI. Kamu bisa Reopen nanti kalau perlu.`;
+      `Selesaikan sesi ini?\n\n${warning}` +
+      `${completedMatches} match selesai akan tetap dihitung sebagai statistik.\n\n` +
+      `Status berubah ke SELESAI. Bisa dibuka kembali nanti kalau perlu.`;
     if (!confirm(msg)) return;
     setError(null);
     startTransition(async () => {
       const result = await endSessionAction(sessionId);
-      if (result?.error) setError(result.error);
+      if (result?.error) {
+        setError(result.error);
+        return;
+      }
+      router.refresh();
     });
   }
 
@@ -59,9 +67,10 @@ export function EndSessionButton({
           strokeLinecap="round"
           strokeLinejoin="round"
         >
-          <rect x="6" y="6" width="12" height="12" rx="1" />
+          <path d="M9 12l2 2 4-4" />
+          <circle cx="12" cy="12" r="10" />
         </svg>
-        <span>{isPending ? "Menutup..." : "End Session"}</span>
+        <span>{isPending ? "Menyelesaikan…" : "Selesaikan Sesi"}</span>
       </button>
     </>
   );

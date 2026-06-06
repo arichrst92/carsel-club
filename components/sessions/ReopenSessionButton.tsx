@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { reopenSessionAction } from "@/app/actions/sessions";
 import { Toast } from "@/components/ui/Toast";
 
@@ -11,21 +12,26 @@ export function ReopenSessionButton({
   sessionId: string;
   hasRounds: boolean;
 }) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
   function handleClick() {
-    const target = hasRounds ? "LIVE" : "UPCOMING";
+    const target = hasRounds ? "LIVE" : "MENDATANG";
     if (
       !confirm(
-        `Reopen session ini?\n\nStatus akan kembali ke ${target}. Stats yang sudah accrued tetap.`
+        `Buka kembali sesi ini?\n\nStatus akan kembali ke ${target}. Statistik yang sudah masuk tetap ada.`
       )
     )
       return;
     setError(null);
     startTransition(async () => {
       const result = await reopenSessionAction(sessionId);
-      if (result?.error) setError(result.error);
+      if (result?.error) {
+        setError(result.error);
+        return;
+      }
+      router.refresh();
     });
   }
 
@@ -68,8 +74,8 @@ export function ReopenSessionButton({
         </svg>
         <span>
           {isPending
-            ? "Membuka ulang..."
-            : `Reopen Session${hasRounds ? " (Live)" : ""}`}
+            ? "Membuka ulang…"
+            : `Buka Ulang Sesi${hasRounds ? " (Live)" : ""}`}
         </span>
       </button>
     </>

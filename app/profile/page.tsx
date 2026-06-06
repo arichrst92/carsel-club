@@ -143,7 +143,7 @@ export default async function ProfilePage() {
       <header className="app-header">
         <div className="logo">
           <AppLogoMark />
-          <span className="logo-text">Profile</span>
+          <span className="logo-text">Profil</span>
         </div>
         <div className="header-actions">
           <form action={logoutAction}>

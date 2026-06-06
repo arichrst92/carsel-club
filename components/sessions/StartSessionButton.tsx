@@ -1,24 +1,30 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { startSessionAction } from "@/app/actions/sessions";
 import { Toast } from "@/components/ui/Toast";
 
 export function StartSessionButton({ sessionId }: { sessionId: string }) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
   function handleClick() {
     if (
       !confirm(
-        "Mulai session? Status berubah ke LIVE. Cocok kalau pemain sudah datang & siap main."
+        "Mulai sesi sekarang? Status berubah ke LIVE. Cocok kalau pemain sudah datang & siap main."
       )
     )
       return;
     setError(null);
     startTransition(async () => {
       const result = await startSessionAction(sessionId);
-      if (result?.error) setError(result.error);
+      if (result?.error) {
+        setError(result.error);
+        return;
+      }
+      router.refresh();
     });
   }
 
@@ -44,7 +50,7 @@ export function StartSessionButton({ sessionId }: { sessionId: string }) {
         >
           <path d="M5 3l14 9-14 9V3z" />
         </svg>
-        <span>{isPending ? "Memulai..." : "Start Session"}</span>
+        <span>{isPending ? "Memulai…" : "Mulai Sesi"}</span>
       </button>
     </>
   );

@@ -314,6 +314,23 @@ export default async function SessionDetailPage({ params }: PageProps) {
                 participants.find((p) => p.role === "host")?.userDisplayName ??
                 null
               }
+              status={session.status}
+              format={session.format}
+              coverPhotoUrl={session.coverPhotoUrl ?? null}
+              playerCount={participants.length}
+              completedMatches={completedMatches}
+              topPlayers={[...participants]
+                .filter((p) => p.sessionMatches > 0)
+                .sort((a, b) => b.sessionPoints - a.sessionPoints)
+                .slice(0, 5)
+                .map((p) => ({
+                  name:
+                    p.userDisplayName ?? p.guestName ?? "Pemain",
+                  wins: p.sessionWins,
+                  draws: p.sessionDraws,
+                  losses: p.sessionLosses,
+                  points: p.sessionPoints,
+                }))}
             />
           </section>
         )}

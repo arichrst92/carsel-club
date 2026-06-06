@@ -308,9 +308,9 @@ function PrivateProfileView({ displayName }: { displayName: string }) {
       <main className="app-content">
         <div className="empty-state" style={{ marginTop: "var(--s-6)" }}>
           <div className="empty-state-icon">🔒</div>
-          <div className="empty-state-title">Profile Private</div>
+          <div className="empty-state-title">Profil Privat</div>
           <div className="empty-state-text">
-            {displayName} memilih untuk tidak menampilkan profile-nya secara
+            {displayName} memilih untuk tidak menampilkan profilnya secara
             publik.
           </div>
           <Link

@@ -8,7 +8,7 @@ export default function FindLoading() {
       <header className="app-header">
         <div className="logo">
           <AppLogoMark />
-          <span className="logo-text">Find Session</span>
+          <span className="logo-text">Cari Sesi</span>
         </div>
       </header>
       <main

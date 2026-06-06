@@ -38,7 +38,7 @@ const TABS: Tab[] = [
   },
   {
     href: "/sessions",
-    label: "Sessions",
+    label: "Sesi",
     matchPrefix: "/sessions",
     icon: (
       <svg
@@ -58,7 +58,7 @@ const TABS: Tab[] = [
   },
   {
     href: "/sessions/new",
-    label: "Create",
+    label: "Buat",
     fab: true,
     icon: (
       <svg
@@ -99,7 +99,7 @@ const TABS: Tab[] = [
   },
   {
     href: "/profile",
-    label: "Profile",
+    label: "Profil",
     matchPrefix: "/profile",
     icon: (
       <svg

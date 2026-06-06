@@ -81,6 +81,8 @@ export async function getSessionWithParticipants(sessionId: string) {
       sessionPoints: sessionParticipants.sessionPoints,
       sessionMatches: sessionParticipants.sessionMatches,
       sessionWins: sessionParticipants.sessionWins,
+      sessionLosses: sessionParticipants.sessionLosses,
+      sessionDraws: sessionParticipants.sessionDraws,
       joinedAt: sessionParticipants.joinedAt,
       // Joined user fields (null for guests)
       userDisplayName: users.displayName,

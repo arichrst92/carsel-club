@@ -141,7 +141,7 @@ export default async function HomePage() {
         {/* QUICK ACTIONS */}
         <section>
           <div className="section-head">
-            <h3>Quick Actions</h3>
+            <h3>Aksi Cepat</h3>
           </div>
           <div className="quick-actions">
             <Link href="/sessions/new" className="qa-btn primary">
@@ -159,8 +159,8 @@ export default async function HomePage() {
                   <path d="M12 5v14M5 12h14" />
                 </svg>
               </div>
-              <div className="qa-title">Create Session</div>
-              <div className="qa-sub">Mulai session baru</div>
+              <div className="qa-title">Buat Sesi</div>
+              <div className="qa-sub">Mulai sesi baru</div>
             </Link>
             <Link href="/find" className="qa-btn">
               <div className="qa-icon">
@@ -178,8 +178,8 @@ export default async function HomePage() {
                   <path d="M21 21l-4.35-4.35" />
                 </svg>
               </div>
-              <div className="qa-title">Find Session</div>
-              <div className="qa-sub">Public sessions di kota</div>
+              <div className="qa-title">Cari Sesi</div>
+              <div className="qa-sub">Sesi publik di kotamu</div>
             </Link>
           </div>
         </section>
