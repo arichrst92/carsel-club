@@ -1325,6 +1325,42 @@ existing session display tetap normal (tanpa playType chip).
 
 ---
 
+### Sprint 47 — Session Leaderboard ✅
+**Goal**: In-session ranking pemain (point/winrate/match) sesuai prototype
+session-leaderboard.html. Data sudah ada di `session_participants` table,
+tinggal di-expose via query + page.
+
+Sub-tasks:
+- Query (lib/db/queries/session-leaderboard.ts):
+  - listSessionLeaderboard(sessionId) — join session_participants + users +
+    tier_definitions, hitung winRate via computeWinRate dari Sprint 32
+  - getSessionLeaderboardHero(sessionId) — playerCount, completedMatches,
+    totalPoints untuk hero stats
+  - Guest participants di-include (display "GUEST" badge)
+- Page /sessions/[id]/leaderboard:
+  - Hero card dengan session title + 3 stats (Pemain / Match Done / Total Pts)
+  - Sort tabs (Point / Win Rate / Match) — URL-driven via searchParams.sort
+  - Player list dengan rank medal (🥇🥈🥉), avatar, name, GUEST badge kalau
+    guest, host/co-host badge, 3 stat cells (Pts/WR/Match) dengan primary
+    column highlighted sesuai sort
+  - Winrate sort require ≥2 match (otherwise -1) supaya gak misleading saat
+    awal session
+  - User sendiri highlighted dengan primary-50 background + primary border
+  - isPlaying filter — yang gak main (host non-playing) gak masuk list
+- Link dari /sessions/[id] (session detail):
+  - Tambah '🏆 Leaderboard' section-link di header section "Pemain"
+  - Visible untuk semua user (bukan staff-only)
+
+Yang TIDAK berubah:
+- Stats sync (Sprint 4 stats-helpers): tetap update session_participants
+  fields saat match completed/edited
+- Pure helper computeWinRate dari lib/leaderboard/sort.ts dipakai ulang
+
+**DoD**: Tombol Leaderboard tampil di session detail, click → page tampil
+ranking dengan medal podium + sort tabs.
+
+---
+
 **Audit findings reference** (Sprint 36 retro):
 - ✅ 37 sprint shipped (Sprint 0-36)
 - 🔴 4 critical gaps surfaced (Sprint 37 covers)

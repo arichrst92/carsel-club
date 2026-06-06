@@ -321,14 +321,22 @@ export default async function SessionDetailPage({ params }: PageProps) {
         <section>
           <div className="section-head">
             <h3>Pemain ({participants.length})</h3>
-            {staff && !isTerminal && (
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <Link
-                href={`/sessions/${session.id}/participants`}
+                href={`/sessions/${session.id}/leaderboard`}
                 className="section-link"
               >
-                + Tambah
+                🏆 Leaderboard
               </Link>
-            )}
+              {staff && !isTerminal && (
+                <Link
+                  href={`/sessions/${session.id}/participants`}
+                  className="section-link"
+                >
+                  + Tambah
+                </Link>
+              )}
+            </div>
           </div>
           <div className="player-list">
             {participants.length === 0 && (
