@@ -13,6 +13,7 @@
 
 import "server-only";
 import {
+  buildAuthorizationHeader,
   buildWablasPayload,
   parseWablasResponse,
   type WablasResponse,
@@ -36,6 +37,10 @@ export async function sendWhatsApp(
     throw new Error("WABLAS_TOKEN environment variable is not set");
   }
   const apiUrl = process.env.WABLAS_API_URL ?? DEFAULT_API_URL;
+  // Sprint 42: optional bypass IP whitelist via secret key.
+  // Wablas format: Authorization: TOKEN.SECRET
+  const secret = process.env.WABLAS_SECRET_KEY ?? null;
+  const authHeader = buildAuthorizationHeader(token, secret);
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -44,7 +49,7 @@ export async function sendWhatsApp(
     const res = await fetch(apiUrl, {
       method: "POST",
       headers: {
-        Authorization: token,
+        Authorization: authHeader,
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: buildWablasPayload(options.target, options.message),
@@ -52,8 +57,17 @@ export async function sendWhatsApp(
     });
 
     if (!res.ok) {
+      // Surface response body for debugging (esp. 403/401 token issues)
+      let bodyText = "";
+      try {
+        bodyText = await res.text();
+      } catch {
+        // ignore
+      }
       throw new Error(
-        `Wablas HTTP ${res.status} ${res.statusText}`
+        `Wablas HTTP ${res.status} ${res.statusText} (endpoint=${apiUrl})${
+          bodyText ? ` body=${bodyText.slice(0, 200)}` : ""
+        }`
       );
     }
 
@@ -61,7 +75,7 @@ export async function sendWhatsApp(
     const parsed = parseWablasResponse(json);
     if (!parsed.status) {
       throw new Error(
-        `Wablas API error: ${parsed.message ?? "unknown"}`
+        `Wablas API error: ${parsed.message ?? "unknown"} (endpoint=${apiUrl})`
       );
     }
     return parsed;

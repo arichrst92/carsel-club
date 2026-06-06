@@ -44,6 +44,26 @@ export function buildWablasPayload(
   return params.toString();
 }
 
+/**
+ * Build Authorization header value untuk Wablas API.
+ *
+ * - Tanpa secret: just `token`
+ * - Dengan secret: `token.secret` (Wablas format, untuk bypass IP whitelist)
+ *
+ * Secret bisa di-set di dashboard Wablas → API → Secret Key. Kalau IP
+ * whitelist aktif tapi client IP dynamic (e.g., dev local), secret allow
+ * request lolos tanpa cek whitelist.
+ */
+export function buildAuthorizationHeader(
+  token: string,
+  secret?: string | null
+): string {
+  if (secret && secret.length > 0) {
+    return `${token}.${secret}`;
+  }
+  return token;
+}
+
 export type WablasResponse = {
   status: boolean;
   message: string | null;

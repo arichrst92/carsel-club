@@ -10,8 +10,25 @@ import {
 } from "@/lib/auth/session-core";
 
 // Public routes — accessible without auth
-const PUBLIC_EXACT = ["/", "/login", "/login/verify"];
-const PUBLIC_PREFIXES = ["/s/", "/invite/"]; // /s/* = public share, /invite/* = referral landing
+const PUBLIC_EXACT = [
+  "/",
+  "/login",
+  "/login/verify",
+  // Sprint 33: PWA assets must be public
+  "/manifest.webmanifest",
+  "/sw.js",
+  "/offline",
+  // Sprint 37: legal pages must be public
+  "/help",
+  "/privacy-policy",
+  "/tos",
+];
+const PUBLIC_PREFIXES = [
+  "/s/", // public share (live view)
+  "/invite/", // referral landing
+  "/api/", // API routes self-gate via requireUser
+  "/uploads/", // uploaded files
+];
 
 function isPublic(path: string): boolean {
   if (PUBLIC_EXACT.includes(path)) return true;
@@ -40,6 +57,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|sw\\.js|manifest\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|json|txt|xml)$).*)",
   ],
 };

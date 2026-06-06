@@ -3,6 +3,7 @@ import {
   normalizeWablasPhone,
   buildWablasPayload,
   parseWablasResponse,
+  buildAuthorizationHeader,
 } from "@/lib/wablas/format";
 
 describe("normalizeWablasPhone", () => {
@@ -94,6 +95,30 @@ describe("buildWablasPayload", () => {
     const payload = buildWablasPayload("628123", "line1\nline2\nline3");
     const parsed = new URLSearchParams(payload);
     expect(parsed.get("message")).toBe("line1\nline2\nline3");
+  });
+
+});
+
+describe("buildAuthorizationHeader", () => {
+  it("token only when no secret", () => {
+    expect(buildAuthorizationHeader("ABC123")).toBe("ABC123");
+  });
+
+  it("token only when secret null", () => {
+    expect(buildAuthorizationHeader("ABC123", null)).toBe("ABC123");
+  });
+
+  it("token only when secret empty string", () => {
+    expect(buildAuthorizationHeader("ABC123", "")).toBe("ABC123");
+  });
+
+  it("token.secret format when secret provided", () => {
+    expect(buildAuthorizationHeader("ABC123", "XYZ789")).toBe("ABC123.XYZ789");
+  });
+
+  it("preserves dots inside token or secret", () => {
+    // Don't strip existing dots — Wablas tokens may contain them
+    expect(buildAuthorizationHeader("AB.CD", "EF.GH")).toBe("AB.CD.EF.GH");
   });
 });
 
