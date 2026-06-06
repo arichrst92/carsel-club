@@ -558,18 +558,29 @@ Sub-tasks:
 
 ---
 
-### Sprint 26 — Notifications: center page + prefs
+### Sprint 26 — Notifications: center page + prefs ✅
 **Goal**: Replace placeholder + per-type prefs
 
 Sub-tasks:
-- Notification center page (replace `app/notifications/page.tsx` stub)
-- Date grouping (Hari ini / Kemarin / Minggu lalu), type icon, mark read on click
-- Unread badge di bell icon di header
-- `/profile/settings/notifications` page
-- Table `user_notification_prefs` (userId, type, channels JSONB)
-- Quiet hours field (start/end)
+- Schema: `user_notification_prefs` (1 row/user — settings JSONB + quiet_hours_start/end)
+- Pure helpers + tests (100% cov):
+  - `lib/notifications/prefs.ts` — resolveChannels, isChannelEnabled, isQuietHours
+    (handles wrap-midnight), shouldDeliver (in_app bypass)
+  - `lib/notifications/group.ts` — bucketForDate (today/yesterday/this_week/older),
+    groupByDate
+- Queries: getNotificationPrefs (default fallback)
+- Actions: markNotificationReadAction (idempotent), markAllNotificationsReadAction,
+  updateNotificationPrefsAction (form-based + sanitization)
+- UI:
+  - `app/notifications/page.tsx` rewritten — grouped list, unread count, settings link
+  - `NotificationItem` (client, tap → markRead + navigate via router)
+  - `NotificationBell` (server, unread badge)
+  - `MarkAllReadButton`
+  - Wired ke home header (replace old Link)
+  - `app/profile/settings/notifications/page.tsx` — per-type 3-channel matrix + quiet hours
 
-**DoD**: Notification center match prototype `notifications.html`.
+**DoD**: Notification center match prototype `notifications.html`. Push & WA delivery
+deferred ke Sprint 27/28 — toggles disimpan untuk dipakai nanti.
 
 ---
 

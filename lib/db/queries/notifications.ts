@@ -4,11 +4,12 @@
 
 import { and, count, desc, eq, isNull } from "drizzle-orm";
 import { db } from "@/lib/db/client";
-import { notifications } from "@/lib/db/schema";
+import { notifications, userNotificationPrefs } from "@/lib/db/schema";
 import type {
   NotificationType,
   NotificationPayloadByType,
 } from "@/lib/notifications/types";
+import type { NotificationSettings } from "@/lib/notifications/prefs";
 
 export type NotificationRow = {
   id: string;
@@ -69,4 +70,36 @@ export function typedPayload<T extends NotificationType>(
 ): NotificationPayloadByType[T] | null {
   if (row.type !== expected) return null;
   return row.payload as NotificationPayloadByType[T];
+}
+
+// ============================================================
+// Notification prefs (Sprint 26)
+// ============================================================
+
+export type NotificationPrefsRow = {
+  settings: NotificationSettings;
+  quietStartHour: number | null;
+  quietEndHour: number | null;
+};
+
+export async function getNotificationPrefs(
+  userId: string
+): Promise<NotificationPrefsRow> {
+  const [row] = await db
+    .select({
+      settings: userNotificationPrefs.settings,
+      quietStartHour: userNotificationPrefs.quietStartHour,
+      quietEndHour: userNotificationPrefs.quietEndHour,
+    })
+    .from(userNotificationPrefs)
+    .where(eq(userNotificationPrefs.userId, userId))
+    .limit(1);
+  if (!row) {
+    return { settings: {}, quietStartHour: null, quietEndHour: null };
+  }
+  return {
+    settings: (row.settings ?? {}) as NotificationSettings,
+    quietStartHour: row.quietStartHour,
+    quietEndHour: row.quietEndHour,
+  };
 }

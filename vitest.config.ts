@@ -56,6 +56,9 @@ export default defineConfig({
         "lib/match/generator-fix-partners.ts",
         // Sprint 25 — notification formatter
         "lib/notifications/format.ts",
+        // Sprint 26 — prefs + grouping
+        "lib/notifications/prefs.ts",
+        "lib/notifications/group.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [

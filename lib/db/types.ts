@@ -23,6 +23,7 @@ import type {
   userBlocks,
   follows,
   notifications,
+  userNotificationPrefs,
 } from "./schema";
 
 // Select types (rows yang di-fetch dari DB)
@@ -41,6 +42,7 @@ export type FriendRequest = InferSelectModel<typeof friendRequests>;
 export type UserBlock = InferSelectModel<typeof userBlocks>;
 export type Follow = InferSelectModel<typeof follows>;
 export type Notification = InferSelectModel<typeof notifications>;
+export type UserNotificationPrefs = InferSelectModel<typeof userNotificationPrefs>;
 
 // Insert types (rows yang di-create)
 export type NewUser = InferInsertModel<typeof users>;
@@ -57,3 +59,4 @@ export type NewFriendRequest = InferInsertModel<typeof friendRequests>;
 export type NewUserBlock = InferInsertModel<typeof userBlocks>;
 export type NewFollow = InferInsertModel<typeof follows>;
 export type NewNotification = InferInsertModel<typeof notifications>;
+export type NewUserNotificationPrefs = InferInsertModel<typeof userNotificationPrefs>;

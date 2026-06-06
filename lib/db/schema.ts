@@ -340,8 +340,32 @@ export const matchRoundSets = pgTable(
 );
 
 // ============================================================
-// NOTIFICATIONS — Sprint 25
+// NOTIFICATIONS — Sprint 25-26
 // ============================================================
+
+/**
+ * Per-user notification preferences (Sprint 26).
+ *
+ * One row per user. `settings` JSONB has per-type channel toggles:
+ *   { session_invite: { in_app: true, push: false, wa: true }, ... }
+ * Missing keys default to all channels enabled.
+ *
+ * Quiet hours stored as 0-23 hour ints. null = no quiet hours.
+ * Range can wrap midnight (e.g., 22 → 7).
+ */
+export const userNotificationPrefs = pgTable("user_notification_prefs", {
+  userId: uuid("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  settings: jsonb("settings")
+    .notNull()
+    .default(sql`'{}'::jsonb`),
+  quietStartHour: integer("quiet_start_hour"),
+  quietEndHour: integer("quiet_end_hour"),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
 
 export const notifications = pgTable(
   "notifications",

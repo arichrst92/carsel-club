@@ -7,6 +7,7 @@ import {
 } from "@/lib/db/queries/home";
 import { getTierById } from "@/lib/db/queries/public-profile";
 import { BottomNav } from "@/components/nav/BottomNav";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { TierUpModal } from "@/components/home/TierUpModal";
 import { logoutAction } from "@/app/actions/auth";
 import { formatDate, formatTime, formatTimeRange, winRate } from "@/lib/utils";
@@ -71,25 +72,7 @@ export default async function HomePage() {
           <span className="logo-text">Carsel Club</span>
         </div>
         <div className="header-actions">
-          <Link
-            href="/notifications"
-            className="icon-btn"
-            aria-label="Notifications"
-          >
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-            </svg>
-          </Link>
+          <NotificationBell userId={user.id} />
           <Link
             href="/profile"
             className="avatar"
