@@ -320,9 +320,9 @@ export default async function SessionDetailPage({ params }: PageProps) {
               playerCount={participants.length}
               completedMatches={completedMatches}
               topPlayers={[...participants]
-                .filter((p) => p.sessionMatches > 0)
+                // Sprint 50: tampilkan SEMUA pemain (renderer auto
+                // adjust row height supaya muat).
                 .sort((a, b) => b.sessionPoints - a.sessionPoints)
-                .slice(0, 5)
                 .map((p) => ({
                   name:
                     p.userDisplayName ?? p.guestName ?? "Pemain",

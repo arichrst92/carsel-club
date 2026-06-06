@@ -100,16 +100,20 @@ function roundRect(
   h: number,
   r: number
 ) {
+  // Clamp radius — kalau lebih besar dari setengah dimensi pendek,
+  // bezier-nya overshoot dan bikin shape segitiga merah aneh.
+  const maxR = Math.max(0, Math.min(w, h) / 2);
+  const rr = Math.min(Math.max(0, r), maxR);
   ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.moveTo(x + rr, y);
+  ctx.lineTo(x + w - rr, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + rr);
+  ctx.lineTo(x + w, y + h - rr);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - rr, y + h);
+  ctx.lineTo(x + rr, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - rr);
+  ctx.lineTo(x, y + rr);
+  ctx.quadraticCurveTo(x, y, x + rr, y);
   ctx.closePath();
 }
 
@@ -287,12 +291,36 @@ function drawBody(ctx: CanvasRenderingContext2D, data: ShareCardData) {
   if (data.top.length > 0) {
     ctx.fillText("🏆 Leaderboard", padX, y);
     y += 50;
-    const rowH = 88;
-    const rowGap = 14;
+
+    // Sprint 50 fix: adaptive sizing supaya SEMUA pemain muat (bukan
+    // cuma 5 besar). Footer di y=1840, header leaderboard di y=1100ish.
+    // Available ~700px utk N rows + gaps.
+    const FOOTER_Y = H - 80;
+    const FOOTER_PAD = 40;
+    const maxBlockH = FOOTER_Y - FOOTER_PAD - y;
+    const n = data.top.length;
+    // Try big rows first, scale down kalau gak muat
+    const candidates = [
+      { rowH: 88, gap: 14, nameFs: 32, subFs: 20, pointsFs: 44, rankFs: 44 },
+      { rowH: 72, gap: 12, nameFs: 28, subFs: 18, pointsFs: 38, rankFs: 36 },
+      { rowH: 58, gap: 10, nameFs: 24, subFs: 16, pointsFs: 32, rankFs: 30 },
+      { rowH: 48, gap: 8, nameFs: 20, subFs: 14, pointsFs: 28, rankFs: 26 },
+    ];
+    let cfg = candidates[0];
+    for (const c of candidates) {
+      const total = n * c.rowH + (n - 1) * c.gap;
+      if (total <= maxBlockH) {
+        cfg = c;
+        break;
+      }
+      cfg = c; // pakai yg paling kecil sebagai fallback
+    }
+
     const medals = ["🥇", "🥈", "🥉"];
     for (let i = 0; i < data.top.length; i++) {
       const p = data.top[i];
       const isFirst = i === 0;
+      const rowH = cfg.rowH;
       // Row background
       ctx.save();
       roundRect(ctx, padX, y, stripW, rowH, 16);
@@ -309,38 +337,50 @@ function drawBody(ctx: CanvasRenderingContext2D, data: ShareCardData) {
 
       // Rank
       const rankX = padX + 32;
-      ctx.font = `900 ${i < 3 ? 44 : 32}px system-ui`;
+      ctx.font = `900 ${i < 3 ? cfg.rankFs : cfg.rankFs - 8}px system-ui`;
       ctx.textAlign = "center";
       ctx.fillStyle = isFirst ? "#FACC15" : "#fff";
       ctx.textBaseline = "middle";
       const rankLabel = i < 3 ? medals[i] : `${i + 1}`;
       ctx.fillText(rankLabel, rankX, y + rowH / 2);
 
-      // Name
-      ctx.font = "800 32px system-ui";
+      // Name + sub stacked di tengah row
+      const textCenterY = y + rowH / 2;
+      const hasSub = rowH >= 58;
+      const nameX = padX + 80;
+      ctx.font = `800 ${cfg.nameFs}px system-ui`;
       ctx.textAlign = "left";
       ctx.fillStyle = "#fff";
-      const nameMaxW = stripW - 200 - 130; // minus rank area + points area
+      const nameMaxW = stripW - 80 - 30 - 130;
       const name = ellipsizeText(ctx, p.name, nameMaxW);
-      ctx.fillText(name, padX + 90, y + 32);
-
-      // W/D/L stats sub
-      ctx.font = "600 20px system-ui";
-      ctx.fillStyle = "rgba(255,255,255,0.85)";
-      ctx.fillText(
-        `${p.wins}W · ${p.draws}D · ${p.losses}L`,
-        padX + 90,
-        y + 64
-      );
+      if (hasSub) {
+        ctx.textBaseline = "alphabetic";
+        ctx.fillText(name, nameX, textCenterY - 4);
+        ctx.font = `600 ${cfg.subFs}px system-ui`;
+        ctx.fillStyle = "rgba(255,255,255,0.85)";
+        ctx.fillText(
+          `${p.wins}W · ${p.draws}D · ${p.losses}L`,
+          nameX,
+          textCenterY + cfg.subFs + 2
+        );
+      } else {
+        // Single line: name + W/D/L gabung
+        ctx.textBaseline = "middle";
+        ctx.fillText(
+          `${name} · ${p.wins}W ${p.draws}D ${p.losses}L`,
+          nameX,
+          y + rowH / 2
+        );
+      }
 
       // Points (right)
-      ctx.font = "900 44px system-ui";
+      ctx.font = `900 ${cfg.pointsFs}px system-ui`;
       ctx.textAlign = "right";
       ctx.textBaseline = "middle";
       ctx.fillStyle = isFirst ? "#FACC15" : "#fff";
       ctx.fillText(String(p.points), padX + stripW - 28, y + rowH / 2);
 
-      y += rowH + rowGap;
+      y += rowH + cfg.gap;
     }
   } else {
     ctx.save();
