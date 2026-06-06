@@ -30,7 +30,6 @@ type Props = {
     joinPolicy: "auto_join" | "need_approval";
     maxRounds: number | null;
     format: "americano" | "mexicano" | "tournament";
-    playType: "freeplay" | "tournament";
     numCourts: number;
     fixPartners: boolean;
   };
@@ -63,7 +62,6 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
     initial.maxRounds ? String(initial.maxRounds) : ""
   );
   const [format, setFormat] = useState(initial.format);
-  const [playType, setPlayType] = useState(initial.playType);
   const [numCourts, setNumCourts] = useState(initial.numCourts);
   const [fixPartners, setFixPartners] = useState(initial.fixPartners);
   const [error, setError] = useState<string | null>(null);
@@ -103,7 +101,6 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
       if (maxRounds) fd.set("max_rounds", maxRounds);
       // Match config — server check lock rule
       fd.set("format", format);
-      fd.set("play_type", playType);
       fd.set("num_courts", String(numCourts));
       fd.set("fix_partners", fixPartners ? "on" : "off");
 
@@ -299,24 +296,6 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
                   style={hasRounds ? { opacity: 0.6 } : undefined}
                 >
                   <span style={{ textTransform: "capitalize" }}>{f}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Type</label>
-            <div className="segmented">
-              {(["freeplay", "tournament"] as const).map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  className={`segmented-option ${playType === t ? "active" : ""}`}
-                  onClick={() => !hasRounds && setPlayType(t)}
-                  disabled={hasRounds}
-                  style={hasRounds ? { opacity: 0.6 } : undefined}
-                >
-                  <span style={{ textTransform: "capitalize" }}>{t}</span>
                 </button>
               ))}
             </div>

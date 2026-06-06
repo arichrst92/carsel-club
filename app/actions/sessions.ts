@@ -39,7 +39,6 @@ const CreateSessionSchema = z.object({
     .min(2, "Nama session minimal 2 karakter")
     .max(60, "Maksimal 60 karakter"),
   format: z.enum(["americano", "mexicano", "tournament"]).default("americano"),
-  playType: z.enum(["freeplay", "tournament"]).default("freeplay"),
   visibility: z.enum(["private", "public"]).default("private"),
   venueName: z.string().trim().min(1, "Venue wajib diisi").max(80),
   mapsUrl: z.string().trim().max(500).optional(),
@@ -84,7 +83,6 @@ export async function createSessionAction(
   const raw = {
     title: s("title"),
     format: s("format") ?? "americano",
-    playType: s("play_type") ?? "freeplay",
     visibility: s("visibility") ?? "private",
     venueName: s("venue_name"),
     mapsUrl: s("maps_url"),
@@ -133,7 +131,10 @@ export async function createSessionAction(
           fixPartners: input.fixPartners,
           description: input.description || null,
           format: input.format,
-          playType: input.playType,
+          // Sprint 44: playType section removed dari create form.
+          // Hardcoded 'freeplay' — concept deprecated, tournament jadi
+          // format pilihan (bracket) bukan separate play type.
+          playType: "freeplay",
           visibility: input.visibility,
           status: "upcoming",
         })
@@ -157,7 +158,6 @@ export async function createSessionAction(
   event("session_created", {
     sessionId: newSessionId,
     format: input.format,
-    playType: input.playType,
     numCourts: input.numCourts,
     visibility: input.visibility,
     fixPartners: input.fixPartners,
@@ -208,7 +208,6 @@ const EditSessionSchema = z.object({
   maxRounds: z.coerce.number().int().min(1).max(50).optional(),
   // Locked-after-round1 fields (server-validate kalau dikirim)
   format: z.enum(["americano", "mexicano", "tournament"]).optional(),
-  playType: z.enum(["freeplay", "tournament"]).optional(),
   numCourts: z.coerce.number().int().min(1).max(20).optional(),
   fixPartners: z.coerce.boolean().optional(),
 });
@@ -256,7 +255,6 @@ export async function editSessionAction(
     joinPolicy: s("join_policy"),
     maxRounds: s("max_rounds"),
     format: s("format"),
-    playType: s("play_type"),
     numCourts: s("num_courts"),
     fixPartners:
       formData.get("fix_partners") === "on"
@@ -286,12 +284,6 @@ export async function editSessionAction(
   if (hasRounds) {
     if (input.format !== undefined && input.format !== current.format) {
       lockedChanges.push("format");
-    }
-    if (
-      input.playType !== undefined &&
-      input.playType !== current.playType
-    ) {
-      lockedChanges.push("tipe");
     }
     if (
       input.numCourts !== undefined &&
@@ -330,7 +322,6 @@ export async function editSessionAction(
   // Match config bisa di-update kalau belum ada round
   if (!hasRounds) {
     if (input.format !== undefined) updates.format = input.format;
-    if (input.playType !== undefined) updates.playType = input.playType;
     if (input.numCourts !== undefined) updates.numCourts = input.numCourts;
     if (input.fixPartners !== undefined)
       updates.fixPartners = input.fixPartners;

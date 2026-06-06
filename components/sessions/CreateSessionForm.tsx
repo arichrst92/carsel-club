@@ -11,7 +11,6 @@ import { createSessionAction } from "@/app/actions/sessions";
 type FormData = {
   name: string;
   format: "americano" | "mexicano" | "tournament";
-  playType: "freeplay" | "tournament";
   venueName: string;
   mapsUrl: string;
   date: string; // YYYY-MM-DD
@@ -49,7 +48,6 @@ function defaultTimeEnd(): string {
 const INITIAL: FormData = {
   name: "Sabtu Sore Padel",
   format: "americano",
-  playType: "freeplay",
   venueName: "",
   mapsUrl: "",
   date: defaultDateStr(),
@@ -134,7 +132,6 @@ export function CreateSessionForm() {
     const fd = new FormData();
     fd.set("title", data.name);
     fd.set("format", data.format);
-    fd.set("play_type", data.playType);
     fd.set("visibility", data.visibility);
     fd.set("venue_name", data.venueName);
     fd.set("maps_url", data.mapsUrl);
@@ -351,29 +348,6 @@ function Step1Info({
           </div>
         </div>
 
-        <div className="form-group">
-          <label className="form-label">Type</label>
-          <div className="segmented">
-            <button
-              type="button"
-              className={`segmented-option ${data.playType === "freeplay" ? "active" : ""}`}
-              onClick={() => setField("playType", "freeplay")}
-            >
-              <span>Freeplay</span>
-              <span className="seg-sub">Casual session</span>
-            </button>
-            <button
-              type="button"
-              className="segmented-option disabled"
-              title="Tournament akan tersedia di v1.5"
-            >
-              <span>
-                Tournament <span className="badge soon">Soon</span>
-              </span>
-              <span className="seg-sub">Competitive</span>
-            </button>
-          </div>
-        </div>
       </section>
     </>
   );
@@ -869,9 +843,7 @@ function Step5Review({
                   ? "Americano"
                   : data.format === "mexicano"
                     ? "Mexicano"
-                    : "Tournament"}{" "}
-                ·{" "}
-                {data.playType === "freeplay" ? "Freeplay" : "Tournament"}
+                    : "Tournament"}
               </span>
             </div>
           </div>

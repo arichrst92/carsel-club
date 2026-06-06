@@ -245,9 +245,6 @@ export default async function SessionDetailPage({ params }: PageProps) {
             <span className="format-chip" style={{ textTransform: "capitalize" }}>
               {session.format}
             </span>
-            <span className="format-chip" style={{ textTransform: "capitalize" }}>
-              {session.playType}
-            </span>
             <span className="format-chip">
               {session.numCourts} Court{session.numCourts > 1 ? "s" : ""}
             </span>

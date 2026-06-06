@@ -1282,6 +1282,49 @@ tests hijau, 100% cov dipertahankan.
 
 ---
 
+### Sprint 44 — Drop Type section (playType) di Create/Edit session form ✅
+**Goal**: Hilangkan duplikasi konsep "Tournament" yang muncul 2x di Create
+form. Sprint 31 sudah implement Tournament sebagai Format (bracket), tapi
+Type section legacy ("Freeplay / Tournament SOON") tidak pernah dipakai.
+
+Decision: Opsi A — hapus Type section total. playType ditinggalkan sebagai
+schema column (backward compat untuk existing rows), hardcoded 'freeplay'
+untuk session baru.
+
+Sub-tasks:
+- components/sessions/CreateSessionForm.tsx:
+  - Hapus Type segmented section (UI)
+  - Hapus playType dari FormData type + INITIAL
+  - Hapus play_type FormData set saat submit
+  - Update review screen — drop "Freeplay/Tournament" label, sisa cuma
+    format display
+- components/sessions/EditSessionForm.tsx:
+  - Hapus Type segmented section
+  - Hapus playType dari initial type + useState
+  - Hapus play_type set di FormData submit
+- app/sessions/[id]/edit/page.tsx:
+  - Hapus playType dari initial prop passed ke EditSessionForm
+- app/sessions/[id]/page.tsx:
+  - Hapus format-chip yang menampilkan playType
+- app/actions/sessions.ts:
+  - CreateSessionSchema: drop playType z.enum
+  - createSessionAction: hardcode playType: 'freeplay' di DB insert dengan
+    comment Sprint 44
+  - event session_created: hapus playType dari payload
+  - EditSessionSchema: drop playType z.enum
+  - editSessionAction: drop play_type raw + lockedChanges check + updates
+    assignment
+
+Yang TIDAK berubah:
+- Schema sessions.play_type column tetap (Postgres compatibility +
+  existing rows masih punya value 'freeplay')
+- sessionPlayTypeEnum di schema tetap
+
+**DoD**: Wizard step 1 lebih ringkas, tidak ada duplikasi "Tournament",
+existing session display tetap normal (tanpa playType chip).
+
+---
+
 **Audit findings reference** (Sprint 36 retro):
 - ✅ 37 sprint shipped (Sprint 0-36)
 - 🔴 4 critical gaps surfaced (Sprint 37 covers)

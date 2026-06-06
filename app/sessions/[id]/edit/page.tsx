@@ -82,7 +82,6 @@ export default async function EditSessionPage({ params }: PageProps) {
           joinPolicy: session.joinPolicy,
           maxRounds: session.maxRounds,
           format: session.format,
-          playType: session.playType,
           numCourts: session.numCourts,
           fixPartners: session.fixPartners,
         }}
