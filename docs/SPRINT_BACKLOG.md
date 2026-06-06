@@ -1214,6 +1214,74 @@ dispatcher ke single-provider.
 
 ---
 
+### Sprint 43 — Remove 3 notification types (tier_up + match_result + achievement_unlocked) ✅
+**Goal**: Kurangin volume notifikasi WA + simplify notif system. User minta
+3 tipe ini dihapus total.
+
+Sub-tasks:
+- Types removal (lib/notifications/types.ts):
+  - NotificationType union dikurangi: hapus tier_up, match_result,
+    achievement_unlocked
+  - Payload types dihapus: TierUpPayload, MatchResultPayload,
+    AchievementUnlockedPayload
+  - NotificationPayloadByType lookup dikurangi
+- Format + WA template (lib/notifications/format.ts +
+  lib/notifications/wa-template.ts):
+  - Formatter functions + FORMATTERS/TEMPLATES mapping dikurangi
+- Prefs (lib/notifications/prefs.ts):
+  - PER_TYPE_DEFAULTS: dropdown tier_up + match_result + achievement_unlocked
+  - Sisa cuma session_reminder (wa=true default), lainnya pakai
+    DEFAULT_CHANNELS (wa=false)
+- Generators (lib/notifications/generate.ts):
+  - notifyTierUp, notifyMatchResult, notifyAchievementUnlocked dihapus
+- Caller cleanup:
+  - lib/match/stats-sync.ts: hapus notifyTierUp call (tier update tetap
+    via users.currentTierId; celebration modal di /home pakai
+    lastSeenTierId comparison, bukan notification)
+  - app/actions/matches.ts: hapus notifyMatchPlayers function + call (66
+    LOC dropped). Match detail tetap accessible dari session page +
+    history page (Sprint 40 W/L filter)
+  - lib/match/achievement-sync.ts: hapus 2 notifyAchievementUnlocked call
+    (1 in syncAchievementsForPlayer, 1 in syncHostAchievements).
+    Achievement detection + persistence tetap. Celebration modal pakai
+    getPendingCelebration → reads user_achievements.dismissedAt
+- UI:
+  - NotificationPrefsForm.tsx TYPE_LABELS: hapus 3 entries
+  - Prefs matrix tinggal 8 toggle (dari 11)
+- Backward compat:
+  - lib/db/queries/notifications.ts listNotifications +
+    countUnreadNotifications: filter `NOT IN (tier_up, match_result,
+    achievement_unlocked)` untuk hide historical rows yang gak punya
+    formatter lagi
+  - DB enum value tetap di schema (Postgres tidak bisa DROP VALUE
+    enum yang ada referensi). Comment ditambahkan di types.ts
+- Tests cleanup:
+  - tests/notifications/format.test.ts: hapus 5 test cases
+  - tests/notifications/wa-template.test.ts: hapus 4 test cases
+  - tests/notifications/prefs.test.ts: hapus 4 tests (yang refer ke
+    tier_up/match_result), ganti dengan friend_request/friend_accepted
+    sebagai test data
+
+Yang TIDAK berubah:
+- Schema users.lastSeenTierId — celebration modal tetap pakai ini
+- lib/db/queries/achievements.ts getPendingCelebration — achievement modal
+  tetap pakai ini
+- Event log (app_logs): tier_up, match_completed, achievement_unlocked
+  events tetap dicatat untuk monitoring/observability (terpisah dari
+  notification system)
+- TierUpModal + AchievementUnlockedModal components
+
+Volume estimate impact (per 100 active users / bulan):
+- Before: ~1000 WA pesan
+- After: ~800 WA pesan (-200 dari tier_up + achievement + match_result)
+- Untuk benar-benar minimize ke OTP-only: matikan WA default untuk
+  session_reminder (Sprint future kalau perlu)
+
+**DoD**: 3 type dihapus dari code, historical rows tidak tampil di UI,
+tests hijau, 100% cov dipertahankan.
+
+---
+
 **Audit findings reference** (Sprint 36 retro):
 - ✅ 37 sprint shipped (Sprint 0-36)
 - 🔴 4 critical gaps surfaced (Sprint 37 covers)

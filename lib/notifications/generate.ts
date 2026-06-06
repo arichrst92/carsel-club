@@ -18,14 +18,11 @@ import type {
   SessionInvitePayload,
   SessionReminderPayload,
   SessionCancelledPayload,
-  TierUpPayload,
-  MatchResultPayload,
   FriendRequestPayload,
   FriendAcceptedPayload,
   JoinRequestedPayload,
   JoinApprovedPayload,
   JoinRejectedPayload,
-  AchievementUnlockedPayload,
 } from "./types";
 import { formatNotification } from "./format";
 import { shouldDeliver } from "./prefs";
@@ -162,20 +159,6 @@ export function notifySessionCancelled(
   dispatch(userId, "session_cancelled", payload);
 }
 
-export function notifyTierUp(
-  userId: string,
-  payload: TierUpPayload
-): void {
-  dispatch(userId, "tier_up", payload);
-}
-
-export function notifyMatchResult(
-  userId: string,
-  payload: MatchResultPayload
-): void {
-  dispatch(userId, "match_result", payload);
-}
-
 export function notifyFriendRequest(
   userId: string,
   payload: FriendRequestPayload
@@ -209,11 +192,4 @@ export function notifyJoinRejected(
   payload: JoinRejectedPayload
 ): void {
   dispatch(userId, "join_rejected", payload);
-}
-
-export function notifyAchievementUnlocked(
-  userId: string,
-  payload: AchievementUnlockedPayload
-): void {
-  dispatch(userId, "achievement_unlocked", payload);
 }

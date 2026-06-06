@@ -43,12 +43,6 @@ export const DEFAULT_CHANNELS: ChannelPrefs = {
 const PER_TYPE_DEFAULTS: Partial<Record<NotificationType, ChannelPrefs>> = {
   // Reminder defaults push + wa on (high-value)
   session_reminder: { in_app: true, push: true, wa: true },
-  // Tier up high-celebration, all on
-  tier_up: { in_app: true, push: true, wa: true },
-  // Match result default WA off (noisy)
-  match_result: { in_app: true, push: true, wa: false },
-  // Achievement unlock celebration → all on
-  achievement_unlocked: { in_app: true, push: true, wa: true },
 };
 
 /**

@@ -24,14 +24,11 @@ const TYPE_LABELS: Record<NotificationType, string> = {
   session_invite: "Diundang ke session",
   session_reminder: "Session reminder (H-1 jam)",
   session_cancelled: "Session dibatalkan",
-  tier_up: "Tier naik",
-  match_result: "Hasil match",
   friend_request: "Friend request",
   friend_accepted: "Friend di-accept",
   join_requested: "Join request masuk (host)",
   join_approved: "Join request di-approve",
   join_rejected: "Join request di-reject",
-  achievement_unlocked: "Achievement unlock",
 };
 
 const TYPES: NotificationType[] = Object.keys(TYPE_LABELS) as NotificationType[];

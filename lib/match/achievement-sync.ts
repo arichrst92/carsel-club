@@ -23,7 +23,6 @@ import {
   nextStreak,
   type UserStatsForAchievement,
 } from "@/lib/achievements";
-import { notifyAchievementUnlocked } from "@/lib/notifications/generate";
 
 export type FreshOutcome = {
   userId: string;
@@ -131,15 +130,9 @@ export async function syncAchievementsForPlayer(
       target: [userAchievements.userId, userAchievements.code],
     });
 
-  // 8. Fire celebration notifications
-  for (const a of newAch) {
-    notifyAchievementUnlocked(fo.userId, {
-      code: a.code,
-      name: a.name,
-      emoji: a.emoji,
-      description: a.description,
-    });
-  }
+  // Sprint 43: achievement_unlocked notification dihapus.
+  // Celebration modal di /home pakai getPendingCelebration (reads
+  // user_achievements.dismissedAt) — tetap fire saat user buka home.
 }
 
 /**
@@ -195,14 +188,8 @@ export async function syncHostAchievements(
       .onConflictDoNothing({
         target: [userAchievements.userId, userAchievements.code],
       });
-    for (const a of newAch) {
-      notifyAchievementUnlocked(userId, {
-        code: a.code,
-        name: a.name,
-        emoji: a.emoji,
-        description: a.description,
-      });
-    }
+    // Sprint 43: achievement_unlocked notification dihapus. Celebration
+    // modal di /home akan show next visit via getPendingCelebration.
   } catch (e) {
     console.error("[achievements] host sync failed:", e);
   }

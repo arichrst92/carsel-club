@@ -2,7 +2,7 @@
  * Notifications queries (Sprint 25).
  */
 
-import { and, count, desc, eq, isNull } from "drizzle-orm";
+import { and, count, desc, eq, isNull, notInArray } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { notifications, userNotificationPrefs } from "@/lib/db/schema";
 import type {
@@ -10,6 +10,16 @@ import type {
   NotificationPayloadByType,
 } from "@/lib/notifications/types";
 import type { NotificationSettings } from "@/lib/notifications/prefs";
+
+/**
+ * Sprint 43: types yang sudah deprecated. Historical rows tetap di DB tapi
+ * tidak ditampilkan ke user (formatter/template sudah dihapus).
+ */
+const DEPRECATED_TYPES = [
+  "tier_up",
+  "match_result",
+  "achievement_unlocked",
+] as const;
 
 export type NotificationRow = {
   id: string;
@@ -24,7 +34,10 @@ export async function listNotifications(
   options: { limit?: number; unreadOnly?: boolean } = {}
 ): Promise<NotificationRow[]> {
   const limit = Math.min(options.limit ?? 50, 200);
-  const conditions = [eq(notifications.userId, userId)];
+  const conditions = [
+    eq(notifications.userId, userId),
+    notInArray(notifications.type, [...DEPRECATED_TYPES]),
+  ];
   if (options.unreadOnly) {
     conditions.push(isNull(notifications.readAt));
   }
@@ -40,8 +53,12 @@ export async function listNotifications(
     .where(and(...conditions))
     .orderBy(desc(notifications.createdAt))
     .limit(limit);
+  // Cast type: DB enum masih punya deprecated values (Sprint 43 — Postgres
+  // tidak support DROP VALUE), tapi SQL filter `notInArray` di atas sudah
+  // exclude historical rows yang gak punya formatter lagi.
   return rows.map((r) => ({
     ...r,
+    type: r.type as NotificationType,
     payload: (r.payload ?? {}) as Record<string, unknown>,
   }));
 }
@@ -55,7 +72,8 @@ export async function countUnreadNotifications(
     .where(
       and(
         eq(notifications.userId, userId),
-        isNull(notifications.readAt)
+        isNull(notifications.readAt),
+        notInArray(notifications.type, [...DEPRECATED_TYPES])
       )
     );
   return row?.value ?? 0;

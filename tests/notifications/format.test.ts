@@ -53,63 +53,6 @@ describe("formatNotification", () => {
     expect(r.body).toContain("Cancel Padel");
   });
 
-  it("tier_up", () => {
-    const r = formatNotification("tier_up", {
-      fromTierId: 1,
-      toTierId: 2,
-      tierName: "Bronze",
-    });
-    expect(r.icon).toBe("🏆");
-    expect(r.body).toContain("Bronze");
-    expect(r.href).toBe("/profile");
-  });
-
-  it("match_result — win positive points", () => {
-    const r = formatNotification("match_result", {
-      matchId: "m1",
-      sessionId: "s5",
-      sessionTitle: "Sess",
-      outcome: "win",
-      pointsEarned: 30,
-      team1Score: 21,
-      team2Score: 10,
-    });
-    expect(r.icon).toBe("🎉");
-    expect(r.title).toContain("Menang");
-    expect(r.title).toContain("21");
-    expect(r.body).toContain("+30");
-  });
-
-  it("match_result — loss negative points", () => {
-    const r = formatNotification("match_result", {
-      matchId: "m2",
-      sessionId: "s6",
-      sessionTitle: "Sess",
-      outcome: "loss",
-      pointsEarned: -5,
-      team1Score: 5,
-      team2Score: 21,
-    });
-    expect(r.icon).toBe("💪");
-    expect(r.title).toContain("Kalah");
-    expect(r.body).toContain("-5");
-  });
-
-  it("match_result — draw zero", () => {
-    const r = formatNotification("match_result", {
-      matchId: "m3",
-      sessionId: "s7",
-      sessionTitle: "Sess",
-      outcome: "draw",
-      pointsEarned: 0,
-      team1Score: 10,
-      team2Score: 10,
-    });
-    expect(r.icon).toBe("🤝");
-    expect(r.title).toContain("Draw");
-    expect(r.body).toContain("+0");
-  });
-
   it("friend_request — with message", () => {
     const r = formatNotification("friend_request", {
       fromUserId: "u1",
@@ -173,18 +116,6 @@ describe("formatNotification", () => {
     expect(r.href).toBe("/sessions/s10");
   });
 
-  it("achievement_unlocked uses payload emoji + name + description", () => {
-    const r = formatNotification("achievement_unlocked", {
-      code: "win_streak_5",
-      name: "Streak 5",
-      emoji: "🚀",
-      description: "5 menang berturut-turut",
-    });
-    expect(r.icon).toBe("🚀");
-    expect(r.title).toContain("Streak 5");
-    expect(r.body).toBe("5 menang berturut-turut");
-    expect(r.href).toBe("/achievements");
-  });
 });
 
 describe("formatRelativeTime", () => {

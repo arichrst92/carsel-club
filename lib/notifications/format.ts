@@ -59,31 +59,6 @@ function fmtSessionCancelled(
   };
 }
 
-function fmtTierUp(
-  p: NotificationPayloadByType["tier_up"]
-): FormattedNotification {
-  return {
-    icon: "🏆",
-    title: "Tier naik!",
-    body: `Selamat — kamu sekarang ${p.tierName}`,
-    href: "/profile",
-  };
-}
-
-function fmtMatchResult(
-  p: NotificationPayloadByType["match_result"]
-): FormattedNotification {
-  const outcomeLabel =
-    p.outcome === "win" ? "Menang" : p.outcome === "loss" ? "Kalah" : "Draw";
-  const pts = p.pointsEarned >= 0 ? `+${p.pointsEarned}` : `${p.pointsEarned}`;
-  return {
-    icon: p.outcome === "win" ? "🎉" : p.outcome === "draw" ? "🤝" : "💪",
-    title: `${outcomeLabel} ${p.team1Score}–${p.team2Score}`,
-    body: `${p.sessionTitle} • ${pts} poin`,
-    href: `/matches/${p.matchId}`,
-  };
-}
-
 function fmtFriendRequest(
   p: NotificationPayloadByType["friend_request"]
 ): FormattedNotification {
@@ -141,29 +116,15 @@ function fmtJoinRejected(
   };
 }
 
-function fmtAchievementUnlocked(
-  p: NotificationPayloadByType["achievement_unlocked"]
-): FormattedNotification {
-  return {
-    icon: p.emoji,
-    title: `Achievement unlock — ${p.name}`,
-    body: p.description,
-    href: "/achievements",
-  };
-}
-
 const FORMATTERS = {
   session_invite: fmtSessionInvite,
   session_reminder: fmtSessionReminder,
   session_cancelled: fmtSessionCancelled,
-  tier_up: fmtTierUp,
-  match_result: fmtMatchResult,
   friend_request: fmtFriendRequest,
   friend_accepted: fmtFriendAccepted,
   join_requested: fmtJoinRequested,
   join_approved: fmtJoinApproved,
   join_rejected: fmtJoinRejected,
-  achievement_unlocked: fmtAchievementUnlocked,
 } as const;
 
 /**

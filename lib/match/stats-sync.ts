@@ -20,8 +20,6 @@ import {
   computeTierId,
 } from "./stats-helpers";
 import { event } from "@/lib/log";
-import { notifyTierUp } from "@/lib/notifications/generate";
-import { TIERS } from "@/lib/constants";
 import {
   syncAchievementsAfterMatch,
   type FreshOutcome,
@@ -136,6 +134,8 @@ export async function applyMatchScoreChange(
                 .where(eq(users.id, p.userId));
               // Sprint 12: fire tier_up event kalau naik (bukan turun).
               // Tier IDs are sequential (1=Rookie → 6=Master) jadi ID compare OK.
+              // Sprint 43: notification dihapus — celebration modal pakai
+              // users.lastSeenTierId comparison, bukan notification row.
               if (newTierId > oldTierId) {
                 event("tier_up", {
                   userId: p.userId,
@@ -144,14 +144,6 @@ export async function applyMatchScoreChange(
                   totalPoints: updatedUser.totalPoints,
                   totalMatches: updatedUser.totalMatches,
                 });
-                const tierInfo = TIERS.find((t) => t.id === newTierId);
-                if (tierInfo) {
-                  notifyTierUp(p.userId, {
-                    fromTierId: oldTierId,
-                    toTierId: newTierId,
-                    tierName: tierInfo.name,
-                  });
-                }
               }
             }
           }

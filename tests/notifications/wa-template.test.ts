@@ -58,71 +58,6 @@ describe("buildWaMessage", () => {
     expect(m).toContain("/sessions/s4");
   });
 
-  it("tier_up no URL needed", () => {
-    const m = buildWaMessage(
-      "tier_up",
-      { fromTierId: 1, toTierId: 2, tierName: "Bronze" },
-      ctx
-    );
-    expect(m).toContain("Bronze");
-    expect(m).toContain("🏆");
-  });
-
-  it("match_result win + positive points", () => {
-    const m = buildWaMessage(
-      "match_result",
-      {
-        matchId: "m1",
-        sessionId: "s5",
-        sessionTitle: "Sess",
-        outcome: "win",
-        pointsEarned: 30,
-        team1Score: 21,
-        team2Score: 10,
-      },
-      ctx
-    );
-    expect(m).toContain("Menang");
-    expect(m).toContain("+30");
-    expect(m).toContain("/matches/m1");
-  });
-
-  it("match_result loss + negative points", () => {
-    const m = buildWaMessage(
-      "match_result",
-      {
-        matchId: "m2",
-        sessionId: "s6",
-        sessionTitle: "Sess",
-        outcome: "loss",
-        pointsEarned: -5,
-        team1Score: 5,
-        team2Score: 21,
-      },
-      ctx
-    );
-    expect(m).toContain("Kalah");
-    expect(m).toContain("-5");
-  });
-
-  it("match_result draw + zero points", () => {
-    const m = buildWaMessage(
-      "match_result",
-      {
-        matchId: "m3",
-        sessionId: "s7",
-        sessionTitle: "Sess",
-        outcome: "draw",
-        pointsEarned: 0,
-        team1Score: 10,
-        team2Score: 10,
-      },
-      ctx
-    );
-    expect(m).toContain("Draw");
-    expect(m).toContain("+0");
-  });
-
   it("friend_request with message", () => {
     const m = buildWaMessage(
       "friend_request",
@@ -187,23 +122,6 @@ describe("buildWaMessage", () => {
     );
     expect(m).toContain("reject");
     expect(m).toContain("/sessions/s10");
-  });
-
-  it("achievement_unlocked contains emoji + name + link", () => {
-    const m = buildWaMessage(
-      "achievement_unlocked",
-      {
-        code: "win_streak_5",
-        name: "Streak 5",
-        emoji: "🚀",
-        description: "5 menang berturut-turut",
-      },
-      ctx
-    );
-    expect(m).toContain("🚀");
-    expect(m).toContain("Streak 5");
-    expect(m).toContain("5 menang berturut-turut");
-    expect(m).toContain("/achievements");
   });
 
   it("strips trailing slash in appUrl", () => {

@@ -69,31 +69,6 @@ function fmtSessionCancelled(
 Cek detail: ${joinUrl(ctx.appUrl, `/sessions/${p.sessionId}`)}`;
 }
 
-function fmtTierUp(
-  p: NotificationPayloadByType["tier_up"]
-): string {
-  return `${BRAND}
-
-🏆 Selamat! Tier kamu naik ke *${p.tierName}*
-
-Keep grinding 💪`;
-}
-
-function fmtMatchResult(
-  p: NotificationPayloadByType["match_result"],
-  ctx: WaTemplateInput
-): string {
-  const outcomeLabel =
-    p.outcome === "win" ? "🎉 Menang!" : p.outcome === "loss" ? "💪 Kalah" : "🤝 Draw";
-  const pts = p.pointsEarned >= 0 ? `+${p.pointsEarned}` : `${p.pointsEarned}`;
-  return `${BRAND}
-
-${outcomeLabel} ${p.team1Score}–${p.team2Score} di *${p.sessionTitle}*
-Poin: ${pts}
-
-Detail: ${joinUrl(ctx.appUrl, `/matches/${p.matchId}`)}`;
-}
-
 function fmtFriendRequest(
   p: NotificationPayloadByType["friend_request"],
   ctx: WaTemplateInput
@@ -150,31 +125,15 @@ function fmtJoinRejected(
 Lihat: ${joinUrl(ctx.appUrl, `/sessions/${p.sessionId}`)}`;
 }
 
-function fmtAchievementUnlocked(
-  p: NotificationPayloadByType["achievement_unlocked"],
-  ctx: WaTemplateInput
-): string {
-  return `${BRAND}
-
-${p.emoji} Achievement unlock: *${p.name}*
-${p.description}
-
-Lihat: ${joinUrl(ctx.appUrl, "/achievements")}`;
-}
-
 const TEMPLATES = {
   session_invite: fmtSessionInvite,
   session_reminder: fmtSessionReminder,
   session_cancelled: fmtSessionCancelled,
-  tier_up: (p: NotificationPayloadByType["tier_up"], _ctx: WaTemplateInput) =>
-    fmtTierUp(p),
-  match_result: fmtMatchResult,
   friend_request: fmtFriendRequest,
   friend_accepted: fmtFriendAccepted,
   join_requested: fmtJoinRequested,
   join_approved: fmtJoinApproved,
   join_rejected: fmtJoinRejected,
-  achievement_unlocked: fmtAchievementUnlocked,
 } satisfies {
   [K in NotificationType]: (
     p: NotificationPayloadByType[K],

@@ -85,8 +85,6 @@ const VALID_TYPES: NotificationType[] = [
   "session_invite",
   "session_reminder",
   "session_cancelled",
-  "tier_up",
-  "match_result",
   "friend_request",
   "friend_accepted",
   "join_requested",

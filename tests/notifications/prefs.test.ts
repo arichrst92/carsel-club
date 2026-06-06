@@ -17,16 +17,6 @@ describe("resolveChannels", () => {
     expect(r.wa).toBe(true);
   });
 
-  it("tier_up defaults all on", () => {
-    const r = resolveChannels({}, "tier_up");
-    expect(r).toEqual({ in_app: true, push: true, wa: true });
-  });
-
-  it("match_result defaults wa=false", () => {
-    const r = resolveChannels({}, "match_result");
-    expect(r.wa).toBe(false);
-  });
-
   it("user override partial — wa off", () => {
     const r = resolveChannels(
       { session_reminder: { wa: false } },
@@ -54,8 +44,8 @@ describe("isChannelEnabled", () => {
   it("disabled push", () => {
     expect(
       isChannelEnabled(
-        { tier_up: { push: false } },
-        "tier_up",
+        { friend_request: { push: false } },
+        "friend_request",
         "push"
       )
     ).toBe(false);
@@ -64,8 +54,8 @@ describe("isChannelEnabled", () => {
   it("disabled in_app respected", () => {
     expect(
       isChannelEnabled(
-        { match_result: { in_app: false } },
-        "match_result",
+        { friend_accepted: { in_app: false } },
+        "friend_accepted",
         "in_app"
       )
     ).toBe(false);

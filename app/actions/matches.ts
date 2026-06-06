@@ -29,9 +29,7 @@ import {
   generateFixPartnersRound,
 } from "@/lib/match/generator-fix-partners";
 import { applyMatchScoreChange } from "@/lib/match/stats-sync";
-import { computeImpact } from "@/lib/match/stats-helpers";
 import { event } from "@/lib/log";
-import { notifyMatchResult } from "@/lib/notifications/generate";
 import {
   transitionForMatchStart,
   transitionForMatchRevert,
@@ -755,86 +753,11 @@ export async function endMatchAction(
           : "draw",
   });
 
-  // Sprint 25: notify each player with their result
-  await notifyMatchPlayers(matchId, loaded.sessionId, team1Score, team2Score);
+  // Sprint 43: match_result notification dihapus — match detail page
+  // tetap accessible via session detail, history page punya filter W/L.
 
   revalidatePath(`/sessions/${loaded.sessionId}`);
   return null;
-}
-
-async function notifyMatchPlayers(
-  matchId: string,
-  sessionId: string,
-  t1Score: number,
-  t2Score: number
-): Promise<void> {
-  // Get participant IDs + session title
-  const [matchRow] = await db
-    .select({
-      team1P1Id: matches.team1P1Id,
-      team1P2Id: matches.team1P2Id,
-      team2P1Id: matches.team2P1Id,
-      team2P2Id: matches.team2P2Id,
-      sessionTitle: sessions.title,
-    })
-    .from(matches)
-    .innerJoin(matchRoundSets, eq(matches.matchRoundSetId, matchRoundSets.id))
-    .innerJoin(sessions, eq(sessions.id, matchRoundSets.sessionId))
-    .where(eq(matches.id, matchId))
-    .limit(1);
-  if (!matchRow) return;
-
-  // Resolve participantId → userId (guests have userId=null, skip them)
-  const participantIds = [
-    matchRow.team1P1Id,
-    matchRow.team1P2Id,
-    matchRow.team2P1Id,
-    matchRow.team2P2Id,
-  ];
-  const participantRows = await db
-    .select({
-      id: sessionParticipants.id,
-      userId: sessionParticipants.userId,
-    })
-    .from(sessionParticipants)
-    .where(inArray(sessionParticipants.id, participantIds));
-  const userIdByParticipant = new Map<string, string>();
-  for (const p of participantRows) {
-    if (p.userId) userIdByParticipant.set(p.id, p.userId);
-  }
-
-  const impact = computeImpact(t1Score, t2Score);
-  const team1UserIds = [
-    userIdByParticipant.get(matchRow.team1P1Id),
-    userIdByParticipant.get(matchRow.team1P2Id),
-  ].filter((id): id is string => !!id);
-  const team2UserIds = [
-    userIdByParticipant.get(matchRow.team2P1Id),
-    userIdByParticipant.get(matchRow.team2P2Id),
-  ].filter((id): id is string => !!id);
-
-  for (const uid of team1UserIds) {
-    notifyMatchResult(uid, {
-      matchId,
-      sessionId,
-      sessionTitle: matchRow.sessionTitle,
-      outcome: impact.team1.outcome,
-      pointsEarned: impact.team1.points,
-      team1Score: t1Score,
-      team2Score: t2Score,
-    });
-  }
-  for (const uid of team2UserIds) {
-    notifyMatchResult(uid, {
-      matchId,
-      sessionId,
-      sessionTitle: matchRow.sessionTitle,
-      outcome: impact.team2.outcome,
-      pointsEarned: impact.team2.points,
-      team1Score: t1Score,
-      team2Score: t2Score,
-    });
-  }
 }
 
 // ============================================================

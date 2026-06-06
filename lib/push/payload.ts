@@ -20,7 +20,6 @@ import type { NotificationType } from "@/lib/notifications/types";
 import type { PushNotificationPayload } from "./types";
 
 const COLLAPSE_TYPES: Set<NotificationType> = new Set([
-  "match_result",
   "friend_request",
   "join_requested",
 ]);
