@@ -7,6 +7,7 @@ import {
   removeAvatarAction,
 } from "@/app/actions/avatar";
 import { Toast } from "@/components/ui/Toast";
+import { compressImageClient } from "@/lib/image/compress-client";
 
 type Props = {
   currentAvatarUrl: string | null;
@@ -30,8 +31,10 @@ export function AvatarUploader({ currentAvatarUrl, initial }: Props) {
     reader.readAsDataURL(file);
 
     startTransition(async () => {
+      // Sprint 48: compress dulu — avatar cukup 800px square
+      const compressed = await compressImageClient(file, { maxSide: 800 });
       const fd = new FormData();
-      fd.set("file", file);
+      fd.set("file", compressed);
       const result = await updateAvatarAction(null, fd);
       if (result?.error) {
         setError(result.error);

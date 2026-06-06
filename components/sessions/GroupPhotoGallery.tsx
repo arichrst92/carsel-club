@@ -8,6 +8,7 @@ import {
   removeGroupPhotoAction,
 } from "@/app/actions/session-photo";
 import { Toast } from "@/components/ui/Toast";
+import { compressImageClient } from "@/lib/image/compress-client";
 
 const MAX = 5;
 
@@ -30,8 +31,10 @@ export function GroupPhotoGallery({ sessionId, photos, canManage }: Props) {
     setError(null);
     setSuccess(null);
     startTransition(async () => {
+      // Sprint 48: compress dulu supaya muat di 1MB Server Action body limit
+      const compressed = await compressImageClient(file);
       const fd = new FormData();
-      fd.set("file", file);
+      fd.set("file", compressed);
       const result = await addGroupPhotoAction(sessionId, null, fd);
       if (result?.error) {
         setError(result.error);

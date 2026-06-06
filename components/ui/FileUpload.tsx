@@ -12,11 +12,12 @@
  */
 
 import { useState, useRef, useCallback } from "react";
+import { compressImageClient } from "@/lib/image/compress-client";
 
 export type FileUploadProps = {
   /** Accepted MIME types (e.g. "image/*"). Default: image/* */
   accept?: string;
-  /** Max bytes (client-side guard). Default 10 MB. */
+  /** Max bytes (client-side guard). Default 25 MB (raw, sebelum compress). */
   maxBytes?: number;
   /** Server should also validate. */
   onSelect: (file: File) => void | Promise<void>;
@@ -26,15 +27,22 @@ export type FileUploadProps = {
   label?: string;
   /** Disabled state. */
   disabled?: boolean;
+  /**
+   * Sprint 48: auto-compress image client-side sebelum onSelect
+   * supaya tidak hit Server Action body size limit (1MB default).
+   * Default true.
+   */
+  autoCompress?: boolean;
 };
 
 export function FileUpload({
   accept = "image/*",
-  maxBytes = 10 * 1024 * 1024,
+  maxBytes = 25 * 1024 * 1024,
   onSelect,
   showPreview = true,
   label = "Pilih file",
   disabled = false,
+  autoCompress = true,
 }: FileUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -75,14 +83,19 @@ export function FileUpload({
 
       setBusy(true);
       try {
-        await onSelect(file);
+        // Sprint 48: compress sebelum upload supaya muat di Server Action
+        // body limit. Compress aman untuk non-image (return as-is).
+        const toUpload = autoCompress
+          ? await compressImageClient(file)
+          : file;
+        await onSelect(toUpload);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Upload gagal");
       } finally {
         setBusy(false);
       }
     },
-    [accept, maxBytes, onSelect, showPreview]
+    [accept, autoCompress, maxBytes, onSelect, showPreview]
   );
 
   function onDragOver(e: React.DragEvent) {

@@ -7,6 +7,7 @@ import {
   removeCoverPhotoAction,
 } from "@/app/actions/session-photo";
 import { Toast } from "@/components/ui/Toast";
+import { compressImageClient } from "@/lib/image/compress-client";
 
 type Props = {
   sessionId: string;
@@ -29,8 +30,10 @@ export function CoverPhotoUploader({ sessionId, currentCoverUrl }: Props) {
     reader.readAsDataURL(file);
 
     startTransition(async () => {
+      // Sprint 48: compress dulu supaya tidak hit 1MB Server Action limit
+      const compressed = await compressImageClient(file);
       const fd = new FormData();
-      fd.set("file", file);
+      fd.set("file", compressed);
       const result = await updateCoverPhotoAction(sessionId, null, fd);
       if (result?.error) {
         setError(result.error);
