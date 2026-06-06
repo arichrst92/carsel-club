@@ -57,6 +57,20 @@ function getSortValue(r: SessionLeaderboardRow, sort: Sort): number {
   }
 }
 
+/**
+ * Sprint 50: tie-break smart — primary sama → kedua metric pendukung
+ * jadi pemutus, terakhir alfabetik.
+ *
+ * - point: tie-break by sessionMatches DESC
+ * - winrate: tie-break by sessionMatches DESC (lebih banyak match
+ *   = sample size lebih meyakinkan)
+ * - match: tie-break by sessionPoints DESC
+ */
+function getTieBreak(r: SessionLeaderboardRow, sort: Sort): number {
+  if (sort === "match") return r.sessionPoints;
+  return r.sessionMatches; // point + winrate
+}
+
 export default async function SessionLeaderboardPage({
   params,
   searchParams,
@@ -83,8 +97,13 @@ export default async function SessionLeaderboardPage({
   // baru dgn 0 match sering hilang dari daftar (Sprint 49 fix).
   const ranked = [...rows]
     .sort((a, b) => {
+      // Primary
       const diff = getSortValue(b, sort) - getSortValue(a, sort);
       if (diff !== 0) return diff;
+      // Tie-break by complementary metric DESC
+      const tieDiff = getTieBreak(b, sort) - getTieBreak(a, sort);
+      if (tieDiff !== 0) return tieDiff;
+      // Final: alfabetik (stable)
       return a.displayName.localeCompare(b.displayName);
     })
     .map((r, i) => ({ ...r, rank: i + 1 }));

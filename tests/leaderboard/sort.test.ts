@@ -89,14 +89,58 @@ describe("sortAndRank", () => {
     ]);
   });
 
-  it("stable tiebreak by id asc", () => {
+  it("stable tiebreak by displayName asc (when all tie-break metrics equal)", () => {
     const list = [
       make("z", { totalPoints: 100 }),
       make("a", { totalPoints: 100 }),
       make("m", { totalPoints: 100 }),
     ];
     const r = sortAndRank(list, "point");
+    // displayName = id.toUpperCase() per make() helper
     expect(r.map((x) => x.id)).toEqual(["a", "m", "z"]);
+  });
+
+  // Sprint 50: smart tie-break per sort metric
+  it("point sort tie-break: more matches wins", () => {
+    const list = [
+      make("a", { totalPoints: 100, totalMatches: 1 }),
+      make("b", { totalPoints: 100, totalMatches: 10 }),
+      make("c", { totalPoints: 100, totalMatches: 5 }),
+    ];
+    const r = sortAndRank(list, "point");
+    expect(r.map((x) => x.id)).toEqual(["b", "c", "a"]);
+  });
+
+  it("match sort tie-break: more points wins", () => {
+    const list = [
+      make("a", { totalMatches: 10, totalPoints: 50 }),
+      make("b", { totalMatches: 10, totalPoints: 100 }),
+      make("c", { totalMatches: 10, totalPoints: 30 }),
+    ];
+    const r = sortAndRank(list, "match");
+    expect(r.map((x) => x.id)).toEqual(["b", "a", "c"]);
+  });
+
+  it("winrate sort tie-break: more matches wins for same WR", () => {
+    const list = [
+      make("a", {
+        totalMatches: 2,
+        totalWins: 1,
+        winRate: 50,
+      }),
+      make("b", {
+        totalMatches: 10,
+        totalWins: 5,
+        winRate: 50,
+      }),
+      make("c", {
+        totalMatches: 4,
+        totalWins: 2,
+        winRate: 50,
+      }),
+    ];
+    const r = sortAndRank(list, "winrate");
+    expect(r.map((x) => x.id)).toEqual(["b", "c", "a"]);
   });
 
   it("winrate sort respects min matches", () => {
