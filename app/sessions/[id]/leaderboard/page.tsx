@@ -52,8 +52,13 @@ function getSortValue(r: SessionLeaderboardRow, sort: Sort): number {
     case "match":
       return r.sessionMatches;
     case "winrate":
-      // Need at least 2 match supaya gak misleading
-      return r.sessionMatches >= 2 ? r.winRate : -1;
+      // Sprint 50 fix: no threshold di session leaderboard. Session
+      // biasanya sedikit match (1-4 match per pemain), threshold ≥2
+      // bikin semua dapat -1 → fall ke alfabetik → "0% di atas 100%"
+      // tampak salah. Tie-break by sessionMatches DESC sudah handle
+      // case "1W di atas 5W 1L" — 5W (5 matches) menang tie-break vs
+      // 1W (1 match) saat sama-sama 100%.
+      return r.winRate;
   }
 }
 
