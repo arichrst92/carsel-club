@@ -647,14 +647,7 @@ export default async function ProfilePage() {
               <SettingsRow
                 icon="👥"
                 title="Friends"
-                sub="Following + followers"
-              />
-            </Link>
-            <Link href="/friends" style={{ textDecoration: "none" }}>
-              <SettingsRow
-                icon="👥"
-                title="Friends"
-                sub="Teman padel kamu"
+                sub="Following + followers + teman padel"
               />
             </Link>
             <Link href="/achievements" style={{ textDecoration: "none" }}>

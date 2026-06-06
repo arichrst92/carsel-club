@@ -122,7 +122,12 @@ export async function getRecentMatches(userId: string, limit = 3) {
       team2Score: matches.team2Score,
       team1P1Id: matches.team1P1Id,
       team1P2Id: matches.team1P2Id,
+      team2P1Id: matches.team2P1Id,
+      team2P2Id: matches.team2P2Id,
+      startedAt: matches.startedAt,
       endedAt: matches.endedAt,
+      roundNumber: matchRoundSets.roundNumber,
+      courtNumber: matches.courtNumber,
     })
     .from(matches)
     .innerJoin(matchRoundSets, eq(matchRoundSets.id, matches.matchRoundSetId))
@@ -141,6 +146,27 @@ export async function getRecentMatches(userId: string, limit = 3) {
     .orderBy(desc(matches.endedAt))
     .limit(limit);
 
+  // Resolve display names untuk all participantIds → User name or guest name
+  const allPartIds = Array.from(
+    new Set(
+      rows.flatMap((r) => [r.team1P1Id, r.team1P2Id, r.team2P1Id, r.team2P2Id])
+    )
+  );
+  const partRows = allPartIds.length
+    ? await db
+        .select({
+          id: sessionParticipants.id,
+          guestName: sessionParticipants.guestName,
+          userDisplayName: users.displayName,
+        })
+        .from(sessionParticipants)
+        .leftJoin(users, eq(users.id, sessionParticipants.userId))
+        .where(inArray(sessionParticipants.id, allPartIds))
+    : [];
+  const nameMap = new Map(
+    partRows.map((p) => [p.id, p.userDisplayName ?? p.guestName ?? "Pemain"])
+  );
+
   return rows.map((m) => {
     const wasTeam1 =
       myPartIds.includes(m.team1P1Id) || myPartIds.includes(m.team1P2Id);
@@ -148,6 +174,27 @@ export async function getRecentMatches(userId: string, limit = 3) {
     const oppScore = wasTeam1 ? m.team2Score : m.team1Score;
     const outcome: "win" | "loss" | "draw" =
       myScore > oppScore ? "win" : myScore < oppScore ? "loss" : "draw";
+
+    // Cari partner (sisi yg sama dengan user, tapi bukan user itu sendiri)
+    const myTeamIds = wasTeam1
+      ? [m.team1P1Id, m.team1P2Id]
+      : [m.team2P1Id, m.team2P2Id];
+    const oppTeamIds = wasTeam1
+      ? [m.team2P1Id, m.team2P2Id]
+      : [m.team1P1Id, m.team1P2Id];
+    const partnerId = myTeamIds.find((id) => !myPartIds.includes(id));
+    const partnerName = partnerId ? nameMap.get(partnerId) ?? null : null;
+    const oppNames = oppTeamIds
+      .map((id) => nameMap.get(id))
+      .filter((n): n is string => Boolean(n));
+
+    // Durasi menit kalau startedAt + endedAt tersedia
+    let durationMin: number | null = null;
+    if (m.startedAt && m.endedAt) {
+      const ms =
+        new Date(m.endedAt).getTime() - new Date(m.startedAt).getTime();
+      if (ms > 0) durationMin = Math.round(ms / 60000);
+    }
 
     return {
       matchId: m.matchId,
@@ -157,6 +204,11 @@ export async function getRecentMatches(userId: string, limit = 3) {
       oppScore,
       outcome,
       endedAt: m.endedAt,
+      roundNumber: m.roundNumber,
+      courtNumber: m.courtNumber,
+      partnerName,
+      opponentNames: oppNames,
+      durationMin,
     };
   });
 }

@@ -1,7 +1,20 @@
+/**
+ * Match History page (Sprint 49 alignment).
+ *
+ * Sesuai prototype `docs/CarselClubPrototype/match-history.html` —
+ * `history-item` style dgn result-badge (W/L + points), score di hi-head,
+ * teams + duration tag, di-group by date bucket (Hari Ini / Kemarin /
+ * Minggu Ini / Bulan Ini / Lebih Lama).
+ *
+ * CSS classes: .match-history-list / .history-item / .result-badge /
+ * .hi-info / .hi-head / .hi-score / .hi-meta-row / .hi-teams /
+ * .hi-team-row / .hi-foot / .hi-tag — di `app/shared.css`.
+ */
+
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/get-current-user";
 import { getRecentMatches } from "@/lib/db/queries/home";
-import { formatDate, formatTime } from "@/lib/utils";
+import { formatTime } from "@/lib/utils";
 import {
   applyHistoryFilter,
   HISTORY_FILTER_LABELS,
@@ -15,6 +28,38 @@ export const metadata = {
 };
 
 export const dynamic = "force-dynamic";
+
+type MatchRow = Awaited<ReturnType<typeof getRecentMatches>>[number];
+
+const POINTS_BY_OUTCOME: Record<"win" | "draw" | "loss", number> = {
+  win: 3,
+  draw: 2,
+  loss: 1,
+};
+
+function dateBucket(d: Date | string | null): {
+  key: string;
+  label: string;
+  order: number;
+} {
+  if (!d) return { key: "older", label: "📜 Lebih Lama", order: 5 };
+  const date = typeof d === "string" ? new Date(d) : d;
+  const now = new Date();
+  const startOfToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  );
+  const diffDays = Math.floor(
+    (startOfToday.getTime() - new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()) /
+      (1000 * 60 * 60 * 24)
+  );
+  if (diffDays <= 0) return { key: "today", label: "🟢 Hari Ini", order: 0 };
+  if (diffDays === 1) return { key: "yesterday", label: "📅 Kemarin", order: 1 };
+  if (diffDays <= 7) return { key: "week", label: "🗓 Minggu Ini", order: 2 };
+  if (diffDays <= 30) return { key: "month", label: "📆 Bulan Ini", order: 3 };
+  return { key: "older", label: "📜 Lebih Lama", order: 4 };
+}
 
 export default async function MatchHistoryPage({
   searchParams,
@@ -30,6 +75,32 @@ export default async function MatchHistoryPage({
   const wins = matches.filter((m) => m.outcome === "win").length;
   const draws = matches.filter((m) => m.outcome === "draw").length;
   const losses = matches.filter((m) => m.outcome === "loss").length;
+
+  // 30 day window untuk insight win rate
+  const cutoff30 = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  const last30 = matches.filter(
+    (m) => m.endedAt && new Date(m.endedAt).getTime() >= cutoff30
+  );
+  const last30Wins = last30.filter((m) => m.outcome === "win").length;
+  const winRate30 = last30.length
+    ? Math.round((last30Wins / last30.length) * 100)
+    : 0;
+
+  // Group filtered by date bucket
+  const grouped = new Map<
+    string,
+    { label: string; order: number; matches: MatchRow[] }
+  >();
+  for (const m of filtered) {
+    const b = dateBucket(m.endedAt);
+    if (!grouped.has(b.key)) {
+      grouped.set(b.key, { label: b.label, order: b.order, matches: [] });
+    }
+    grouped.get(b.key)!.matches.push(m);
+  }
+  const groups = Array.from(grouped.values()).sort(
+    (a, b) => a.order - b.order
+  );
 
   return (
     <div className="app-shell">
@@ -53,211 +124,233 @@ export default async function MatchHistoryPage({
       </header>
 
       <main id="main-content" className="app-content subscreen">
-        {/* Stats summary */}
-        <section
-          style={{
-            background: "var(--bg)",
-            border: "1px solid var(--border-light)",
-            borderRadius: "var(--r-xl)",
-            padding: "var(--s-4)",
-            boxShadow: "var(--shadow-card)",
-            marginBottom: "var(--s-2)",
-            display: "flex",
-            gap: "var(--s-3)",
-          }}
-        >
-          <Summary
-            value={matches.length}
-            label="Total"
-            color="var(--text-900)"
-          />
-          <Summary value={wins} label="Menang" color="var(--primary-700)" />
-          <Summary value={draws} label="Seri" color="var(--text-500)" />
-          <Summary value={losses} label="Kalah" color="var(--accent-600)" />
-        </section>
-
-        {/* Filter chips */}
-        <section
-          aria-label="Filter berdasarkan hasil"
-          style={{
-            display: "flex",
-            gap: "var(--s-2)",
-            margin: "var(--s-3) 0 var(--s-2)",
-            overflowX: "auto",
-            paddingBottom: 2,
-          }}
-        >
-          {VALID_HISTORY_FILTERS.map((f) => (
-            <FilterChip
-              key={f}
-              filter={f}
-              active={filter === f}
-              count={
-                f === "all"
-                  ? matches.length
-                  : f === "win"
-                    ? wins
-                    : f === "loss"
-                      ? losses
-                      : draws
-              }
-            />
-          ))}
-        </section>
-
-        {/* List */}
+        {/* INSIGHTS — featured 30-day win rate */}
         <section>
           <div className="section-head">
-            <h3>
-              {HISTORY_FILTER_LABELS[filter]} ({filtered.length})
-            </h3>
+            <h3>Insights</h3>
+            <span
+              style={{
+                color: "var(--text-500)",
+                fontSize: 12,
+                fontWeight: 700,
+              }}
+            >
+              30 hari terakhir
+            </span>
           </div>
-
-          {filtered.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-state-icon">🎾</div>
-              <div className="empty-state-title">
-                {filter === "all"
-                  ? "Belum ada match selesai"
-                  : `Tidak ada match ${HISTORY_FILTER_LABELS[filter].toLowerCase()}`}
-              </div>
-              <div className="empty-state-text">
-                {filter === "all"
-                  ? "Match yang sudah completed akan muncul di sini setelah host end match."
-                  : "Ganti filter atau cek lagi nanti."}
+          <div className="history-insights">
+            <div className="insight-card featured">
+              <div className="insight-icon">📈</div>
+              <div className="insight-label">Win Rate</div>
+              <div className="insight-value">{winRate30}%</div>
+              <div className="insight-value-sub">
+                {last30Wins} menang dari {last30.length} match
               </div>
             </div>
-          ) : (
-            <div className="activity-list">
-              {filtered.map((m) => (
-                <Link
-                  key={m.matchId}
-                  href={`/sessions/${m.sessionId}/matches/${m.matchId}`}
-                  className="activity-item"
-                  style={{ textDecoration: "none" }}
-                >
-                  <div className={`activity-icon ${m.outcome}`}>
-                    {m.outcome === "win"
-                      ? "🏆"
-                      : m.outcome === "draw"
-                        ? "🤝"
-                        : "⚡"}
-                  </div>
-                  <div className="activity-info">
-                    <div className="activity-title">{m.sessionTitle}</div>
-                    <div className="activity-meta">
-                      {m.outcome === "win"
-                        ? "Menang"
-                        : m.outcome === "draw"
-                          ? "Seri"
-                          : "Kalah"}{" "}
-                      {m.myScore}-{m.oppScore}
-                      {m.endedAt && (
-                        <>
-                          {" · "}
-                          {formatDate(m.endedAt)} {formatTime(m.endedAt)}
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  <div className={`activity-points ${m.outcome}`}>
-                    {m.outcome === "win"
-                      ? "+3"
-                      : m.outcome === "draw"
-                        ? "+2"
-                        : "+1"}
-                  </div>
-                </Link>
-              ))}
+            <div className="insight-card">
+              <div className="insight-icon">🏆</div>
+              <div className="insight-label">Total Menang</div>
+              <div
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 800,
+                  fontSize: 22,
+                  color: "var(--primary-700)",
+                  marginTop: 4,
+                }}
+              >
+                {wins}W
+              </div>
+              <div
+                style={{
+                  fontSize: 10,
+                  color: "var(--text-500)",
+                  fontWeight: 700,
+                  marginTop: 2,
+                }}
+              >
+                Lifetime
+              </div>
             </div>
-          )}
+            <div className="insight-card">
+              <div className="insight-icon">⚡</div>
+              <div className="insight-label">Total Match</div>
+              <div
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 800,
+                  fontSize: 22,
+                  color: "var(--text-900)",
+                  marginTop: 4,
+                }}
+              >
+                {matches.length}
+              </div>
+              <div
+                style={{
+                  fontSize: 10,
+                  color: "var(--text-500)",
+                  fontWeight: 700,
+                  marginTop: 2,
+                }}
+              >
+                {wins}W · {draws}D · {losses}L
+              </div>
+            </div>
+          </div>
         </section>
+
+        {/* FILTER TABS — list-tabs style */}
+        <section className="list-tabs">
+          {VALID_HISTORY_FILTERS.map((f) => {
+            const count =
+              f === "all"
+                ? matches.length
+                : f === "win"
+                  ? wins
+                  : f === "loss"
+                    ? losses
+                    : draws;
+            const active = filter === f;
+            const href =
+              f === "all"
+                ? "/profile/matches"
+                : `/profile/matches?filter=${f}`;
+            return (
+              <Link
+                key={f}
+                href={href}
+                className={`list-tab ${active ? "active" : ""}`}
+                style={{ textDecoration: "none" }}
+              >
+                <span>{filterEmoji(f) + HISTORY_FILTER_LABELS[f]}</span>
+                <span className="tab-count">{count}</span>
+              </Link>
+            );
+          })}
+        </section>
+
+        {/* GROUPED LIST */}
+        {filtered.length === 0 ? (
+          <div className="empty-state" style={{ marginTop: "var(--s-3)" }}>
+            <div className="empty-state-icon">🎾</div>
+            <div className="empty-state-title">
+              {filter === "all"
+                ? "Belum ada match selesai"
+                : `Tidak ada match ${HISTORY_FILTER_LABELS[filter].toLowerCase()}`}
+            </div>
+            <div className="empty-state-text">
+              {filter === "all"
+                ? "Match yang sudah completed akan muncul di sini setelah host end match."
+                : "Ganti filter atau cek lagi nanti."}
+            </div>
+          </div>
+        ) : (
+          groups.map((g) => (
+            <section key={g.label} style={{ marginTop: "var(--s-3)" }}>
+              <div
+                className="section-head"
+                style={{ marginBottom: "var(--s-2)" }}
+              >
+                <h3>{g.label}</h3>
+                <span
+                  style={{
+                    color: "var(--text-500)",
+                    fontSize: 11,
+                    fontWeight: 700,
+                  }}
+                >
+                  {g.matches.length} match
+                </span>
+              </div>
+              <div className="match-history-list">
+                {g.matches.map((m) => (
+                  <HistoryItem key={m.matchId} m={m} />
+                ))}
+              </div>
+            </section>
+          ))
+        )}
       </main>
     </div>
   );
 }
 
-function FilterChip({
-  filter,
-  active,
-  count,
-}: {
-  filter: HistoryFilter;
-  active: boolean;
-  count: number;
-}) {
-  const href =
-    filter === "all"
-      ? "/profile/matches"
-      : `/profile/matches?filter=${filter}`;
-  return (
-    <Link
-      href={href}
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 6,
-        padding: "var(--s-2) var(--s-3)",
-        background: active ? "var(--primary)" : "var(--bg-soft)",
-        color: active ? "#fff" : "var(--text-900)",
-        border: `1px solid ${active ? "var(--primary)" : "var(--border)"}`,
-        borderRadius: "var(--r-full)",
-        fontSize: 12,
-        fontWeight: 700,
-        textDecoration: "none",
-        whiteSpace: "nowrap",
-      }}
-    >
-      <span>{HISTORY_FILTER_LABELS[filter]}</span>
-      <span
-        style={{
-          background: active
-            ? "rgba(255,255,255,0.25)"
-            : "var(--bg-card)",
-          padding: "1px 6px",
-          borderRadius: "var(--r-full)",
-          fontSize: 10,
-        }}
-      >
-        {count}
-      </span>
-    </Link>
-  );
+function filterEmoji(f: HistoryFilter): string {
+  if (f === "win") return "🏆 ";
+  if (f === "loss") return "⚡ ";
+  if (f === "draw") return "🤝 ";
+  return "";
 }
 
-function Summary({
-  value,
-  label,
-  color,
-}: {
-  value: number;
-  label: string;
-  color: string;
-}) {
+function HistoryItem({ m }: { m: MatchRow }) {
+  const points = POINTS_BY_OUTCOME[m.outcome];
+  const resultLetter =
+    m.outcome === "win" ? "W" : m.outcome === "loss" ? "L" : "D";
   return (
-    <div style={{ flex: 1, textAlign: "center" }}>
-      <div
-        style={{
-          fontFamily: "var(--font-display)",
-          fontWeight: 800,
-          fontSize: 22,
-          color,
-        }}
-      >
-        {value}
+    <Link
+      href={`/sessions/${m.sessionId}/matches/${m.matchId}`}
+      className="history-item"
+      style={{ textDecoration: "none" }}
+    >
+      <div className={`result-badge ${m.outcome}`}>
+        <div className="rb-result">{resultLetter}</div>
+        <div className="rb-points">+{points}</div>
       </div>
-      <div
-        style={{
-          fontSize: 10,
-          color: "var(--text-500)",
-          fontWeight: 700,
-          textTransform: "uppercase",
-          letterSpacing: "0.04em",
-          marginTop: 2,
-        }}
-      >
-        {label}
+      <div className="hi-info">
+        <div className="hi-head">
+          <div
+            className="hi-session"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontWeight: 800,
+              fontSize: 13,
+              color: "var(--text-900)",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              flex: 1,
+              minWidth: 0,
+            }}
+          >
+            {m.sessionTitle}
+          </div>
+          <div className="hi-score">
+            {m.myScore} – {m.oppScore}
+          </div>
+        </div>
+        <div className="hi-meta-row">
+          {m.endedAt && <span>{formatTime(m.endedAt)}</span>}
+          {m.endedAt && <span>·</span>}
+          <span>
+            Round {m.roundNumber} · Court {m.courtNumber}
+          </span>
+        </div>
+        <div className="hi-teams">
+          <div className="hi-team-row you">
+            <span className="hi-team-emoji">🎾</span>
+            <span>
+              You{m.partnerName ? ` · ${m.partnerName}` : ""}
+            </span>
+          </div>
+          <div className="hi-team-row vs">
+            <span className="hi-team-emoji">vs</span>
+            <span>
+              {m.opponentNames.length > 0
+                ? m.opponentNames.join(" · ")
+                : "Lawan"}
+            </span>
+          </div>
+        </div>
+        <div className="hi-foot">
+          <div className="hi-foot-tags">
+            {m.durationMin !== null && (
+              <span className="hi-tag">{m.durationMin} min</span>
+            )}
+          </div>
+          <span style={{ color: "var(--text-400)" }}>→</span>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }

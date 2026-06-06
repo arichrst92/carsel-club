@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/get-current-user";
 import { listMySessions } from "@/lib/db/queries/sessions";
-import { SessionCard } from "@/components/sessions/SessionCard";
+import { SessionListItem } from "@/components/sessions/SessionListItem";
 import { BottomNav } from "@/components/nav/BottomNav";
 import {
   SessionsFilterBar,
@@ -143,7 +143,7 @@ export default async function SessionsPage({
             }}
           >
             {filtered.map((s) => (
-              <SessionCard key={s.id} session={s} />
+              <SessionListItem key={s.id} session={s} />
             ))}
           </div>
         )}

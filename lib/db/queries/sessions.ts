@@ -3,7 +3,7 @@
  * Use from Server Components / Server Actions.
  */
 
-import { and, desc, eq, inArray, or } from "drizzle-orm";
+import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
   sessions,
@@ -11,11 +11,18 @@ import {
   users,
 } from "@/lib/db/schema";
 
+export type MySessionRow = typeof sessions.$inferSelect & {
+  participantCount: number;
+  isHost: boolean;
+};
+
 /**
  * List sessions where the user is host or participant.
  * Ordered by scheduled_at descending (newest/upcoming first).
+ *
+ * Sprint 49: include participantCount + isHost flag untuk SessionListItem.
  */
-export async function listMySessions(userId: string) {
+export async function listMySessions(userId: string): Promise<MySessionRow[]> {
   // Get session IDs where user participates
   const myParticipations = await db
     .select({ sessionId: sessionParticipants.sessionId })
@@ -24,9 +31,15 @@ export async function listMySessions(userId: string) {
 
   const sessionIds = myParticipations.map((p) => p.sessionId);
 
-  // Combine: hosted OR participating
+  // Combine: hosted OR participating, dengan COUNT(participants) subquery
   const rows = await db
-    .select()
+    .select({
+      session: sessions,
+      participantCount: sql<number>`(
+        SELECT COUNT(*)::int FROM ${sessionParticipants}
+        WHERE ${sessionParticipants.sessionId} = ${sessions.id}
+      )`,
+    })
     .from(sessions)
     .where(
       or(
@@ -38,7 +51,11 @@ export async function listMySessions(userId: string) {
     )
     .orderBy(desc(sessions.scheduledAt));
 
-  return rows;
+  return rows.map((r) => ({
+    ...r.session,
+    participantCount: r.participantCount,
+    isHost: r.session.hostId === userId,
+  }));
 }
 
 /**

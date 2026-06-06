@@ -322,12 +322,16 @@ export default async function SessionDetailPage({ params }: PageProps) {
           <div className="section-head">
             <h3>Pemain ({participants.length})</h3>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <Link
-                href={`/sessions/${session.id}/leaderboard`}
-                className="section-link"
-              >
-                🏆 Leaderboard
-              </Link>
+              {/* Leaderboard link disini hanya muncul kalau quick-actions
+                  Share tidak di-render (terminal session / bukan peserta) */}
+              {(isTerminal || !isParticipant) && (
+                <Link
+                  href={`/sessions/${session.id}/leaderboard`}
+                  className="section-link"
+                >
+                  🏆 Leaderboard
+                </Link>
+              )}
               {staff && !isTerminal && (
                 <Link
                   href={`/sessions/${session.id}/participants`}

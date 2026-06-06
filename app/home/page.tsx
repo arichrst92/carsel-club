@@ -16,6 +16,7 @@ import { getPendingCelebration } from "@/lib/db/queries/achievements";
 import { ACHIEVEMENTS } from "@/lib/achievements";
 import { logoutAction } from "@/app/actions/auth";
 import { formatDate, formatTime, formatTimeRange, winRate } from "@/lib/utils";
+import { SessionCard } from "@/components/sessions/SessionCard";
 
 export const metadata = {
   title: "Home",
@@ -196,78 +197,11 @@ export default async function HomePage() {
                 Lihat Semua
               </Link>
             </div>
-            <Link
-              href={`/sessions/${nextSession.id}`}
-              className="session-card"
-              style={{ display: "block" }}
-            >
-              <div className="session-banner">
-                <div className="session-banner-text">
-                  <div className="session-banner-tag">
-                    {formatDate(nextSession.scheduledAt)} ·{" "}
-                    {formatTime(nextSession.scheduledAt)}
-                  </div>
-                  <div className="session-banner-title">{nextSession.title}</div>
-                </div>
-              </div>
-              <div className="session-body">
-                <div className="session-meta">
-                  {nextSession.venueName && (
-                    <div className="session-meta-row">
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                        <circle cx="12" cy="10" r="3" />
-                      </svg>
-                      <span>{nextSession.venueName}</span>
-                    </div>
-                  )}
-                  <div className="session-meta-row">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <circle cx="12" cy="12" r="10" />
-                      <path d="M12 6v6l4 2" />
-                    </svg>
-                    <span style={{ textTransform: "capitalize" }}>
-                      {nextSession.format} · {nextSession.numCourts} court
-                      {nextSession.numCourts > 1 ? "s" : ""}
-                    </span>
-                  </div>
-                  <div className="session-meta-row">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-                      <circle cx="9" cy="7" r="4" />
-                    </svg>
-                    <span>{nextSession.participantCount} pemain</span>
-                  </div>
-                </div>
-              </div>
-            </Link>
+            <SessionCard
+              session={nextSession}
+              participantCount={nextSession.participantCount}
+              bannerTag={`${formatDate(nextSession.scheduledAt)} · ${formatTime(nextSession.scheduledAt)}`}
+            />
           </section>
         )}
 
