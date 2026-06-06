@@ -97,6 +97,8 @@ export default async function PublicLiveView({ params }: PageProps) {
     .slice(0, 5);
 
   const isLive = session.status === "live";
+  const isTerminal =
+    session.status === "completed" || session.status === "cancelled";
   const statusInfo = STATUS_LABEL[session.status] ?? STATUS_LABEL.upcoming;
 
   return (
@@ -394,10 +396,65 @@ export default async function PublicLiveView({ params }: PageProps) {
           </div>
         )}
 
-        {/* CTA */}
+        {/* CTA: Join as Guest (Sprint 19) — visible kalau session non-terminal */}
+        {!isTerminal && (
+          <section
+            style={{
+              marginTop: "var(--s-4)",
+              padding: "var(--s-4)",
+              background: "var(--bg)",
+              borderRadius: "var(--r-xl)",
+              border: "1px solid var(--primary-100)",
+              textAlign: "center",
+              boxShadow: "var(--shadow-card)",
+            }}
+          >
+            <div style={{ fontSize: 28, marginBottom: 6 }}>🎾</div>
+            <div
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 800,
+                fontSize: 15,
+                color: "var(--text-900)",
+                marginBottom: 4,
+              }}
+            >
+              Mau ikut main?
+            </div>
+            <div
+              style={{
+                fontSize: 11,
+                color: "var(--text-500)",
+                fontWeight: 600,
+                marginBottom: "var(--s-3)",
+              }}
+            >
+              Join as guest tanpa daftar — nama kamu langsung masuk lineup.
+            </div>
+            <Link
+              href={`/s/${session.id}/guest`}
+              style={{
+                display: "inline-block",
+                padding: "10px 18px",
+                borderRadius: "var(--r-full)",
+                background: "var(--primary)",
+                color: "#fff",
+                fontFamily: "var(--font-display)",
+                fontWeight: 800,
+                fontSize: 12,
+                textDecoration: "none",
+                boxShadow: "var(--shadow-sm)",
+              }}
+            >
+              Join as Guest →
+            </Link>
+          </section>
+        )}
+
+        {/* CTA: Powered by */}
         <section
           style={{
-            marginTop: "var(--s-4)",
+            marginTop: "var(--s-3)",
             padding: "var(--s-4)",
             background: "var(--bg-soft)",
             borderRadius: "var(--r-xl)",
@@ -405,12 +462,11 @@ export default async function PublicLiveView({ params }: PageProps) {
             textAlign: "center",
           }}
         >
-          <div style={{ fontSize: 28, marginBottom: 6 }}>🎾</div>
           <div
             style={{
               fontFamily: "var(--font-display)",
               fontWeight: 800,
-              fontSize: 14,
+              fontSize: 13,
               color: "var(--text-900)",
               marginBottom: 4,
             }}
@@ -425,7 +481,7 @@ export default async function PublicLiveView({ params }: PageProps) {
               marginBottom: "var(--s-3)",
             }}
           >
-            Padel community Indonesia · Buat session padel mudah
+            Padel community Indonesia
           </div>
           <Link
             href="/"
@@ -433,16 +489,16 @@ export default async function PublicLiveView({ params }: PageProps) {
               display: "inline-block",
               padding: "10px 18px",
               borderRadius: "var(--r-full)",
-              background: "var(--primary)",
-              color: "#fff",
+              background: "var(--bg)",
+              color: "var(--text-900)",
+              border: "1px solid var(--border)",
               fontFamily: "var(--font-display)",
-              fontWeight: 800,
+              fontWeight: 700,
               fontSize: 12,
               textDecoration: "none",
-              boxShadow: "var(--shadow-sm)",
             }}
           >
-            Daftar Sekarang
+            Daftar Member
           </Link>
         </section>
       </main>

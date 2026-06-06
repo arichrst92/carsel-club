@@ -23,6 +23,7 @@ export type EventName =
   | "round_regenerated" // Sprint 14
   | "match_swap" // Sprint 15
   | "session_edited" // Sprint 18
+  | "guest_joined" // Sprint 19
   | "match_started" // Sprint 4
   | "match_completed"
   | "match_reverted" // Sprint 4
