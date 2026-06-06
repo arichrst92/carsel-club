@@ -42,6 +42,7 @@ export type EventName =
   | "session_reminder_sent" // Sprint 28
   | "bracket_generated" // Sprint 31
   | "bracket_advanced" // Sprint 31
+  | "admin_stats_recomputed" // Sprint 35
   | "referral_claimed"
   | "upload_success";
 

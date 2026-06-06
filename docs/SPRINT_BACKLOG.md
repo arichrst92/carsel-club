@@ -843,16 +843,43 @@ Deferred / future iterations:
 
 ---
 
-### Sprint 35 — Admin/Ops: super-admin + stats recompute
+### Sprint 35 — Admin/Ops: super-admin + stats recompute ✅
 **Goal**: Operational tools
 
 Sub-tasks:
-- Role baru `users.isAdmin` boolean
-- Admin dashboard `/admin/`: user search, session search, manual override
-- Stats recompute action (in case stats drift): iterate matches → rebuild stats per user
-- Match audit log table `match_events` (insert on each state transition)
-- Soft delete columns (`deletedAt`) — selective per table
-- (Open) Audit log viewer
+- Pure helpers (100% cov, lib/stats/recompute.ts):
+  - recomputeStats(outcomes) — totalMatches/Wins/Losses/Draws/Points +
+    currentWinStreak/bestWinStreak from match outcome list (streak from
+    insertion order)
+  - diffStats(before, after) — surface changed fields only
+- Admin queries (lib/db/queries/admin.ts):
+  - searchUsers(q) — ilike on displayName/whatsappNumber/city, ordered by
+    createdAt desc, default limit 30 (capped 100)
+  - getAdminUserDetail(id) — full stats row
+  - searchSessions(q) — ilike on title/venueName + host name correlated
+    subquery
+  - getAdminCounts — totalUsers, totalSessions, liveSessions, totalMatches
+- Admin action (app/actions/admin.ts):
+  - recomputeUserStatsAction(userId) — gates requireAdmin, runs
+    recomputeStats(getUserMatchOutcomes), updates user row (incl. tier via
+    computeTierId), re-runs detectNewlyUnlocked + inserts new
+    user_achievements (ON CONFLICT DO NOTHING)
+  - Event log: admin_stats_recomputed (admin id, target id, changed fields,
+    achievements added)
+- Pages:
+  - /admin (dashboard) — counts cards + nav links to users/sessions/monitor
+  - /admin/users (search) — name/phone/city
+  - /admin/users/[userId] — detail + RecomputeButton (confirm dialog,
+    transition state, before→after delta result)
+  - /admin/sessions (search) — title/venue + live status pill
+- /admin/error.tsx route boundary
+- Existing Sprint 2 `users.isAdmin` boolean reused
+- Existing `requireAdmin` / `getAdmin` helpers in lib/auth/admin.ts reused
+
+Deferred:
+- match_events audit table (insert on each state transition)
+- Soft delete columns
+- Bulk admin actions (delete user, edit session)
 
 **DoD**: Admin bisa search/intervene, recompute available.
 

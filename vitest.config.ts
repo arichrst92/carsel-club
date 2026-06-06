@@ -76,6 +76,8 @@ export default defineConfig({
         "lib/pwa/install-prompt.ts",
         // Sprint 34 — error parsing
         "lib/errors/friendly.ts",
+        // Sprint 35 — stats recompute
+        "lib/stats/recompute.ts",
       ],
       // Exclude: files yang belum sprint-nya untuk di-test.
       exclude: [
