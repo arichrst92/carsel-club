@@ -47,6 +47,40 @@ export type FriendRequestState = {
   };
 } | null;
 
+/**
+ * Lightweight lookup for preview UI (QR scan, etc) — returns
+ * a public-safe user summary.
+ */
+export async function lookupUserForPreviewAction(
+  userId: string
+): Promise<
+  | {
+      id: string;
+      displayName: string;
+      city: string | null;
+      avatarUrl: string | null;
+    }
+  | { error: string }
+> {
+  const me = await getCurrentUser();
+  if (!me) redirect("/login");
+  if (userId === me.id) return { error: "That's your own profile 😅" };
+
+  const [user] = await db
+    .select({
+      id: users.id,
+      displayName: users.displayName,
+      city: users.city,
+      avatarUrl: users.avatarUrl,
+    })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  if (!user) return { error: "User not found" };
+
+  return user;
+}
+
 // Search user by phone (reused — same as Sprint pattern)
 export async function searchUserForRequestAction(
   _prev: FriendRequestState,

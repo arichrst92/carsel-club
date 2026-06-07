@@ -276,6 +276,35 @@ export default async function MatchHistoryPage({
   );
 }
 
+/**
+ * Render a player name as a link to /u/[userId] when userId present
+ * (member), or as plain text (guest / removed user). Tap on link is
+ * caught by stopPropagation so it doesn't trigger the parent
+ * `<Link>` to match detail.
+ */
+function PlayerName({
+  name,
+  userId,
+}: {
+  name: string;
+  userId: string | null;
+}) {
+  if (!userId) return <span>{name}</span>;
+  return (
+    <Link
+      href={`/u/${userId}`}
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        color: "var(--primary-700)",
+        textDecoration: "none",
+        fontWeight: 700,
+      }}
+    >
+      {name}
+    </Link>
+  );
+}
+
 function filterEmoji(f: HistoryFilter): string {
   if (f === "win") return "🏆 ";
   if (f === "loss") return "⚡ ";
@@ -330,14 +359,31 @@ function HistoryItem({ m }: { m: MatchRow }) {
           <div className="hi-team-row you">
             <span className="hi-team-emoji">🎾</span>
             <span>
-              You{m.partnerName ? ` · ${m.partnerName}` : ""}
+              You
+              {m.partnerName && (
+                <>
+                  {" · "}
+                  <PlayerName
+                    name={m.partnerName}
+                    userId={m.partnerUserId}
+                  />
+                </>
+              )}
             </span>
           </div>
           <div className="hi-team-row vs">
             <span className="hi-team-emoji">vs</span>
             <span>
               {m.opponentNames.length > 0
-                ? m.opponentNames.join(" · ")
+                ? m.opponentNames.map((name, i) => (
+                    <span key={i}>
+                      {i > 0 && " · "}
+                      <PlayerName
+                        name={name}
+                        userId={m.opponentUserIds[i] ?? null}
+                      />
+                    </span>
+                  ))
                 : "Opponents"}
             </span>
           </div>

@@ -5,7 +5,13 @@
 
 import { and, eq, or, desc } from "drizzle-orm";
 import { db } from "@/lib/db/client";
-import { friendships, tierDefinitions, users } from "@/lib/db/schema";
+import {
+  friendRequests,
+  friendships,
+  tierDefinitions,
+  users,
+} from "@/lib/db/schema";
+import type { RelationshipState } from "@/components/friends/FriendRequestButton";
 
 function canonical(a: string, b: string): [string, string] {
   return a < b ? [a, b] : [b, a];
@@ -69,3 +75,57 @@ export async function countFriends(userId: string): Promise<number> {
 }
 
 export { canonical as canonicalPair };
+
+/**
+ * Resolve the friendship relationship between `viewerId` and `targetId`
+ * for use by the public profile FriendRequestButton.
+ *
+ * Priority order:
+ *   1. self                        → viewing own profile
+ *   2. friends                     → already in friendships table
+ *   3. incoming  (target → viewer) → there's a pending request that the
+ *                                    viewer can accept
+ *   4. outgoing  (viewer → target) → viewer has sent a pending request
+ *   5. none                        → no relationship yet
+ */
+export async function getRelationshipState(
+  viewerId: string,
+  targetId: string
+): Promise<RelationshipState> {
+  if (viewerId === targetId) return { kind: "self" };
+
+  if (await areFriends(viewerId, targetId)) {
+    return { kind: "friends" };
+  }
+
+  const [req] = await db
+    .select({
+      id: friendRequests.id,
+      fromUserId: friendRequests.fromUserId,
+      toUserId: friendRequests.toUserId,
+      status: friendRequests.status,
+    })
+    .from(friendRequests)
+    .where(
+      and(
+        eq(friendRequests.status, "pending"),
+        or(
+          and(
+            eq(friendRequests.fromUserId, viewerId),
+            eq(friendRequests.toUserId, targetId)
+          ),
+          and(
+            eq(friendRequests.fromUserId, targetId),
+            eq(friendRequests.toUserId, viewerId)
+          )
+        )
+      )
+    )
+    .limit(1);
+
+  if (!req) return { kind: "none" };
+  if (req.fromUserId === viewerId) {
+    return { kind: "outgoing", requestId: req.id };
+  }
+  return { kind: "incoming", requestId: req.id };
+}

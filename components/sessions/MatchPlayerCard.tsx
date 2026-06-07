@@ -7,6 +7,7 @@
  * - GUI: docs/CarselClubPrototype/match-detail.html (lineup section)
  */
 
+import Link from "next/link";
 import type { MatchDetailPlayer } from "@/lib/db/queries/match-detail";
 import {
   computePlayerStats,
@@ -31,18 +32,29 @@ export function MatchPlayerCard({
   const stats = computePlayerStats(team1Score, team2Score, player.side);
   const initial = (player.name.trim()[0] ?? "?").toUpperCase();
 
+  const cardStyle: React.CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    gap: "var(--s-3)",
+    padding: "var(--s-3)",
+    background: "var(--bg)",
+    border: "1px solid var(--border-light)",
+    borderRadius: "var(--r-md)",
+    textDecoration: "none",
+    color: "inherit",
+  };
+
+  const Wrapper = ({ children }: { children: React.ReactNode }) =>
+    player.userId ? (
+      <Link href={`/u/${player.userId}`} style={cardStyle}>
+        {children}
+      </Link>
+    ) : (
+      <div style={cardStyle}>{children}</div>
+    );
+
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "var(--s-3)",
-        padding: "var(--s-3)",
-        background: "var(--bg)",
-        border: "1px solid var(--border-light)",
-        borderRadius: "var(--r-md)",
-      }}
-    >
+    <Wrapper>
       {/* Avatar */}
       <div
         style={{
@@ -162,6 +174,6 @@ export function MatchPlayerCard({
           </div>
         </div>
       )}
-    </div>
+    </Wrapper>
   );
 }

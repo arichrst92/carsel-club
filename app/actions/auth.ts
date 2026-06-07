@@ -48,11 +48,11 @@ export async function sendOtpAction(
   formData: FormData
 ): Promise<AuthActionState> {
   const rawPhone = String(formData.get("phone") ?? "").trim();
-  if (!rawPhone) return { error: "Nomor WhatsApp required" };
+  if (!rawPhone) return { error: "WhatsApp number is required" };
 
   const phone = normalizePhone(rawPhone);
   if (!isValidIndonesianPhone(phone)) {
-    return { error: "Nomor WhatsApp Indonesia tidak valid" };
+    return { error: "Invalid Indonesian WhatsApp number" };
   }
 
   // Rate limit
@@ -72,7 +72,7 @@ export async function sendOtpAction(
     });
   } catch (e) {
     console.error("[sendOtpAction] insert error:", e);
-    return { error: "Gagal menyimpan OTP. Coba lagi." };
+    return { error: "Failed to save OTP. Please try again." };
   }
 
   // Sprint 42: Wablas primary, Fonnte fallback via dispatcher
@@ -83,7 +83,7 @@ export async function sendOtpAction(
       res.error
     );
     return {
-      error: "Gagal kirim OTP ke WhatsApp. Pastikan nomor benar & aktif.",
+      error: "Failed to send OTP to WhatsApp. Make sure the number is correct & active.",
     };
   }
 
@@ -106,7 +106,7 @@ export async function verifyOtpAction(
     return { error: "Invalid number. Please start over." };
   }
   if (!/^\d{6}$/.test(code)) {
-    return { error: "Kode OTP harus 6 digit angka" };
+    return { error: "OTP code must be 6 digits" };
   }
 
   // Find latest non-verified, non-expired OTP
@@ -125,14 +125,14 @@ export async function verifyOtpAction(
 
   if (!otp) {
     return {
-      error: "Kode OTP tidak ditemukan atau sudah expired. Kirim ulang.",
+      error: "OTP code not found or already expired. Resend it.",
     };
   }
 
   // Sprint 37: pure-helper-backed attempt check (audited + tested)
   const check = checkAttempt(otp.attempts, OTP_CONFIG.maxAttempts);
   if (check.status === "locked_out") {
-    return { error: "Terlalu banyak percobaan. Kirim ulang OTP." };
+    return { error: "Too many attempts. Resend the OTP." };
   }
 
   // Verify code
@@ -184,7 +184,7 @@ export async function verifyOtpAction(
       isNewUser = true;
     } catch (e) {
       console.error("[verifyOtpAction] user create error:", e);
-      return { error: "Gagal membuat akun. Coba lagi." };
+      return { error: "Failed to create account. Please try again." };
     }
   }
 
@@ -275,7 +275,7 @@ export async function completeOnboardingAction(
       .where(eq(users.id, session!.userId));
   } catch (e) {
     console.error("[completeOnboardingAction] update error:", e);
-    return { error: "Gagal update profil. Coba lagi." };
+    return { error: "Failed to update profile. Please try again." };
   }
 
   redirect("/home");

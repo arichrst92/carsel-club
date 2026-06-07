@@ -1,25 +1,78 @@
 "use client";
 
 /**
- * AddFriendActions — gabungkan AddFriendForm (search by phone) +
- * tombol "Scan QR" yang buka QRScanModal.
+ * AddFriendActions — combines AddFriendForm (search by phone) + a
+ * "Scan QR" button that opens QRScanModal.
  *
- * Refs:
- * - AddFriendForm: pre-existing
- * - QRScanModal: Sprint 50
+ * QR scan flow (Sprint 52):
+ *   1. Modal opens, scans QR
+ *   2. On scan → look up the user → show preview modal with
+ *      "Add as friend?" confirmation
+ *   3. On confirm → sendFriendRequestAction
+ *
+ * (Previously the QR callback routed straight to /u/{userId}; this caused
+ * confusion because the public-profile view used to show Follow/Block
+ * buttons, not the friend-request flow.)
  */
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { AddFriendForm } from "./AddFriendForm";
 import { QRScanModal } from "./QRScanModal";
+import {
+  lookupUserForPreviewAction,
+  sendFriendRequestAction,
+} from "@/app/actions/friend-requests";
+import { Toast } from "@/components/ui/Toast";
+
+type Preview = {
+  id: string;
+  displayName: string;
+  city: string | null;
+  avatarUrl: string | null;
+};
 
 export function AddFriendActions() {
   const router = useRouter();
   const [scanOpen, setScanOpen] = useState(false);
+  const [preview, setPreview] = useState<Preview | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+
+  async function handleScan(userId: string) {
+    const result = await lookupUserForPreviewAction(userId);
+    if ("error" in result) {
+      setError(result.error);
+      return;
+    }
+    setPreview(result);
+  }
+
+  function sendRequest() {
+    if (!preview) return;
+    setError(null);
+    startTransition(async () => {
+      const result = await sendFriendRequestAction(preview.id);
+      if (result?.error) {
+        setError(result.error);
+      } else {
+        setSuccess(result?.success ?? "Request sent!");
+        router.refresh();
+      }
+      setPreview(null);
+    });
+  }
 
   return (
     <>
+      <Toast message={error} onDismiss={() => setError(null)} />
+      <Toast
+        message={success}
+        kind="success"
+        onDismiss={() => setSuccess(null)}
+      />
+
       <div
         style={{
           display: "flex",
@@ -70,10 +123,138 @@ export function AddFriendActions() {
 
       {scanOpen && (
         <QRScanModal
-          onScan={(userId) => router.push(`/u/${userId}`)}
+          onScan={handleScan}
           onClose={() => setScanOpen(false)}
         />
       )}
+
+      {preview && (
+        <ConfirmAddFriendModal
+          preview={preview}
+          pending={pending}
+          onConfirm={sendRequest}
+          onCancel={() => setPreview(null)}
+        />
+      )}
     </>
+  );
+}
+
+function ConfirmAddFriendModal({
+  preview,
+  pending,
+  onConfirm,
+  onCancel,
+}: {
+  preview: Preview;
+  pending: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  const initial = (preview.displayName.trim()[0] ?? "?").toUpperCase();
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      onClick={onCancel}
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.6)",
+        zIndex: 1100,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 24,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "var(--bg)",
+          borderRadius: 18,
+          padding: 20,
+          width: "100%",
+          maxWidth: 360,
+          boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
+          textAlign: "center",
+        }}
+      >
+        <div
+          style={{
+            width: 72,
+            height: 72,
+            borderRadius: "50%",
+            margin: "0 auto 12px",
+            background: preview.avatarUrl
+              ? `url(${preview.avatarUrl}) center/cover no-repeat`
+              : "linear-gradient(135deg, #FB7185, #F43F5E)",
+            color: "#fff",
+            display: "grid",
+            placeItems: "center",
+            fontFamily: "var(--font-display)",
+            fontWeight: 800,
+            fontSize: 28,
+            border: "3px solid var(--bg)",
+            boxShadow: "var(--shadow-sm)",
+          }}
+        >
+          {!preview.avatarUrl && initial}
+        </div>
+        <div
+          style={{
+            fontFamily: "var(--font-display)",
+            fontWeight: 800,
+            fontSize: 18,
+            color: "var(--text-900)",
+          }}
+        >
+          {preview.displayName}
+        </div>
+        {preview.city && (
+          <div
+            style={{
+              fontSize: 12,
+              color: "var(--text-500)",
+              fontWeight: 600,
+              marginTop: 2,
+            }}
+          >
+            📍 {preview.city}
+          </div>
+        )}
+        <p
+          style={{
+            fontSize: 13,
+            color: "var(--text-700)",
+            fontWeight: 600,
+            margin: "16px 0",
+            lineHeight: 1.5,
+          }}
+        >
+          Send {preview.displayName} a friend request?
+        </p>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={pending}
+            className="btn-secondary-lg"
+            style={{ flex: 1 }}
+          >
+            <span>Cancel</span>
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={pending}
+            className="btn-primary-lg"
+            style={{ flex: 1 }}
+          >
+            <span>{pending ? "Sending..." : "Send Request"}</span>
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -11,13 +11,10 @@ import { getPublicProfile } from "@/lib/db/queries/public-profile";
 import { winRate, toAbsoluteUrl } from "@/lib/utils";
 import { getSession } from "@/lib/auth/session";
 import {
-  isFollowing,
-  isUserBlocked,
-  countFollowers,
-  countFollowing,
-} from "@/lib/db/queries/social";
-import { areFriends } from "@/lib/db/queries/friends";
-import { FollowBlockActions } from "@/components/social/FollowBlockActions";
+  areFriends,
+  getRelationshipState,
+} from "@/lib/db/queries/friends";
+import { FriendRequestButton } from "@/components/friends/FriendRequestButton";
 
 export const dynamic = "force-dynamic";
 
@@ -78,14 +75,10 @@ export default async function PublicProfilePage({ params }: Props) {
   const avatarUrl = toAbsoluteUrl(profile.avatarUrl);
   const initial = (profile.displayName.trim()[0] ?? "?").toUpperCase();
 
-  // Sprint 23: social state
-  const [followers, following, viewerFollowing, viewerBlocked] =
-    await Promise.all([
-      countFollowers(userId),
-      countFollowing(userId),
-      session ? isFollowing(session.userId, userId) : Promise.resolve(false),
-      session ? isUserBlocked(session.userId, userId) : Promise.resolve(false),
-    ]);
+  // Friendship relationship state (replaces Sprint 23 follow/block UI)
+  const relationship = session
+    ? await getRelationshipState(session.userId, userId)
+    : { kind: "none" as const };
 
   return (
     <div className="app-shell">
@@ -170,67 +163,14 @@ export default async function PublicProfilePage({ params }: Props) {
             </div>
           )}
 
-          {/* Follower / Following counts */}
-          <div
-            style={{
-              display: "flex",
-              gap: 16,
-              justifyContent: "center",
-              marginTop: 12,
-            }}
-          >
-            <div>
-              <span
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontWeight: 800,
-                  fontSize: 14,
-                  color: "var(--text-900)",
-                }}
-              >
-                {followers}
-              </span>{" "}
-              <span
-                style={{
-                  fontSize: 11,
-                  color: "var(--text-500)",
-                  fontWeight: 600,
-                }}
-              >
-                Followers
-              </span>
-            </div>
-            <div>
-              <span
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontWeight: 800,
-                  fontSize: 14,
-                  color: "var(--text-900)",
-                }}
-              >
-                {following}
-              </span>{" "}
-              <span
-                style={{
-                  fontSize: 11,
-                  color: "var(--text-500)",
-                  fontWeight: 600,
-                }}
-              >
-                Following
-              </span>
-            </div>
-          </div>
         </section>
 
-        {/* Follow / Block — kalau auth + bukan profile sendiri */}
+        {/* Friend request action — kalau auth + bukan profile sendiri */}
         {session && !isOwnProfile && (
           <section style={{ marginBottom: "var(--s-3)" }}>
-            <FollowBlockActions
+            <FriendRequestButton
               targetUserId={userId}
-              isFollowing={viewerFollowing}
-              isBlocked={viewerBlocked}
+              state={relationship}
             />
           </section>
         )}

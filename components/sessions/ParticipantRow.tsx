@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ParticipantActions } from "./ParticipantActions";
 
 type ParticipantData = {
@@ -64,14 +65,26 @@ export function ParticipantRow({
       </div>
       <div className="player-info">
         <div className="player-name">
-          <span>{name}</span>
+          {participant.userId ? (
+            <Link
+              href={`/u/${participant.userId}`}
+              style={{
+                color: "inherit",
+                textDecoration: "none",
+              }}
+            >
+              {name}
+            </Link>
+          ) : (
+            <span>{name}</span>
+          )}
           {roleLabel && (
             <span className={`role-badge ${badgeCls}`}>{roleLabel}</span>
           )}
         </div>
         <div className="player-meta-row">
           <span style={{ fontSize: 12, color: "var(--text-500)" }}>
-            {!participant.isPlaying && "🚫 tidak main"}
+            {!participant.isPlaying && "🚫 not playing"}
             {participant.role === "player" && participant.isPlaying && "Player"}
             {participant.role === "guest" && participant.isPlaying && "Guest player"}
           </span>

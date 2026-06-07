@@ -1,10 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import {
-  searchUserForFriendAction,
-  addFriendAction,
-} from "@/app/actions/friends";
+import { searchUserForFriendAction } from "@/app/actions/friends";
+import { sendFriendRequestAction } from "@/app/actions/friend-requests";
 
 export function AddFriendForm() {
   const [phone, setPhone] = useState("");
@@ -44,9 +42,7 @@ export function AddFriendForm() {
     setSuccess(null);
 
     startTransition(async () => {
-      const fd = new FormData();
-      fd.set("friend_id", found.id);
-      const result = await addFriendAction(null, fd);
+      const result = await sendFriendRequestAction(found.id);
       if (result?.success) {
         setSuccess(result.success);
         setFound(null);
@@ -183,7 +179,7 @@ export function AddFriendForm() {
               flexShrink: 0,
             }}
           >
-            {isPending ? "..." : "+ Friend"}
+            {isPending ? "..." : "Send Request"}
           </button>
         </div>
       )}

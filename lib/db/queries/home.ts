@@ -156,6 +156,7 @@ export async function getRecentMatches(userId: string, limit = 3) {
     ? await db
         .select({
           id: sessionParticipants.id,
+          userId: sessionParticipants.userId,
           guestName: sessionParticipants.guestName,
           userDisplayName: users.displayName,
         })
@@ -164,7 +165,13 @@ export async function getRecentMatches(userId: string, limit = 3) {
         .where(inArray(sessionParticipants.id, allPartIds))
     : [];
   const nameMap = new Map(
-    partRows.map((p) => [p.id, p.userDisplayName ?? p.guestName ?? "Player"])
+    partRows.map((p) => [
+      p.id,
+      {
+        name: p.userDisplayName ?? p.guestName ?? "Player",
+        userId: p.userId,
+      },
+    ])
   );
 
   return rows.map((m) => {
@@ -183,10 +190,14 @@ export async function getRecentMatches(userId: string, limit = 3) {
       ? [m.team2P1Id, m.team2P2Id]
       : [m.team1P1Id, m.team1P2Id];
     const partnerId = myTeamIds.find((id) => !myPartIds.includes(id));
-    const partnerName = partnerId ? nameMap.get(partnerId) ?? null : null;
-    const oppNames = oppTeamIds
+    const partnerEntry = partnerId ? nameMap.get(partnerId) ?? null : null;
+    const partnerName = partnerEntry?.name ?? null;
+    const partnerUserId = partnerEntry?.userId ?? null;
+    const oppEntries = oppTeamIds
       .map((id) => nameMap.get(id))
-      .filter((n): n is string => Boolean(n));
+      .filter((n): n is { name: string; userId: string | null } => Boolean(n));
+    const oppNames = oppEntries.map((e) => e.name);
+    const opponentUserIds = oppEntries.map((e) => e.userId);
 
     // Durasi menit kalau startedAt + endedAt tersedia
     let durationMin: number | null = null;
@@ -207,7 +218,9 @@ export async function getRecentMatches(userId: string, limit = 3) {
       roundNumber: m.roundNumber,
       courtNumber: m.courtNumber,
       partnerName,
+      partnerUserId,
       opponentNames: oppNames,
+      opponentUserIds,
       durationMin,
     };
   });
