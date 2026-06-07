@@ -50,7 +50,7 @@ export async function updateAvatarAction(
 
   const file = formData.get("file");
   if (!file || !(file instanceof File) || file.size === 0) {
-    return { error: "Pilih file dulu" };
+    return { error: "Pick file dulu" };
   }
   if (file.size > MAX_UPLOAD_BYTES) {
     const mb = Math.round(MAX_UPLOAD_BYTES / 1024 / 1024);

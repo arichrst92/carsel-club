@@ -129,7 +129,7 @@ export default async function FindSessionPage({ searchParams }: PageProps) {
                   boxShadow: "var(--shadow-sm)",
                 }}
               >
-                + Buat Sesi Publik
+                + Create Session Publik
               </Link>
             </div>
           ) : (

@@ -249,7 +249,7 @@ function HourSelect({
           color: "var(--text-900)",
         }}
       >
-        <option value="null">Tidak ada</option>
+        <option value="null">None</option>
         {Array.from({ length: 24 }).map((_, h) => (
           <option key={h} value={String(h)}>
             {String(h).padStart(2, "0")}:00

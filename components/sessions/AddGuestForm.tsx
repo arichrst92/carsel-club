@@ -92,7 +92,7 @@ export function AddGuestForm({ sessionId }: { sessionId: string }) {
       <div style={{ marginTop: "var(--s-4)" }}>
         <div className="sp-section-label">
           {addedGuests.length === 0
-            ? "Belum ada guest ditambahkan"
+            ? "No guests added yet"
             : `Guest Baru Ditambahkan (${addedGuests.length})`}
         </div>
         {addedGuests.length === 0 ? (

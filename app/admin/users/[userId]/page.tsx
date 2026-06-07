@@ -67,7 +67,7 @@ export default async function AdminUserDetailPage({
           }}
         >
           <Field label="WhatsApp" value={u.whatsappNumber} />
-          <Field label="Kota" value={u.city ?? "—"} />
+          <Field label="City" value={u.city ?? "—"} />
           <Field
             label="Created"
             value={u.createdAt.toISOString().slice(0, 10)}

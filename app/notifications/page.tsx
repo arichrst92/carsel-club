@@ -184,7 +184,7 @@ function EmptyState() {
           color: "var(--text-900)",
         }}
       >
-        Belum ada notifikasi
+        No notifications yet
       </div>
       <div
         style={{

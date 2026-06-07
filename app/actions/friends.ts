@@ -32,7 +32,7 @@ export async function searchUserForFriendAction(
   if (!me) redirect("/login");
 
   const rawPhone = String(formData.get("phone") ?? "").trim();
-  if (!rawPhone) return { error: "Nomor WhatsApp wajib diisi" };
+  if (!rawPhone) return { error: "Nomor WhatsApp required" };
 
   const phone = normalizePhone(rawPhone);
   if (!isValidIndonesianPhone(phone)) {

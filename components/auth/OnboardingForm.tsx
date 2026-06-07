@@ -459,7 +459,7 @@ function Step3Welcome({
 }) {
   return (
     <>
-      <h2 className="wizard-step-title">Selamat datang! 🎾</h2>
+      <h2 className="wizard-step-title">Welcome! 🎾</h2>
       <p
         style={{
           color: "var(--text-500)",

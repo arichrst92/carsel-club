@@ -111,7 +111,7 @@ export default async function SessionsPage({
               whiteSpace: "nowrap",
             }}
           >
-            + Baru
+            + New
           </Link>
         </div>
       </header>
@@ -159,9 +159,9 @@ function EmptyState() {
   return (
     <div className="empty-state">
       <div className="empty-state-icon">🎾</div>
-      <div className="empty-state-title">Belum ada session</div>
+      <div className="empty-state-title">No sessions yet</div>
       <div className="empty-state-text">
-        Buat session pertama kamu dan undang teman padel.
+        Create your first session and invite your padel friends.
       </div>
       <Link
         href="/sessions/new"
@@ -197,21 +197,21 @@ function FilteredEmpty({
       <div className="empty-state-icon">🔍</div>
       <div className="empty-state-title">
         {hasFilter
-          ? "Tidak ada session yang cocok"
+          ? "No matching sessions"
           : tab === "upcoming"
-            ? "Belum ada upcoming session"
+            ? "No upcoming sessions yet"
             : tab === "live"
-              ? "Tidak ada live session sekarang"
-              : "Belum ada past session"}
+              ? "No live sessions right now"
+              : "No past sessions yet"}
       </div>
       <div className="empty-state-text">
         {hasFilter
-          ? "Coba ubah filter atau search query."
+          ? "Try adjusting filter or search query."
           : tab === "upcoming"
-            ? "Buat session baru untuk muncul di sini."
+            ? "Create a new session to appear here."
             : tab === "live"
-              ? "Session yang sedang live akan muncul di sini."
-              : "Session selesai/cancelled akan tampil di sini."}
+              ? "Live sessions will appear here."
+              : "Completed/cancelled sessions will appear here."}
       </div>
     </div>
   );

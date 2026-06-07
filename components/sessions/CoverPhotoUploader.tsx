@@ -195,7 +195,7 @@ export function CoverPhotoUploader({ sessionId, currentCoverUrl }: Props) {
               color: "var(--text-900)",
             }}
           >
-            {isPending ? "Uploading..." : "Tambah cover photo"}
+            {isPending ? "Uploading..." : "Add cover photo"}
           </div>
           <div
             style={{

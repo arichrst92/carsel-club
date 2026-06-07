@@ -468,7 +468,7 @@ export default async function ProfilePage() {
         {/* STATS GRID */}
         <section>
           <div className="section-head">
-            <h3>Stats Lengkap</h3>
+            <h3>Full Stats</h3>
           </div>
           <div
             style={{
@@ -668,27 +668,27 @@ export default async function ProfilePage() {
             <Link href="/help" style={{ textDecoration: "none" }}>
               <SettingsRow
                 icon="❓"
-                title="Bantuan"
+                title="Help"
                 sub="FAQ, kontak support"
               />
             </Link>
             <Link href="/privacy-policy" style={{ textDecoration: "none" }}>
               <SettingsRow
                 icon="🔒"
-                title="Kebijakan privasi"
+                title="Privacy Policy"
                 sub="Cara kami pakai data kamu"
               />
             </Link>
             <Link href="/tos" style={{ textDecoration: "none" }}>
               <SettingsRow
                 icon="📜"
-                title="Syarat & ketentuan"
-                sub="Aturan main"
+                title="Terms & Conditions"
+                sub="Rules"
               />
             </Link>
             <SettingsRow
               icon="🌐"
-              title="Bahasa"
+              title="Language"
               sub="Indonesia"
               disabled
             />
@@ -742,7 +742,7 @@ export default async function ProfilePage() {
                       marginTop: 2,
                     }}
                   >
-                    Keluar dari Carsel Club
+                    Log out of Carsel Club
                   </div>
                 </div>
               </button>
@@ -795,7 +795,7 @@ function ProfileAchievements({
             fontWeight: 600,
           }}
         >
-          🔒 Belum ada achievement. Mulai main untuk unlock!
+          🔒 No achievements yet. Play to unlock!
         </div>
       ) : (
         <div

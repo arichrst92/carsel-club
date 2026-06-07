@@ -102,17 +102,17 @@ export default async function FriendsPage({
         {tab === "discover" && (
           <section>
             <div className="section-head">
-              <h3>Saran ({discover.length})</h3>
+              <h3>Suggestions ({discover.length})</h3>
             </div>
             {discover.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-state-icon">🔍</div>
                 <div className="empty-state-title">
-                  Belum ada saran
+                  No suggestions yet
                 </div>
                 <div className="empty-state-text">
-                  Suggestion muncul dari friend-of-friend dan teman main
-                  session. Main bareng dulu untuk seed datanya.
+                  Suggestions come from friend-of-friend and session co-players.
+                  Play some sessions to seed the data.
                 </div>
               </div>
             ) : (
@@ -134,14 +134,14 @@ export default async function FriendsPage({
         {tab === "friends" && (
           <section>
             <div className="section-head">
-              <h3>Daftar Teman ({friends.length})</h3>
+              <h3>Friends List ({friends.length})</h3>
             </div>
             {friends.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-state-icon">👥</div>
-                <div className="empty-state-title">Belum ada teman</div>
+                <div className="empty-state-title">No friends yet</div>
                 <div className="empty-state-text">
-                  Search & kirim request via nomor WhatsApp di atas.
+                  Search & send request via WhatsApp number above.
                 </div>
               </div>
             ) : (
@@ -166,16 +166,16 @@ export default async function FriendsPage({
         {tab === "incoming" && (
           <section>
             <div className="section-head">
-              <h3>Permintaan Masuk ({incoming.length})</h3>
+              <h3>Incoming Requests ({incoming.length})</h3>
             </div>
             {incoming.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-state-icon">📭</div>
                 <div className="empty-state-title">
-                  Tidak ada incoming request
+                  No incoming requests
                 </div>
                 <div className="empty-state-text">
-                  Request masuk akan muncul di sini.
+                  Incoming requests will appear here.
                 </div>
               </div>
             ) : (
@@ -201,16 +201,16 @@ export default async function FriendsPage({
         {tab === "outgoing" && (
           <section>
             <div className="section-head">
-              <h3>Permintaan Keluar ({outgoing.length})</h3>
+              <h3>Outgoing Requests ({outgoing.length})</h3>
             </div>
             {outgoing.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-state-icon">📤</div>
                 <div className="empty-state-title">
-                  Tidak ada outgoing request
+                  No outgoing requests
                 </div>
                 <div className="empty-state-text">
-                  Request yang kamu kirim akan muncul di sini.
+                  Requests you sent will appear here.
                 </div>
               </div>
             ) : (

@@ -128,7 +128,7 @@ export async function GET(req: Request) {
           ))}
           {top.length === 0 && (
             <div style={{ fontSize: 24, opacity: 0.85 }}>
-              Belum ada pemain.
+              No players yet.
             </div>
           )}
         </div>

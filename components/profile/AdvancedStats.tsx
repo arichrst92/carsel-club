@@ -33,7 +33,7 @@ export function AdvancedStats(props: AdvancedStatsProps) {
   return (
     <section>
       <div className="section-head">
-        <h3>📊 Stats Mendalam</h3>
+        <h3>📊 Deep Stats</h3>
       </div>
       <div
         style={{
@@ -45,7 +45,7 @@ export function AdvancedStats(props: AdvancedStatsProps) {
         <StreakCard streak={props.bestWinStreak} />
         <ListCard
           title="Partner terbaik"
-          subtitle="Tingkat menang paling tinggi (min 3 match)"
+          subtitle="Highest win rate (min 3 match)"
           empty="Belum cukup data partner"
           rows={props.bestPartners}
           metricLabel={(r) =>
@@ -55,8 +55,8 @@ export function AdvancedStats(props: AdvancedStatsProps) {
         />
         <ListCard
           title="Nemesis"
-          subtitle="Lawan yang paling sering kalahin kamu (min 3 match)"
-          empty="Belum ada nemesis"
+          subtitle="Opponents who beat you most (min 3 match)"
+          empty="No nemesis yet"
           rows={props.nemesis}
           metricLabel={(r) =>
             `${Math.round((r.lost / r.played) * 100)}% (${r.lost}L / ${r.played})`

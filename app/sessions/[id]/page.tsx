@@ -364,7 +364,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
             {participants.length === 0 && (
               <div className="empty-state" style={{ padding: "var(--s-5)" }}>
                 <div className="empty-state-icon">🎾</div>
-                <div className="empty-state-title">Belum ada pemain</div>
+                <div className="empty-state-title">No players yet</div>
                 <div className="empty-state-text">
                   {staff
                     ? "Tambah pemain via WhatsApp atau invite link untuk mulai session."
@@ -422,7 +422,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
                   </svg>
                 </div>
                 <div className="plus-text">
-                  <div>Tambah Pemain</div>
+                  <div>Add Players</div>
                   <div
                     style={{
                       fontSize: 12,
@@ -535,7 +535,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
                 <div className="ir-label">Co-Host</div>
                 <div className="ir-value">
                   {cohostCount === 0
-                    ? "Belum ada co-host"
+                    ? "No co-host yet"
                     : `${cohostCount} co-host`}
                 </div>
               </div>
@@ -583,7 +583,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
                 </svg>
               </div>
               <div className="empty-state-title">
-                Belum ada match yang dibuat
+                No matches created yet
               </div>
               <div className="empty-state-text">
                 Klik &quot;Generate Match&quot; di bawah saat semua pemain

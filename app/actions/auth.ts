@@ -48,7 +48,7 @@ export async function sendOtpAction(
   formData: FormData
 ): Promise<AuthActionState> {
   const rawPhone = String(formData.get("phone") ?? "").trim();
-  if (!rawPhone) return { error: "Nomor WhatsApp wajib diisi" };
+  if (!rawPhone) return { error: "Nomor WhatsApp required" };
 
   const phone = normalizePhone(rawPhone);
   if (!isValidIndonesianPhone(phone)) {

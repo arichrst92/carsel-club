@@ -173,7 +173,7 @@ export default async function SessionLeaderboardPage({
               marginBottom: "var(--s-3)",
             }}
           >
-            Peringkat pemain di sesi ini
+            Player ranking of this session
           </div>
           <div
             style={{
@@ -234,7 +234,7 @@ export default async function SessionLeaderboardPage({
               fontWeight: 600,
             }}
           >
-            Belum ada pemain aktif di sesi ini.
+            No active players in this session.
           </div>
         ) : (
           <section

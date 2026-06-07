@@ -38,7 +38,7 @@ export function AddParticipantsTabs({
             <path d="M6 6l12 12M6 18L18 6" />
           </svg>
         </Link>
-        <h2 className="modal-title">Tambah Pemain</h2>
+        <h2 className="modal-title">Add Players</h2>
       </header>
 
       <main className="app-content subscreen with-footer">

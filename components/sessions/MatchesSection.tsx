@@ -61,7 +61,7 @@ export async function MatchesSection({
               <path d="M12 6v6l4 2" />
             </svg>
           </div>
-          <div className="empty-state-title">Belum ada match</div>
+          <div className="empty-state-title">No matches yet</div>
           <div className="empty-state-text">
             {staff && !isTerminal
               ? 'Klik "Generate Round 1" di bawah saat semua pemain sudah datang. Kamu bisa buat extra match kapan saja saat session berjalan.'

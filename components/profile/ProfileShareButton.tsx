@@ -93,7 +93,7 @@ export function ProfileShareButton({
           <path d="M16 6l-4-4-4 4" />
           <path d="M12 2v13" />
         </svg>
-        Bagikan Profilku
+        Share My Profile
       </button>
     </>
   );

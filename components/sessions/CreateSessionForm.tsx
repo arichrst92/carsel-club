@@ -78,11 +78,11 @@ export function CreateSessionForm() {
   }
 
   function validateStep(s: number): string | null {
-    if (s === 1 && !data.name.trim()) return "Nama sesi wajib diisi";
+    if (s === 1 && !data.name.trim()) return "Nama sesi required";
     if (s === 2) {
-      if (!data.venueName.trim()) return "Venue wajib diisi";
-      if (!data.date) return "Tanggal wajib diisi";
-      if (!data.timeStart) return "Jam mulai wajib diisi";
+      if (!data.venueName.trim()) return "Venue required";
+      if (!data.date) return "Tanggal required";
+      if (!data.timeStart) return "Jam mulai required";
     }
     return null;
   }
@@ -231,7 +231,7 @@ export function CreateSessionForm() {
             >
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
-            <span>Kembali</span>
+            <span>Back</span>
           </button>
         ) : (
           <Link href="/sessions" className="btn-secondary-lg">
@@ -319,7 +319,7 @@ function Step1Info({
         </div>
 
         <div className="form-group">
-          <label className="form-label">Format Permainan</label>
+          <label className="form-label">Game Format</label>
           <div className="format-card-list">
             <FormatCard
               active={data.format === "americano"}
@@ -527,7 +527,7 @@ function Step2Location({
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Jam Berakhir</label>
+            <label className="form-label">End Time</label>
             <input
               type="time"
               className="form-input"
@@ -558,7 +558,7 @@ function Step3Players({
 
       <section className="form-section">
         <div className="form-group">
-          <label className="form-label">Jumlah Court</label>
+          <label className="form-label">Number of Courts</label>
           <div className="chip-group">
             {[1, 2, 3, 4].map((n) => (
               <button
@@ -607,7 +607,7 @@ function Step3Players({
               lineHeight: 1.5,
             }}
           >
-            Tidak ada batas maksimal pemain. Tambah pemain via WhatsApp invite
+            No maximum player limit. Add players via WhatsApp invite
             — kapan saja sebelum/saat session.
           </div>
         </div>
@@ -712,7 +712,7 @@ function Step3Players({
               lineHeight: 1.5,
             }}
           >
-            Match tidak punya batas poin/waktu. Host atau co-host memutuskan
+            Match has no point/time limit. Host or co-host decides
             kapan match berakhir saat scoring.
           </div>
         </div>
@@ -807,7 +807,7 @@ function Step4Visibility({
 
         <div className="toggle-row">
           <div className="toggle-info">
-            <div className="form-label">Saya akan ikut main</div>
+            <div className="form-label">I will play</div>
             <p className="form-help">
               Disable kalau kamu hanya jadi organizer/wasit.
             </p>
@@ -989,7 +989,7 @@ function Step5Review({
                   ? "Host (kamu) ikut main"
                   : "Host hanya organizer (tidak ikut main)"}
               </span>
-              <span style={{ color: "var(--text-500)" }}>Belum ada co-host</span>
+              <span style={{ color: "var(--text-500)" }}>No co-host yet</span>
             </div>
           </div>
           <button

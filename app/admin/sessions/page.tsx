@@ -94,7 +94,7 @@ export default async function AdminSessions({
                 fontWeight: 600,
               }}
             >
-              {q ? "Tidak ada match." : "Mulai ketik untuk cari."}
+              {q ? "No matches." : "Start typing to search."}
             </div>
           ) : (
             rows.map((s) => (

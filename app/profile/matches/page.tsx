@@ -169,7 +169,7 @@ export default async function MatchHistoryPage({
                   marginTop: 2,
                 }}
               >
-                Sepanjang waktu
+                Lifetime
               </div>
             </div>
             <div className="insight-card">
@@ -236,8 +236,8 @@ export default async function MatchHistoryPage({
             <div className="empty-state-icon">🎾</div>
             <div className="empty-state-title">
               {filter === "all"
-                ? "Belum ada match selesai"
-                : `Tidak ada match ${HISTORY_FILTER_LABELS[filter].toLowerCase()}`}
+                ? "No completed matches"
+                : `No ${HISTORY_FILTER_LABELS[filter].toLowerCase()} matches`}
             </div>
             <div className="empty-state-text">
               {filter === "all"

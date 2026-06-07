@@ -188,7 +188,7 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
                     letterSpacing: "0.04em",
                   }}
                 >
-                  Posisi Kamu
+                  Your Position
                 </div>
                 <div
                   style={{
@@ -293,7 +293,7 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
             <div className="empty-state-title">Leaderboard masih kosong</div>
             <div className="empty-state-text">
               {period !== "all_time"
-                ? "Belum ada match selesai di periode ini."
+                ? "No completed matches in this period."
                 : "Mulai main session pertama kamu untuk masuk leaderboard."}
             </div>
           </div>

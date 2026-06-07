@@ -8,7 +8,7 @@ import Link from "next/link";
 import { LegalShell } from "@/components/legal/LegalShell";
 
 export const metadata = {
-  title: "Bantuan",
+  title: "Help",
 };
 
 const FAQ_SECTIONS: { title: string; items: { q: string; a: string }[] }[] = [
@@ -138,7 +138,7 @@ const FAQ_SECTIONS: { title: string; items: { q: string; a: string }[] }[] = [
 
 export default function HelpPage() {
   return (
-    <LegalShell title="Bantuan">
+    <LegalShell title="Help">
       <h1
         style={{
           fontFamily: "var(--font-display)",

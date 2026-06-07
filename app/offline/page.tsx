@@ -35,7 +35,7 @@ export default function OfflinePage() {
           color: "var(--text-900)",
         }}
       >
-        Tidak ada koneksi
+        No connection
       </div>
       <div
         style={{

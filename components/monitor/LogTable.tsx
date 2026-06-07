@@ -24,7 +24,7 @@ export function LogTable({ rows }: { rows: LogRow[] }) {
           fontSize: 13,
         }}
       >
-        📭 Tidak ada log entry di rentang ini.
+        📭 No log entries in this range.
       </div>
     );
   }

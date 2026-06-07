@@ -49,7 +49,7 @@ export async function searchMemberAction(
   formData: FormData
 ): Promise<ParticipantActionState> {
   const rawPhone = String(formData.get("phone") ?? "").trim();
-  if (!rawPhone) return { error: "Nomor WhatsApp wajib diisi" };
+  if (!rawPhone) return { error: "Nomor WhatsApp required" };
 
   const phone = normalizePhone(rawPhone);
   if (!isValidIndonesianPhone(phone)) {
@@ -159,7 +159,7 @@ const AddGuestSchema = z.object({
   guestName: z
     .string()
     .trim()
-    .min(1, "Nama guest wajib diisi")
+    .min(1, "Nama guest required")
     .max(30, "Nama maksimal 30 karakter"),
 });
 

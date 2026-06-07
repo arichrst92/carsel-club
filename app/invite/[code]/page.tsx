@@ -140,7 +140,7 @@ export default async function InviteLandingPage({ params }: PageProps) {
               lineHeight: 1.5,
             }}
           >
-            Untuk bergabung di Carsel Club — komunitas padel Indonesia
+            Join Carsel Club — Indonesia padel community
           </div>
         </section>
 

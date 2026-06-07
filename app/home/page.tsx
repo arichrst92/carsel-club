@@ -33,10 +33,10 @@ const TIER_EMOJI: Record<string, string> = {
 
 function greet(): string {
   const h = new Date().getHours();
-  if (h < 11) return "Selamat pagi";
-  if (h < 15) return "Selamat siang";
-  if (h < 18) return "Selamat sore";
-  return "Selamat malam";
+  if (h < 11) return "Good morning";
+  if (h < 15) return "Good afternoon";
+  if (h < 18) return "Good evening";
+  return "Good night";
 }
 
 export default async function HomePage() {
@@ -159,8 +159,8 @@ export default async function HomePage() {
                   <path d="M12 5v14M5 12h14" />
                 </svg>
               </div>
-              <div className="qa-title">Buat Sesi</div>
-              <div className="qa-sub">Mulai sesi baru</div>
+              <div className="qa-title">Create Session</div>
+              <div className="qa-sub">Start a new session</div>
             </Link>
             <Link href="/find" className="qa-btn">
               <div className="qa-icon">
@@ -179,7 +179,7 @@ export default async function HomePage() {
                 </svg>
               </div>
               <div className="qa-title">Find Session</div>
-              <div className="qa-sub">Sesi publik di kotamu</div>
+              <div className="qa-sub">Public sessions in your city</div>
             </Link>
           </div>
         </section>
@@ -190,7 +190,7 @@ export default async function HomePage() {
             <div className="section-head">
               <h3>Next Session</h3>
               <Link href="/sessions" className="section-link">
-                Lihat Semua
+                See All
               </Link>
             </div>
             <SessionCard
@@ -204,7 +204,7 @@ export default async function HomePage() {
         {/* STATS GRID */}
         <section>
           <div className="section-head">
-            <h3>Stats Kamu</h3>
+            <h3>Your Stats</h3>
           </div>
           <div className="stats-grid">
             <div className="stat-card teal">
@@ -284,7 +284,7 @@ export default async function HomePage() {
                 fontWeight: 600,
               }}
             >
-              Belum ada match. Buat session & mulai main!
+              No matches yet. Create a session Belum ada match. Buat session & mulai main! start playing!
             </div>
           ) : (
             <div className="activity-list">
@@ -385,7 +385,7 @@ function TierCard({
         <div className="tier-progress">
           <div className="tier-progress-meta">
             <span>
-              {ptsToNext} pts lagi ke {nextTierName}
+              {ptsToNext} pts going to {nextTierName}
             </span>
             <span>
               {totalPoints} / {nextTierMinPoints}

@@ -83,7 +83,7 @@ export function EditProfileForm({
         {/* City */}
         <section className="form-section">
           <div className="form-group">
-            <label className="form-label">Kota</label>
+            <label className="form-label">City</label>
             <div
               style={{
                 display: "grid",

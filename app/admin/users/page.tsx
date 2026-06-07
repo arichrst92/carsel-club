@@ -87,7 +87,7 @@ export default async function AdminUsers({
                 fontWeight: 600,
               }}
             >
-              {q ? "Tidak ada match." : "Mulai ketik untuk cari."}
+              {q ? "No matches." : "Start typing to search."}
             </div>
           ) : (
             rows.map((u) => (

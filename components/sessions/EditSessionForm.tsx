@@ -74,7 +74,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
       return;
     }
     if (!date || !timeStart) {
-      setError("Tanggal & jam wajib diisi");
+      setError("Tanggal & jam required");
       return;
     }
     const scheduledAt = new Date(`${date}T${timeStart}`);
@@ -215,7 +215,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
               />
             </div>
             <div className="form-group">
-              <label className="form-label">Jam Berakhir</label>
+              <label className="form-label">End Time</label>
               <input
                 type="time"
                 className="form-input"
@@ -338,7 +338,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Jumlah Court</label>
+            <label className="form-label">Number of Courts</label>
             <input
               type="number"
               className="form-input"

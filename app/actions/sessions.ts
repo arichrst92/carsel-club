@@ -40,11 +40,11 @@ const CreateSessionSchema = z.object({
     .max(60, "Maksimal 60 karakter"),
   format: z.enum(["americano", "mexicano", "tournament"]).default("americano"),
   visibility: z.enum(["private", "public"]).default("private"),
-  venueName: z.string().trim().min(1, "Venue wajib diisi").max(80),
+  venueName: z.string().trim().min(1, "Venue required").max(80),
   mapsUrl: z.string().trim().max(500).optional(),
   scheduledAt: z
     .string()
-    .min(1, "Tanggal & waktu wajib diisi")
+    .min(1, "Tanggal & waktu required")
     .refine((s) => !isNaN(new Date(s).getTime()), "Format tanggal tidak valid"),
   scheduledEndAt: z
     .string()
@@ -189,11 +189,11 @@ const EditSessionSchema = z.object({
     .trim()
     .min(2, "Nama session minimal 2 karakter")
     .max(60, "Maksimal 60 karakter"),
-  venueName: z.string().trim().min(1, "Venue wajib diisi").max(80),
+  venueName: z.string().trim().min(1, "Venue required").max(80),
   mapsUrl: z.string().trim().max(500).optional(),
   scheduledAt: z
     .string()
-    .min(1, "Tanggal & waktu wajib diisi")
+    .min(1, "Tanggal & waktu required")
     .refine((s) => !isNaN(new Date(s).getTime()), "Format tanggal tidak valid"),
   scheduledEndAt: z
     .string()

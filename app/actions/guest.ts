@@ -29,7 +29,7 @@ const Schema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, "Nama wajib diisi")
+    .min(1, "Nama required")
     .max(30, "Nama maksimal 30 karakter"),
 });
 

@@ -88,7 +88,7 @@ export function LeaderboardFilterBar(props: LeaderboardFilterBarProps) {
         />
         {props.scope === "regional" && (
           <SmallSelect
-            label="Kota"
+            label="City"
             value={props.city ?? ""}
             onChange={(v) => setParam("city", v || null)}
             options={[

@@ -23,7 +23,7 @@ export type FileUploadProps = {
   onSelect: (file: File) => void | Promise<void>;
   /** Show preview thumb saat file dipilih. Default true untuk image. */
   showPreview?: boolean;
-  /** Label untuk button (default "Pilih file") */
+  /** Label untuk button (default "Pick file") */
   label?: string;
   /** Disabled state. */
   disabled?: boolean;
@@ -40,7 +40,7 @@ export function FileUpload({
   maxBytes = 25 * 1024 * 1024,
   onSelect,
   showPreview = true,
-  label = "Pilih file",
+  label = "Pick file",
   disabled = false,
   autoCompress = true,
 }: FileUploadProps) {
@@ -55,7 +55,7 @@ export function FileUpload({
       setError(null);
       if (file.size > maxBytes) {
         const mb = Math.round(maxBytes / 1024 / 1024);
-        setError(`File terlalu besar. Maksimum ${mb} MB.`);
+        setError(`File too large. Maximum ${mb} MB.`);
         return;
       }
       if (accept !== "*" && accept !== "*/*") {
@@ -70,7 +70,7 @@ export function FileUpload({
             return file.type === rule;
           });
         if (!matchesAccept) {
-          setError("Tipe file tidak diperbolehkan.");
+          setError("File type not allowed.");
           return;
         }
       }
@@ -90,7 +90,7 @@ export function FileUpload({
           : file;
         await onSelect(toUpload);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Upload gagal");
+        setError(e instanceof Error ? e.message : "Upload failed");
       } finally {
         setBusy(false);
       }
@@ -193,7 +193,7 @@ export function FileUpload({
           marginTop: 4,
         }}
       >
-        {isDragging ? "Lepas file di sini" : "Tap atau drag & drop"}
+        {isDragging ? "Drop file here" : "Tap or drag & drop"}
       </div>
 
       {error && (
