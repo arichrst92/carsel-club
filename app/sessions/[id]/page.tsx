@@ -552,6 +552,77 @@ export default async function SessionDetailPage({ params }: PageProps) {
           staff &&
           !isTerminal && <GenerateBracketButton sessionId={session.id} />}
 
+        {/* Sprint 52: Manage Pairs CTA — fix_partners ON + no rounds yet */}
+        {session.fixPartners && rounds.length === 0 && staff && !isTerminal && (
+          <section>
+            <Link
+              href={`/sessions/${session.id}/pairs`}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "var(--s-3)",
+                padding: "var(--s-3) var(--s-4)",
+                background: "linear-gradient(135deg, var(--primary-50), var(--bg))",
+                border: "1.5px solid var(--primary-200)",
+                borderRadius: "var(--r-xl)",
+                textDecoration: "none",
+                color: "inherit",
+                boxShadow: "var(--shadow-card)",
+              }}
+            >
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  background: "var(--primary)",
+                  color: "#fff",
+                  borderRadius: "var(--r-md)",
+                  display: "grid",
+                  placeItems: "center",
+                  fontSize: 18,
+                  flexShrink: 0,
+                }}
+              >
+                🎾
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontWeight: 800,
+                    fontSize: 14,
+                    color: "var(--text-900)",
+                  }}
+                >
+                  Manage Pairs
+                </div>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: "var(--text-500)",
+                    fontWeight: 600,
+                    marginTop: 2,
+                  }}
+                >
+                  Assign teams before generating Round 1 (Fix Partners is on).
+                </div>
+              </div>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--primary-700)"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </Link>
+          </section>
+        )}
+
         {/* MATCH STATUS */}
         <section>
           <div className="section-head">

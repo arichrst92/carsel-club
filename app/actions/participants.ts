@@ -15,14 +15,44 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { and, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/lib/db/client";
-import { sessionParticipants, sessions, users } from "@/lib/db/schema";
+import {
+  matchRoundSets,
+  sessionParticipants,
+  sessions,
+  users,
+} from "@/lib/db/schema";
 import { getCurrentUser } from "@/lib/auth/get-current-user";
 import { isSessionStaff } from "@/lib/db/queries/sessions";
 import { normalizePhone, isValidIndonesianPhone } from "@/lib/auth/otp";
 import { notifySessionInvite } from "@/lib/notifications/generate";
+
+/**
+ * Sprint 52: when session.fix_partners = true AND a round has been
+ * generated, the participant roster is locked because pair_key
+ * assignments are tied to the Round 1 lineup. Adding/removing players
+ * would break the Berger round-robin schedule. Block mutation actions.
+ */
+async function isParticipantRosterLocked(
+  sessionId: string
+): Promise<boolean> {
+  const [session] = await db
+    .select({ fixPartners: sessions.fixPartners })
+    .from(sessions)
+    .where(eq(sessions.id, sessionId))
+    .limit(1);
+  if (!session?.fixPartners) return false;
+  const [{ value: roundCount }] = await db
+    .select({ value: count() })
+    .from(matchRoundSets)
+    .where(eq(matchRoundSets.sessionId, sessionId));
+  return roundCount > 0;
+}
+
+const ROSTER_LOCKED_MSG =
+  "Roster is locked — Fix Partners is on and rounds have started.";
 
 export type FoundUser = {
   id: string;
@@ -105,6 +135,10 @@ export async function addMemberAction(
     return { error: "Only host/co-host can add players" };
   }
 
+  if (await isParticipantRosterLocked(sessionId)) {
+    return { error: ROSTER_LOCKED_MSG };
+  }
+
   // Pre-check duplicate (UNIQUE constraint would catch, but UX cleaner)
   const [existing] = await db
     .select({ id: sessionParticipants.id })
@@ -159,8 +193,8 @@ const AddGuestSchema = z.object({
   guestName: z
     .string()
     .trim()
-    .min(1, "Nama guest required")
-    .max(30, "Nama maksimal 30 karakter"),
+    .min(1, "Guest name is required")
+    .max(30, "Name must be at most 30 characters"),
 });
 
 export async function addGuestAction(
@@ -181,7 +215,11 @@ export async function addGuestAction(
   const { sessionId, guestName } = parsed.data;
 
   if (!(await isSessionStaff(sessionId, me.id))) {
-    return { error: "Hanya host/co-host yang bisa tambah guest" };
+    return { error: "Only host/co-host can add guests" };
+  }
+
+  if (await isParticipantRosterLocked(sessionId)) {
+    return { error: ROSTER_LOCKED_MSG };
   }
 
   try {
@@ -198,7 +236,7 @@ export async function addGuestAction(
 
   revalidatePath(`/sessions/${sessionId}`);
   revalidatePath(`/sessions/${sessionId}/participants`);
-  return { success: `Guest "${guestName}" ditambahkan` };
+  return { success: `Guest "${guestName}" added` };
 }
 
 // ============================================================
@@ -214,6 +252,10 @@ export async function removeParticipantAction(
 
   if (!(await isSessionStaff(sessionId, me.id))) {
     return { error: "No access" };
+  }
+
+  if (await isParticipantRosterLocked(sessionId)) {
+    return { error: ROSTER_LOCKED_MSG };
   }
 
   const [p] = await db

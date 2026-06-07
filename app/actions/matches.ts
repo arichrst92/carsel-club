@@ -27,7 +27,13 @@ import {
   formInitialPairs,
   extractPairs,
   generateFixPartnersRound,
+  type Pair,
 } from "@/lib/match/generator-fix-partners";
+import {
+  getSessionPairs,
+  sessionHasAssignedPairs,
+  listUnpairedActiveParticipants,
+} from "@/lib/db/queries/session-pairs";
 import { applyMatchScoreChange } from "@/lib/match/stats-sync";
 import { event } from "@/lib/log";
 import {
@@ -108,10 +114,37 @@ export async function generateRoundAction(
   let result;
   try {
     if (useFixPartners) {
-      // Sprint 17: Round Robin dengan pair tetap
-      // Round 1 → form pairs. Round 2+ → extract dari round sebelumnya.
-      let pairs;
-      if (nextRoundNumber === 1) {
+      // Sprint 52: prefer host-assigned pair_key (new flow). Backward-compat
+      // for legacy sessions: if no participant has pair_key, fall back to
+      // Sprint 17 auto-form + extract-from-matches logic.
+      const hasAssigned = await sessionHasAssignedPairs(sessionId);
+      let pairs: Pair[];
+
+      if (hasAssigned) {
+        // New flow: read user-defined pairs from DB
+        if (nextRoundNumber === 1) {
+          const unpaired = await listUnpairedActiveParticipants(sessionId);
+          if (unpaired.length > 0) {
+            return {
+              error: `${unpaired.length} active player(s) are not paired yet. Open Manage Pairs to assign teams before generating Round 1.`,
+            };
+          }
+        }
+        const dbPairs = await getSessionPairs(sessionId);
+        // Filter: only include pairs where BOTH players are active (isPlaying)
+        // — host may toggle isPlaying after pair setup; sit-outs are skipped
+        // for this round but pair persists for future rounds.
+        const activeIds = new Set(activeParticipants.map((p) => p.id));
+        pairs = dbPairs
+          .filter(
+            (pair) =>
+              pair.players.length === 2 &&
+              pair.players.every((p) => activeIds.has(p.id))
+          )
+          .map<Pair>((pair) => [pair.players[0].id, pair.players[1].id]);
+      } else if (nextRoundNumber === 1) {
+        // Legacy auto-form (pre-Sprint 52 sessions that toggled fixPartners
+        // before the /pairs UI existed)
         pairs = formInitialPairs(
           activeParticipants.map((p) => ({
             id: p.id,
@@ -121,7 +154,7 @@ export async function generateRoundAction(
           session.format
         );
       } else {
-        // Extract dari semua match round sebelumnya
+        // Legacy: extract from prior matches
         const allPriorMatches = await db
           .select({
             team1P1Id: matches.team1P1Id,
@@ -141,7 +174,7 @@ export async function generateRoundAction(
       if (pairs.length < 2) {
         return {
           error:
-            "Need at least 4 active players and valid pairs for a Fix Partners round",
+            "Need at least 2 fully active pairs (4 players) for a Fix Partners round",
         };
       }
 

@@ -310,6 +310,13 @@ export const sessionParticipants = pgTable(
     guestName: text("guest_name"),
     role: participantRoleEnum("role").notNull().default("player"),
     isPlaying: boolean("is_playing").notNull().default(true),
+    /**
+     * Fix Partners (Sprint 52): participants sharing the same pairKey are
+     * a fixed team for the entire session. Null = unpaired. Host assigns
+     * pairKey via the /pairs setup UI when session.fixPartners=true and
+     * no rounds have been generated yet.
+     */
+    pairKey: uuid("pair_key"),
     sessionPoints: integer("session_points").notNull().default(0),
     sessionMatches: integer("session_matches").notNull().default(0),
     sessionWins: integer("session_wins").notNull().default(0),
@@ -322,6 +329,7 @@ export const sessionParticipants = pgTable(
   (t) => [
     index("idx_sp_session").on(t.sessionId),
     index("idx_sp_user").on(t.userId),
+    index("idx_sp_pair_key").on(t.sessionId, t.pairKey),
     unique("uq_session_member").on(t.sessionId, t.userId),
     check(
       "cohost_non_guest",

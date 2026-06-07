@@ -22,6 +22,7 @@ type FormData = {
   roundCount: number;
   visibility: "private" | "public";
   hostIsPlaying: boolean;
+  fixPartners: boolean;
 };
 
 function defaultDateStr(): string {
@@ -60,6 +61,7 @@ const INITIAL: FormData = {
   roundCount: 7,
   visibility: "private",
   hostIsPlaying: true,
+  fixPartners: false,
 };
 
 const TOTAL_STEPS = 5;
@@ -144,6 +146,7 @@ export function CreateSessionForm() {
     fd.set("num_courts", String(data.numCourts));
     if (data.roundMode === "manual") fd.set("max_rounds", String(data.roundCount));
     fd.set("host_is_playing", data.hostIsPlaying ? "on" : "off");
+    fd.set("fix_partners", data.fixPartners ? "on" : "off");
 
     startTransition(async () => {
       const result = await createSessionAction(fd);
@@ -694,6 +697,26 @@ function Step3Players({
               </div>
             </div>
           )}
+        </div>
+
+        {/* Sprint 52: Fix Partners toggle */}
+        <div className="form-group" style={{ marginTop: 12 }}>
+          <div className="toggle-row">
+            <div className="toggle-info">
+              <div className="form-label">Fix Partners</div>
+              <p className="form-help">
+                {data.fixPartners
+                  ? "Pre-assign teams. After creating, set the pairs before generating Round 1."
+                  : "System rotates partners each round (default Americano/Mexicano)."}
+              </p>
+            </div>
+            <button
+              type="button"
+              className={`toggle ${data.fixPartners ? "on" : ""}`}
+              onClick={() => setField("fixPartners", !data.fixPartners)}
+              aria-pressed={data.fixPartners}
+            />
+          </div>
         </div>
 
         <div
