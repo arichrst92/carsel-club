@@ -164,7 +164,7 @@ export function SessionShareActions({
   return (
     <>
     <Toast message={error} onDismiss={() => setError(null)} />
-    <div className="quick-actions">
+    <div className="quick-actions compact">
       <button
         type="button"
         className="qa-btn primary"
