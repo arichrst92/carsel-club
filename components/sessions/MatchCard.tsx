@@ -638,7 +638,7 @@ function TeamRow({
           }}
           title={`Has played ${matchesPlayed} match${matchesPlayed === 1 ? "" : "es"} in this session`}
         >
-          🎾 {matchesPlayed} match{matchesPlayed === 1 ? "" : "es"}
+          {matchesPlayed} match{matchesPlayed === 1 ? "" : "es"}
         </div>
       </div>
     );
@@ -875,8 +875,9 @@ function TeamRow({
   );
 }
 
-// Sprint 53: small avatar circle for match card. Falls back to initial when
-// no avatarUrl. Optional ring color = subtle highlight (used by swap mode).
+// Sprint 53: small avatar circle for match card. Falls back to a SOLID initial
+// circle when no avatarUrl — high contrast so guests are easy to scan. Optional
+// ring color = subtle highlight (used by swap mode).
 function Avatar({
   url,
   name,
@@ -898,18 +899,15 @@ function Avatar({
         borderRadius: "50%",
         background: url
           ? `url(${url}) center/cover no-repeat`
-          : "linear-gradient(135deg, var(--primary-300), var(--primary-600))",
+          : "var(--primary-600)",
         color: "#fff",
         display: "grid",
         placeItems: "center",
         fontFamily: "var(--font-display)",
         fontWeight: 800,
-        fontSize: Math.round(size * 0.42),
-        boxShadow: "var(--shadow-sm)",
-        border: ring ? `2px solid ${ring}` : "1.5px solid var(--bg)",
-        outline: ring
-          ? `1px solid ${ring}`
-          : "1px solid var(--border-light)",
+        fontSize: Math.round(size * 0.46),
+        lineHeight: 1,
+        boxShadow: ring ? `0 0 0 2px ${ring}` : "var(--shadow-sm)",
       }}
       aria-hidden
     >

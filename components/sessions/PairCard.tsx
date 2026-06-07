@@ -54,7 +54,7 @@ function Avatar({
         borderRadius: "50%",
         background: url
           ? `url(${url}) center/cover no-repeat`
-          : "linear-gradient(135deg, var(--primary-300), var(--primary-600))",
+          : "var(--primary-600)",
         color: "#fff",
         display: "grid",
         placeItems: "center",
