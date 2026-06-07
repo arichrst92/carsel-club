@@ -28,6 +28,8 @@ import {
   listPendingJoinRequests,
   getRequestStatusForUser,
 } from "@/lib/db/queries/join-requests";
+import { PairCard } from "@/components/sessions/PairCard";
+import { SessionDescription } from "@/components/sessions/SessionDescription";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -241,25 +243,6 @@ export default async function SessionDetailPage({ params }: PageProps) {
               </span>
             </div>
           </div>
-          {session.description && (
-            <div
-              style={{
-                marginTop: "var(--s-3)",
-                padding: "var(--s-3) var(--s-4)",
-                background: "var(--bg-soft)",
-                borderRadius: "var(--r-md)",
-                border: "1px solid var(--border-light)",
-                fontSize: 13,
-                color: "var(--text-700)",
-                fontWeight: 600,
-                lineHeight: 1.5,
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-word",
-              }}
-            >
-              {session.description}
-            </div>
-          )}
           <div className="hero-format-chips">
             <span className="format-chip" style={{ textTransform: "capitalize" }}>
               {session.format}
@@ -275,6 +258,11 @@ export default async function SessionDetailPage({ params }: PageProps) {
             </span>
           </div>
         </section>
+
+        {/* DESCRIPTION (Sprint 52) — outside hero so long text doesn't break the teal card */}
+        {session.description && (
+          <SessionDescription description={session.description} />
+        )}
 
         {/* JOIN PUBLIC SESSION (non-participants) */}
         {canJoinPublic && (
@@ -411,14 +399,140 @@ export default async function SessionDetailPage({ params }: PageProps) {
                 )}
               </div>
             )}
-            {participants.map((p) => (
-              <ParticipantRow
-                key={p.id}
-                participant={p}
-                sessionId={session.id}
-                canManage={staff && !isTerminal}
-              />
-            ))}
+            {(() => {
+              // Sprint 52: when session uses Fix Partners and pairs have been
+              // assigned, group participants by pair_key and render pair cards
+              // instead of individual rows. Unpaired active participants render
+              // as a callout so the host knows there's work to do.
+              const showAsPairs =
+                session.fixPartners &&
+                participants.some(
+                  (p) => p.isPlaying && p.pairKey !== null
+                );
+
+              if (!showAsPairs) {
+                return participants.map((p) => (
+                  <ParticipantRow
+                    key={p.id}
+                    participant={p}
+                    sessionId={session.id}
+                    canManage={staff && !isTerminal}
+                  />
+                ));
+              }
+
+              // Build pair groups (preserves first-seen order)
+              const pairOrder: string[] = [];
+              const byPair = new Map<
+                string,
+                typeof participants
+              >();
+              const unpaired: typeof participants = [];
+              for (const p of participants) {
+                if (!p.isPlaying) continue;
+                if (p.pairKey) {
+                  if (!byPair.has(p.pairKey)) {
+                    byPair.set(p.pairKey, []);
+                    pairOrder.push(p.pairKey);
+                  }
+                  byPair.get(p.pairKey)!.push(p);
+                } else {
+                  unpaired.push(p);
+                }
+              }
+
+              return (
+                <>
+                  {pairOrder.map((pairKey, idx) => {
+                    const players = byPair.get(pairKey)!;
+                    return (
+                      <PairCard
+                        key={pairKey}
+                        pairLabel={`Pair ${idx + 1}`}
+                        players={players.map((p) => ({
+                          id: p.id,
+                          userId: p.userId,
+                          displayName:
+                            p.userDisplayName ?? p.guestName ?? "Player",
+                          avatarUrl: p.userAvatarUrl,
+                          role: p.role,
+                          isPlaying: p.isPlaying,
+                          sessionWins: p.sessionWins,
+                          sessionLosses: p.sessionLosses,
+                          sessionDraws: p.sessionDraws,
+                          sessionPoints: p.sessionPoints,
+                        }))}
+                        sessionId={session.id}
+                        canManage={staff && !isTerminal}
+                        editable={!hasRounds}
+                      />
+                    );
+                  })}
+
+                  {unpaired.length > 0 && (
+                    <div
+                      style={{
+                        background: "var(--accent-50)",
+                        border: "1px solid var(--accent-100)",
+                        borderRadius: "var(--r-md)",
+                        padding: "var(--s-3) var(--s-4)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
+                      }}
+                    >
+                      <span style={{ fontSize: 18 }}>⚠️</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div
+                          style={{
+                            fontFamily: "var(--font-display)",
+                            fontWeight: 800,
+                            fontSize: 13,
+                            color: "var(--accent-600)",
+                          }}
+                        >
+                          {unpaired.length} player
+                          {unpaired.length > 1 ? "s" : ""} not paired yet
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 11,
+                            color: "var(--text-600)",
+                            fontWeight: 600,
+                            marginTop: 2,
+                          }}
+                        >
+                          {unpaired
+                            .map(
+                              (p) =>
+                                p.userDisplayName ?? p.guestName ?? "Player"
+                            )
+                            .join(", ")}
+                        </div>
+                      </div>
+                      {staff && !isTerminal && !hasRounds && (
+                        <Link
+                          href={`/sessions/${session.id}/pairs`}
+                          style={{
+                            padding: "6px 12px",
+                            borderRadius: "var(--r-full)",
+                            background: "var(--accent-600)",
+                            color: "#fff",
+                            fontFamily: "var(--font-display)",
+                            fontWeight: 800,
+                            fontSize: 11,
+                            textDecoration: "none",
+                            flexShrink: 0,
+                          }}
+                        >
+                          Assign
+                        </Link>
+                      )}
+                    </div>
+                  )}
+                </>
+              );
+            })()}
 
             {participants.length > 0 && staff && !isTerminal && (
               <Link

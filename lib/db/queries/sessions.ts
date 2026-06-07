@@ -84,6 +84,8 @@ export async function getSessionWithParticipants(sessionId: string) {
       sessionLosses: sessionParticipants.sessionLosses,
       sessionDraws: sessionParticipants.sessionDraws,
       joinedAt: sessionParticipants.joinedAt,
+      // Sprint 52: pair_key for Fix Partners grouping in session detail
+      pairKey: sessionParticipants.pairKey,
       // Joined user fields (null for guests)
       userDisplayName: users.displayName,
       userAvatarUrl: users.avatarUrl,
