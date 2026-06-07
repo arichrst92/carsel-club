@@ -264,7 +264,7 @@ export function GenerateMatchConfig({
 
         {/* Section: Members & Guests */}
         {membersAndGuests.length > 0 && (
-          <Section title="Members & Guest">
+          <Section title="Pemain & Tamu">
             {membersAndGuests.map((p) => (
               <ToggleRow
                 key={p.id}

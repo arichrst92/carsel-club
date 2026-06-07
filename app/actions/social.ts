@@ -100,7 +100,7 @@ export async function blockUserAction(
 
   revalidatePath(`/u/${targetUserId}`);
   revalidatePath("/friends");
-  return { success: "User di-block" };
+  return { success: "Pengguna diblokir" };
 }
 
 export async function unblockUserAction(
@@ -126,7 +126,7 @@ export async function unblockUserAction(
   event("user_unblocked", { blockerId: me.id, blockedId: targetUserId });
 
   revalidatePath(`/u/${targetUserId}`);
-  return { success: "User di-unblock" };
+  return { success: "Pengguna dibuka blokirnya" };
 }
 
 export async function followUserAction(
@@ -180,7 +180,7 @@ export async function followUserAction(
   event("user_followed", { followerId: me.id, followingId: targetUserId });
 
   revalidatePath(`/u/${targetUserId}`);
-  return { success: "Followed!" };
+  return { success: "Mengikuti!" };
 }
 
 export async function unfollowUserAction(
@@ -206,5 +206,5 @@ export async function unfollowUserAction(
   event("user_unfollowed", { followerId: me.id, followingId: targetUserId });
 
   revalidatePath(`/u/${targetUserId}`);
-  return { success: "Unfollowed" };
+  return { success: "Berhenti mengikuti" };
 }

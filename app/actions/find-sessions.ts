@@ -62,5 +62,5 @@ export async function joinPublicSessionAction(
 
   revalidatePath(`/sessions/${sessionId}`);
   revalidatePath("/find");
-  return { success: "Berhasil join! Lihat detail session." };
+  return { success: "Berhasil bergabung! Lihat detail sesi." };
 }

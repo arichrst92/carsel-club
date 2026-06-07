@@ -145,7 +145,7 @@ export async function requestJoinAction(
 
   revalidatePath(`/sessions/${sessionId}`);
   revalidatePath("/find");
-  return { success: "Request terkirim. Menunggu approval host." };
+  return { success: "Permintaan terkirim. Menunggu persetujuan host." };
 }
 
 export async function approveJoinRequestAction(
@@ -226,7 +226,7 @@ export async function approveJoinRequestAction(
 
   revalidatePath(`/sessions/${req.sessionId}`);
   revalidatePath(`/sessions/${req.sessionId}/participants`);
-  return { success: "Request di-approve" };
+  return { success: "Permintaan disetujui" };
 }
 
 export async function rejectJoinRequestAction(
@@ -283,5 +283,5 @@ export async function rejectJoinRequestAction(
   }
 
   revalidatePath(`/sessions/${req.sessionId}`);
-  return { success: "Request di-reject" };
+  return { success: "Permintaan ditolak" };
 }

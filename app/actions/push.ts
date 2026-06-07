@@ -60,7 +60,7 @@ export async function savePushSubscriptionAction(
     console.error("[savePushSubscriptionAction]", e);
     return { error: "Gagal simpan subscription" };
   }
-  return { success: "Push aktif" };
+  return { success: "Notifikasi push aktif" };
 }
 
 export async function removePushSubscriptionAction(
@@ -82,5 +82,5 @@ export async function removePushSubscriptionAction(
     console.error("[removePushSubscriptionAction]", e);
     return { error: "Gagal hapus subscription" };
   }
-  return { success: "Push dimatikan" };
+  return { success: "Notifikasi push dimatikan" };
 }

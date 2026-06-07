@@ -127,7 +127,7 @@ export default async function MatchHistoryPage({
         {/* INSIGHTS — featured 30-day win rate */}
         <section>
           <div className="section-head">
-            <h3>Insights</h3>
+            <h3>Wawasan</h3>
             <span
               style={{
                 color: "var(--text-500)",
@@ -141,7 +141,7 @@ export default async function MatchHistoryPage({
           <div className="history-insights">
             <div className="insight-card featured">
               <div className="insight-icon">📈</div>
-              <div className="insight-label">Win Rate</div>
+              <div className="insight-label">Tingkat Menang</div>
               <div className="insight-value">{winRate30}%</div>
               <div className="insight-value-sub">
                 {last30Wins} menang dari {last30.length} match
@@ -174,7 +174,7 @@ export default async function MatchHistoryPage({
             </div>
             <div className="insight-card">
               <div className="insight-icon">⚡</div>
-              <div className="insight-label">Total Match</div>
+              <div className="insight-label">Total Pertandingan</div>
               <div
                 style={{
                   fontFamily: "var(--font-display)",

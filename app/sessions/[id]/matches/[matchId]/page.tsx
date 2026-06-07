@@ -115,7 +115,7 @@ export default async function MatchDetailPage({ params }: PageProps) {
               gap: 8,
             }}
           >
-            <MetaCard label="Court" value={`#${match.courtNumber}`} />
+            <MetaCard label="Lapangan" value={`#${match.courtNumber}`} />
             <MetaCard label="Round" value={`#${round.roundNumber}`} />
             <MetaCard
               label={isLive ? "Berjalan" : isCompleted ? "Durasi" : "Status"}

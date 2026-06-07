@@ -222,7 +222,7 @@ export async function sendFriendRequestAction(
   });
 
   revalidatePath("/friends");
-  return { success: `Request terkirim ke ${target.displayName}!` };
+  return { success: `Permintaan terkirim ke ${target.displayName}!` };
 }
 
 export async function acceptFriendRequestAction(
@@ -278,7 +278,7 @@ export async function acceptFriendRequestAction(
   });
 
   revalidatePath("/friends");
-  return { success: "Friend di-accept!" };
+  return { success: "Pertemanan diterima!" };
 }
 
 export async function rejectFriendRequestAction(
@@ -317,7 +317,7 @@ export async function rejectFriendRequestAction(
   });
 
   revalidatePath("/friends");
-  return { success: "Request di-reject" };
+  return { success: "Permintaan ditolak" };
 }
 
 export async function cancelOutgoingRequestAction(

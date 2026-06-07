@@ -34,7 +34,7 @@ import {
 } from "@/components/profile/AdvancedStats";
 
 export const metadata = {
-  title: "Profile",
+  title: "Profil",
 };
 
 const TIER_EMOJI: Record<string, string> = {
@@ -71,7 +71,7 @@ function formatJoinDate(d: Date | string): string {
     "Nov",
     "Des",
   ];
-  return `Joined ${months[date.getMonth()]} ${date.getFullYear()}`;
+  return `Bergabung ${months[date.getMonth()]} ${date.getFullYear()}`;
 }
 
 export default async function ProfilePage() {
@@ -151,7 +151,7 @@ export default async function ProfilePage() {
               type="submit"
               className="icon-btn"
               aria-label="Logout"
-              title="Logout"
+              title="Keluar"
             >
               <svg
                 width="22"
@@ -298,7 +298,7 @@ export default async function ProfilePage() {
             }}
           >
             <QuickStat value={profile.totalPoints.toLocaleString()} label="Points" />
-            <QuickStat value={`${wr}%`} label="Win Rate" />
+            <QuickStat value={`${wr}%`} label="Tingkat Menang" />
             <QuickStat value={profile.totalMatches.toString()} label="Match" />
           </div>
         </section>
@@ -365,7 +365,7 @@ export default async function ProfilePage() {
                     {ptsToNext > 0 && `${ptsToNext} pts`}
                     {ptsToNext > 0 && matchesToNext > 0 && " · "}
                     {matchesToNext > 0 && `${matchesToNext} match`}
-                    {ptsToNext === 0 && matchesToNext === 0 && "Ready!"}
+                    {ptsToNext === 0 && matchesToNext === 0 && "Siap!"}
                   </div>
                 </div>
               ) : (
@@ -486,13 +486,13 @@ export default async function ProfilePage() {
             <StatCard
               variant="coral"
               value={`${wr}%`}
-              label="Win Rate"
+              label="Tingkat Menang"
               icon="📈"
             />
             <StatCard
               variant="yellow"
               value={profile.totalWins}
-              label="Total Wins"
+              label="Total Menang"
               icon="🏆"
             />
             <StatCard
@@ -641,7 +641,7 @@ export default async function ProfilePage() {
             <Link href="/achievements" style={{ textDecoration: "none" }}>
               <SettingsRow
                 icon="🏆"
-                title="Achievements"
+                title="Pencapaian"
                 sub="Badge & milestones"
               />
             </Link>
@@ -661,7 +661,7 @@ export default async function ProfilePage() {
             >
               <SettingsRow
                 icon="🔐"
-                title="Privacy"
+                title="Privasi"
                 sub="Display + friend req + data export"
               />
             </Link>

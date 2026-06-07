@@ -1,7 +1,7 @@
 "use server";
 
 /**
- * Session cover photo upload + foto group post-match.
+ * Session cover photo upload + foto grup post-match.
  *
  * Refs:
  * - GUI: docs/CarselClubPrototype/session-detail.html (cover hero)
@@ -87,7 +87,7 @@ export async function updateCoverPhotoAction(
       .where(eq(sessions.id, sessionId));
   } catch (e) {
     logError("cover_db_update_failed", { error: e });
-    return { error: "Gagal simpan ke session. Coba lagi." };
+    return { error: "Gagal simpan ke sesi. Coba lagi." };
   }
 
   event("upload_success", { kind: "cover", sessionId, url: savedUrl });
@@ -97,7 +97,7 @@ export async function updateCoverPhotoAction(
   revalidatePath("/home");
   revalidatePath("/find");
   revalidatePath(`/s/${sessionId}`);
-  return { success: "Cover updated!", coverPhotoUrl: savedUrl };
+  return { success: "Cover berhasil diubah!", coverPhotoUrl: savedUrl };
 }
 
 export async function removeCoverPhotoAction(
@@ -155,14 +155,14 @@ export async function addGroupPhotoAction(
   if (!user) redirect("/login");
 
   if (!(await isSessionStaff(sessionId, user!.id))) {
-    return { error: "Hanya host/co-host yang bisa upload foto group" };
+    return { error: "Hanya host/co-host yang bisa upload foto grup" };
   }
 
   // Count check (max 5)
   const existing = await countGroupPhotos(sessionId);
   if (existing >= MAX_GROUP_PHOTOS) {
     return {
-      error: `Maksimal ${MAX_GROUP_PHOTOS} foto group per session.`,
+      error: `Maksimal ${MAX_GROUP_PHOTOS} foto grup per session.`,
     };
   }
 
@@ -214,7 +214,7 @@ export async function addGroupPhotoAction(
     try {
       await storage.deleteFile(storageKey);
     } catch {}
-    return { error: "Gagal simpan ke session. Coba lagi." };
+    return { error: "Gagal simpan ke sesi. Coba lagi." };
   }
 
   event("upload_success", {

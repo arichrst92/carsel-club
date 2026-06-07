@@ -22,9 +22,9 @@ import type { NotificationType } from "@/lib/notifications/types";
 
 const TYPE_LABELS: Record<NotificationType, string> = {
   session_invite: "Diundang ke session",
-  session_reminder: "Session reminder (H-1 jam)",
-  session_cancelled: "Session dibatalkan",
-  friend_request: "Friend request",
+  session_reminder: "Pengingat sesi (H-1 jam)",
+  session_cancelled: "Sesi dibatalkan",
+  friend_request: "Permintaan pertemanan",
   friend_accepted: "Friend di-accept",
   join_requested: "Join request masuk (host)",
   join_approved: "Join request di-approve",

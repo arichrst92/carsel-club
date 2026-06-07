@@ -142,13 +142,13 @@ export default async function AdminIndex() {
             href="/admin/users"
             emoji="🔍"
             title="Cari user"
-            sub="Search by name, phone, city"
+            sub="Cari berdasar nama, nomor, kota"
           />
           <AdminLink
             href="/admin/sessions"
             emoji="📅"
             title="Cari session"
-            sub="Search by title, venue"
+            sub="Cari berdasar judul, venue"
           />
           <AdminLink
             href="/monitor"

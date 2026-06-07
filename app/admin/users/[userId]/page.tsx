@@ -92,7 +92,7 @@ export default async function AdminUserDetailPage({
           <Stat label="Losses" value={u.totalLosses} />
           <Stat label="Draws" value={u.totalDraws} />
           <Stat label="Tier ID" value={u.currentTierId ?? 1} />
-          <Stat label="Streak" value={u.currentWinStreak} />
+          <Stat label="Streak Menang" value={u.currentWinStreak} />
           <Stat label="Best Streak" value={u.bestWinStreak} />
         </section>
 

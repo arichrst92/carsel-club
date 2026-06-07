@@ -45,7 +45,7 @@ export function AdvancedStats(props: AdvancedStatsProps) {
         <StreakCard streak={props.bestWinStreak} />
         <ListCard
           title="Partner terbaik"
-          subtitle="Win rate paling tinggi (min 3 match)"
+          subtitle="Tingkat menang paling tinggi (min 3 match)"
           empty="Belum cukup data partner"
           rows={props.bestPartners}
           metricLabel={(r) =>

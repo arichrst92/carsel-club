@@ -99,7 +99,7 @@ export async function addFriendAction(
   }
 
   revalidatePath("/friends");
-  return { success: `${friend.displayName} sekarang jadi friend!` };
+  return { success: `${friend.displayName} sekarang jadi teman!` };
 }
 
 // Remove friend

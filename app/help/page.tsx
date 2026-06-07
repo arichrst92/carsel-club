@@ -114,7 +114,7 @@ const FAQ_SECTIONS: { title: string; items: { q: string; a: string }[] }[] = [
     ],
   },
   {
-    title: "Privacy & Data",
+    title: "Privasi & Data",
     items: [
       {
         q: "Siapa yang bisa lihat profil aku?",
