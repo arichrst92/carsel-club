@@ -169,7 +169,7 @@ export default async function MatchHistoryPage({
                   marginTop: 2,
                 }}
               >
-                Lifetime
+                Sepanjang waktu
               </div>
             </div>
             <div className="insight-card">

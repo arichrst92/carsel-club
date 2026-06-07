@@ -24,15 +24,39 @@ export function LeaderboardShareButton(props: {
 
   async function handleShare() {
     const url = buildUrl();
-    const title = `Top 10 ${props.scope === "regional" && props.city ? props.city : "Indonesia"} — Carsel Club`;
+    const scopeLabel =
+      props.scope === "regional" && props.city
+        ? props.city
+        : "Indonesia";
+    const periodLabel =
+      props.period === "weekly"
+        ? "minggu ini"
+        : props.period === "monthly"
+          ? "bulan ini"
+          : "sepanjang waktu";
+    const title = `Top 10 ${scopeLabel} — Carsel Club`;
+    // Sprint 50: body text WITHOUT URL — URL via param tunggal navigator.share
+    // supaya tidak duplikat saat WhatsApp gabungkan text + url.
+    const bodyText =
+      `🏆 *Top 10 Pemain Padel ${scopeLabel}*\n` +
+      `Papan peringkat ${periodLabel} di Carsel Club ⚡\n\n` +
+      `Cek siapa yang lagi di puncak — komunitas padel Indonesia!`;
+
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
-        await navigator.share({ title, url });
+        await navigator.share({ title, text: bodyText, url });
         return;
       } catch {
-        // user cancelled, fall through to clipboard
+        // user cancelled or unsupported → fall to wa.me
       }
     }
+    // Fallback wa.me — URL inline di akhir
+    const waText = `${bodyText}\n\nLihat selengkapnya:\n${url}`;
+    window.open(
+      `https://wa.me/?text=${encodeURIComponent(waText)}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
     if (typeof navigator !== "undefined" && navigator.clipboard) {
       await navigator.clipboard.writeText(url);
       setCopied(true);
@@ -58,7 +82,7 @@ export function LeaderboardShareButton(props: {
         gap: "var(--s-1)",
       }}
     >
-      {copied ? "✓ Disalin" : "🔗 Share top 10"}
+      {copied ? "✓ Tersalin" : "🔗 Bagikan Top 10"}
     </button>
   );
 }

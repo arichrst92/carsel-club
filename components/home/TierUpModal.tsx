@@ -53,35 +53,37 @@ export function TierUpModal({
 
   async function handleShare() {
     const url = `${getAppUrl()}/u/${userId}?tier_up=${newTierId}`;
-    const text =
-      `🎉 *Tier Up!*\n\n` +
-      `${displayName} naik tier ke *${newTierName}* ${emoji}\n` +
-      `${totalPoints} pts · ${totalMatches} matches\n\n` +
-      `${url}\n\nvia Carsel Club ⚡`;
+    // Sprint 50: body text TANPA URL — URL via param tunggal navigator.share.
+    // Hindari duplikat saat WhatsApp gabung text + url.
+    const bodyText =
+      `🎉 *Naik Tier!*\n\n` +
+      `${displayName} naik ke tier *${newTierName}* ${emoji}\n` +
+      `${totalPoints} poin · ${totalMatches} pertandingan\n\n` +
+      `via Carsel Club ⚡`;
 
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
-          title: `Tier Up! ${newTierName}`,
-          text,
+          title: `Naik Tier! ${newTierName}`,
+          text: bodyText,
           url,
         });
+        handleDismiss();
+        return;
       } catch (e) {
-        if ((e as Error).name !== "AbortError") {
-          window.open(
-            `https://wa.me/?text=${encodeURIComponent(text)}`,
-            "_blank",
-            "noopener,noreferrer"
-          );
+        if ((e as Error).name === "AbortError") {
+          handleDismiss();
+          return;
         }
       }
-    } else {
-      window.open(
-        `https://wa.me/?text=${encodeURIComponent(text)}`,
-        "_blank",
-        "noopener,noreferrer"
-      );
     }
+    // Fallback wa.me — URL inline di akhir
+    const waText = `${bodyText}\n\nLihat profil:\n${url}`;
+    window.open(
+      `https://wa.me/?text=${encodeURIComponent(waText)}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
     handleDismiss();
   }
 
