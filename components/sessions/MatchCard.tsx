@@ -629,19 +629,17 @@ function TeamRow({
           {isSelected && "✓ "}
           {name}
         </div>
-        {matchesPlayed > 0 && (
-          <div
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              color: "var(--text-500)",
-              lineHeight: 1.3,
-            }}
-            title={`Has played ${matchesPlayed} match${matchesPlayed === 1 ? "" : "es"} in this session`}
-          >
-            🎾 {matchesPlayed} match{matchesPlayed === 1 ? "" : "es"}
-          </div>
-        )}
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: "var(--text-500)",
+            lineHeight: 1.3,
+          }}
+          title={`Has played ${matchesPlayed} match${matchesPlayed === 1 ? "" : "es"} in this session`}
+        >
+          🎾 {matchesPlayed} match{matchesPlayed === 1 ? "" : "es"}
+        </div>
       </div>
     );
 

@@ -318,30 +318,28 @@ export async function regenerateRoundAction(
     };
   }
 
-  // Derive participant pool dari matches existing (yg dipilih saat generate awal)
-  const originalParticipantIds = new Set<string>();
-  for (const m of existingMatches) {
-    originalParticipantIds.add(m.team1P1Id);
-    originalParticipantIds.add(m.team1P2Id);
-    originalParticipantIds.add(m.team2P1Id);
-    originalParticipantIds.add(m.team2P2Id);
-  }
-
-  // Load fresh sessionMatches stats untuk participants (untuk sit-out fairness)
+  // Sprint 53: regenerate must consider ALL active participants in the session,
+  // not just the ones who were in the existing matches. Otherwise sit-outs from
+  // the original generate never get a chance to rotate in. Pull everyone with
+  // isPlaying=true and let the generator decide the new lineup + sit-outs based
+  // on fairness (lowest sessionMatches first).
   const participants = await db
     .select({
       id: sessionParticipants.id,
       sessionMatches: sessionParticipants.sessionMatches,
     })
     .from(sessionParticipants)
-    .where(eq(sessionParticipants.sessionId, round.sessionId));
+    .where(
+      and(
+        eq(sessionParticipants.sessionId, round.sessionId),
+        eq(sessionParticipants.isPlaying, true)
+      )
+    );
 
-  const activePool = participants.filter((p) =>
-    originalParticipantIds.has(p.id)
-  );
+  const activePool = participants;
 
   if (activePool.length < 4) {
-    return { error: "Need at least 4 players to regenerate" };
+    return { error: "Need at least 4 active players to regenerate" };
   }
 
   // Load session untuk numCourts
