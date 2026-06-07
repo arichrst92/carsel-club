@@ -36,7 +36,7 @@ export async function searchUserForFriendAction(
 
   const phone = normalizePhone(rawPhone);
   if (!isValidIndonesianPhone(phone)) {
-    return { error: "Nomor WhatsApp Indonesia tidak valid" };
+    return { error: "Invalid Indonesian WhatsApp number" };
   }
 
   const [user] = await db
@@ -51,7 +51,7 @@ export async function searchUserForFriendAction(
     .limit(1);
 
   if (!user) {
-    return { error: "User dengan nomor itu belum daftar Carsel Club" };
+    return { error: "No Carsel Club user found for that number" };
   }
 
   if (user.id === me.id) {

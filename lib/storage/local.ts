@@ -55,10 +55,10 @@ export class LocalStorageProvider implements StorageProvider {
       throw new Error("Key invalid (null byte)");
     }
     if (key.startsWith("/") || key.startsWith("\\")) {
-      throw new Error("Key tidak boleh absolute path");
+      throw new Error("Key cannot be an absolute path");
     }
     if (key.includes("..")) {
-      throw new Error("Key tidak boleh mengandung '..'");
+      throw new Error("Key cannot contain '..'");
     }
 
     // Check di atas (includes("..") + absolute path + null byte) udah catch

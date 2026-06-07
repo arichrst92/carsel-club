@@ -67,7 +67,7 @@ export function rateLimitMessage(decision: RateLimitDecision): string {
       return "Terlalu banyak request OTP. Coba lagi nanti.";
     }
     const mins = Math.ceil(decision.retryAfterSeconds / 60);
-    return `Terlalu banyak request OTP. Coba lagi ${mins} menit lagi.`;
+    return `Too many OTP requests. Try again in ${mins} minutes.`;
   }
-  return "Terlalu banyak percobaan kode. Kirim ulang OTP.";
+  return "Too many code attempts. Resend the OTP.";
 }

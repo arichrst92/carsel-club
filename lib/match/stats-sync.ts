@@ -44,7 +44,7 @@ export async function applyMatchScoreChange(
       .where(eq(matches.id, matchId))
       .limit(1);
 
-    if (!match) throw new Error("Match tidak ditemukan");
+    if (!match) throw new Error("Match not found");
 
     const oldCounted = match.status === "completed";
     const newCounted = newStatus === "completed";

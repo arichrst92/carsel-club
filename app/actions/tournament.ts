@@ -69,7 +69,7 @@ export async function generateBracketAction(
     .from(tournamentBrackets)
     .where(eq(tournamentBrackets.sessionId, sessionId))
     .limit(1);
-  if (existing) return { error: "Bracket sudah di-generate" };
+  if (existing) return { error: "Bracket has already been generated" };
 
   // Read participants (host + members + guests), order by joinedAt
   const parts = await db

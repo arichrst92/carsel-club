@@ -158,9 +158,9 @@ export function validateTeamCount(teamCount: number): string | null {
 export function validateTeams(teams: Team[]): string | null {
   const seen = new Set<string>();
   for (const t of teams) {
-    if (t[0] === t[1]) return "Team tidak boleh punya pemain duplikat";
-    if (seen.has(t[0])) return "Pemain tidak boleh muncul di > 1 team";
-    if (seen.has(t[1])) return "Pemain tidak boleh muncul di > 1 team";
+    if (t[0] === t[1]) return "Team cannot have duplicate players";
+    if (seen.has(t[0])) return "Player cannot appear in more than 1 team";
+    if (seen.has(t[1])) return "Player cannot appear in more than 1 team";
     seen.add(t[0]);
     seen.add(t[1]);
   }

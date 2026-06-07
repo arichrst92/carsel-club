@@ -275,9 +275,9 @@ export async function acceptFriendRequestAction(
     .from(friendRequests)
     .where(eq(friendRequests.id, requestId))
     .limit(1);
-  if (!req) return { error: "Request tidak ditemukan" };
+  if (!req) return { error: "Request not found" };
   if (req.toUserId !== me.id) return { error: "Hanya recipient yang bisa accept" };
-  if (req.status !== "pending") return { error: "Request sudah di-proses" };
+  if (req.status !== "pending") return { error: "Request already processed" };
 
   const [lo, hi] = canonicalPair(req.fromUserId, req.toUserId);
 
@@ -331,9 +331,9 @@ export async function rejectFriendRequestAction(
     .from(friendRequests)
     .where(eq(friendRequests.id, requestId))
     .limit(1);
-  if (!req) return { error: "Request tidak ditemukan" };
+  if (!req) return { error: "Request not found" };
   if (req.toUserId !== me.id) return { error: "Hanya recipient yang bisa reject" };
-  if (req.status !== "pending") return { error: "Request sudah di-proses" };
+  if (req.status !== "pending") return { error: "Request already processed" };
 
   try {
     await db
@@ -369,9 +369,9 @@ export async function cancelOutgoingRequestAction(
     .from(friendRequests)
     .where(eq(friendRequests.id, requestId))
     .limit(1);
-  if (!req) return { error: "Request tidak ditemukan" };
+  if (!req) return { error: "Request not found" };
   if (req.fromUserId !== me.id) return { error: "Hanya sender yang bisa cancel" };
-  if (req.status !== "pending") return { error: "Request sudah di-proses" };
+  if (req.status !== "pending") return { error: "Request already processed" };
 
   try {
     await db.delete(friendRequests).where(eq(friendRequests.id, requestId));

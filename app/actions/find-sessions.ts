@@ -29,10 +29,10 @@ export async function joinPublicSessionAction(
 
   if (!session) return { error: "Session not found" };
   if (session.visibility !== "public") {
-    return { error: "Session ini private, hanya bisa join via invite link" };
+    return { error: "This session is private — join via invite link only" };
   }
   if (session.status === "completed" || session.status === "cancelled") {
-    return { error: "Session sudah selesai/dibatalkan" };
+    return { error: "Session is already completed/cancelled" };
   }
 
   // Check duplicate

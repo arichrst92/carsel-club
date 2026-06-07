@@ -1,11 +1,11 @@
 /**
- * Pure helper: parse Error → user-friendly Indonesian message (Sprint 34).
+ * Pure helper: parse Error → user-friendly English message (Sprint 34).
  *
  * Strategy:
- * - Network-like errors → "Tidak ada koneksi"
- * - Auth-like errors → "Sesi habis, login ulang"
+ * - Network-like errors → "No connection"
+ * - Auth-like errors → "Session expired, log in again"
  * - Validation-like (Zod-style) → first issue extracted
- * - Default → generic "Ada masalah" + technical hint di dev
+ * - Default → generic "Something went wrong" + technical hint in dev
  *
  * Used by:
  * - Route-group error.tsx boundaries
@@ -43,7 +43,7 @@ export function parseFriendlyError(input: unknown): FriendlyError {
 
   if (matchesAny(lower, NETWORK_HINTS)) {
     return {
-      title: "Tidak ada koneksi",
+      title: "No connection",
       body: "Check your WiFi/data and try again.",
       retryable: true,
       category: "network",
@@ -52,22 +52,22 @@ export function parseFriendlyError(input: unknown): FriendlyError {
   if (matchesAny(lower, AUTH_HINTS)) {
     return {
       title: "Session expired",
-      body: "Silakan login ulang untuk lanjut.",
+      body: "Please log in again to continue.",
       retryable: false,
       category: "auth",
     };
   }
   if (matchesAny(lower, PERMISSION_HINTS)) {
     return {
-      title: "Tidak diizinkan",
-      body: "Kamu tidak punya akses untuk aksi ini.",
+      title: "Not allowed",
+      body: "You don't have access to this action.",
       retryable: false,
       category: "permission",
     };
   }
   if (isValidationLike(input)) {
     return {
-      title: "Input tidak valid",
+      title: "Invalid input",
       body: message,
       retryable: false,
       category: "validation",
@@ -78,8 +78,8 @@ export function parseFriendlyError(input: unknown): FriendlyError {
 
 function generic(detail?: string): FriendlyError {
   return {
-    title: "Ada masalah",
-    body: detail ?? "Sesuatu tidak berjalan sesuai rencana. Coba lagi.",
+    title: "Something went wrong",
+    body: detail ?? "That didn't go as planned. Please try again.",
     retryable: true,
     category: "unknown",
   };

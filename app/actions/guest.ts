@@ -55,7 +55,7 @@ export async function joinAsGuestAction(
     .limit(1);
   if (!session) return { error: "Session not found" };
   if (session.status === "cancelled" || session.status === "completed") {
-    return { error: "Session sudah selesai/dibatalkan" };
+    return { error: "Session is already completed/cancelled" };
   }
 
   // Insert participant

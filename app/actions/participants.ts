@@ -53,7 +53,7 @@ export async function searchMemberAction(
 
   const phone = normalizePhone(rawPhone);
   if (!isValidIndonesianPhone(phone)) {
-    return { error: "Nomor WhatsApp Indonesia tidak valid" };
+    return { error: "Invalid Indonesian WhatsApp number" };
   }
 
   const [user] = await db
@@ -97,7 +97,7 @@ export async function addMemberAction(
     sessionId: formData.get("session_id"),
     userId: formData.get("user_id"),
   });
-  if (!parsed.success) return { error: "Input tidak valid" };
+  if (!parsed.success) return { error: "Invalid input" };
 
   const { sessionId, userId } = parsed.data;
 
@@ -117,7 +117,7 @@ export async function addMemberAction(
     )
     .limit(1);
 
-  if (existing) return { error: "User sudah ada di session ini" };
+  if (existing) return { error: "User is already in this session" };
 
   try {
     await db.insert(sessionParticipants).values({
@@ -223,7 +223,7 @@ export async function removeParticipantAction(
     .limit(1);
 
   if (!p) return { error: "Participant not found" };
-  if (p.role === "host") return { error: "Host tidak bisa di-remove" };
+  if (p.role === "host") return { error: "Host cannot be removed" };
 
   try {
     await db
@@ -265,7 +265,7 @@ export async function toggleCohostAction(
   if (!p) return { error: "Participant not found" };
   if (p.role === "host") return { error: "Host gak perlu di-toggle" };
   if (p.role === "guest" || !p.userId) {
-    return { error: "Guest tidak bisa jadi co-host" };
+    return { error: "A guest cannot be a co-host" };
   }
 
   const newRole = p.role === "co_host" ? "player" : "co_host";

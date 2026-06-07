@@ -31,7 +31,7 @@ export async function savePushSubscriptionAction(
   if (!me) redirect("/login");
 
   const sub = parsePushSubscription(rawSubscription);
-  if (!sub) return { error: "Subscription tidak valid" };
+  if (!sub) return { error: "Invalid subscription" };
 
   const h = await headers();
   const ua = sanitizeUserAgent(h.get("user-agent"));

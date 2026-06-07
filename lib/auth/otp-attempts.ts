@@ -38,7 +38,7 @@ export function recordFailedAttempt(
   const remaining = Math.max(0, maxAttempts - newAttempts);
   const message =
     remaining > 0
-      ? `Kode salah. Sisa percobaan: ${remaining}`
-      : "Terlalu banyak percobaan. Kirim ulang OTP.";
+      ? `Wrong code. Attempts remaining: ${remaining}`
+      : "Too many attempts. Resend the OTP.";
   return { newAttempts, remaining, message };
 }

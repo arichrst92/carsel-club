@@ -45,13 +45,13 @@ const CreateSessionSchema = z.object({
   scheduledAt: z
     .string()
     .min(1, "Tanggal & waktu required")
-    .refine((s) => !isNaN(new Date(s).getTime()), "Format tanggal tidak valid"),
+    .refine((s) => !isNaN(new Date(s).getTime()), "Invalid date format"),
   scheduledEndAt: z
     .string()
     .optional()
     .refine(
       (s) => !s || !isNaN(new Date(s).getTime()),
-      "Format jam berakhir tidak valid"
+      "Invalid end time format"
     ),
   numCourts: z.coerce
     .number()
@@ -98,19 +98,19 @@ export async function createSessionAction(
   const parsed = CreateSessionSchema.safeParse(raw);
   if (!parsed.success) {
     const firstIssue = parsed.error.issues[0];
-    return { error: firstIssue?.message ?? "Input tidak valid" };
+    return { error: firstIssue?.message ?? "Invalid input" };
   }
   const input = parsed.data;
 
   const scheduledDate = new Date(input.scheduledAt);
   if (scheduledDate.getTime() < Date.now() - 60_000) {
-    return { error: "Tanggal & waktu harus di masa depan" };
+    return { error: "Date & time must be in the future" };
   }
   const scheduledEndDate = input.scheduledEndAt
     ? new Date(input.scheduledEndAt)
     : null;
   if (scheduledEndDate && scheduledEndDate.getTime() <= scheduledDate.getTime()) {
-    return { error: "Jam berakhir harus setelah jam mulai" };
+    return { error: "End time must be after start time" };
   }
 
   let newSessionId: string;
@@ -194,13 +194,13 @@ const EditSessionSchema = z.object({
   scheduledAt: z
     .string()
     .min(1, "Tanggal & waktu required")
-    .refine((s) => !isNaN(new Date(s).getTime()), "Format tanggal tidak valid"),
+    .refine((s) => !isNaN(new Date(s).getTime()), "Invalid date format"),
   scheduledEndAt: z
     .string()
     .optional()
     .refine(
       (s) => !s || !isNaN(new Date(s).getTime()),
-      "Format jam berakhir tidak valid"
+      "Invalid end time format"
     ),
   description: z.string().trim().max(500).optional(),
   visibility: z.enum(["private", "public"]),
@@ -230,7 +230,7 @@ export async function editSessionAction(
     .from(sessions)
     .where(eq(sessions.id, sessionId))
     .limit(1);
-  if (!current) return { error: "Session tidak ditemukan" };
+  if (!current) return { error: "Session not found" };
 
   // Cek hasRounds untuk lock rules
   const [{ value: roundCount }] = await db
@@ -267,7 +267,7 @@ export async function editSessionAction(
   const parsed = EditSessionSchema.safeParse(raw);
   if (!parsed.success) {
     const firstIssue = parsed.error.issues[0];
-    return { error: firstIssue?.message ?? "Input tidak valid" };
+    return { error: firstIssue?.message ?? "Invalid input" };
   }
   const input = parsed.data;
 
@@ -276,7 +276,7 @@ export async function editSessionAction(
     ? new Date(input.scheduledEndAt)
     : null;
   if (scheduledEndDate && scheduledEndDate.getTime() <= scheduledDate.getTime()) {
-    return { error: "Jam berakhir harus setelah jam mulai" };
+    return { error: "End time must be after start time" };
   }
 
   // Lock rules: kalau hasRounds, tolak perubahan match config
@@ -300,7 +300,7 @@ export async function editSessionAction(
   }
   if (lockedChanges.length > 0) {
     return {
-      error: `Tidak bisa ubah ${lockedChanges.join(", ")} karena sudah ada round yang ter-generate.`,
+      error: `Cannot change ${lockedChanges.join(", ")} because rounds have already been generated.`,
     };
   }
 
@@ -361,7 +361,7 @@ async function loadSessionForLifecycle(
     .from(sessions)
     .where(eq(sessions.id, sessionId))
     .limit(1);
-  if (!row) return { ok: false, error: "Session tidak ditemukan" };
+  if (!row) return { ok: false, error: "Session not found" };
   return { ok: true, current: row.status as SessionStatus };
 }
 
@@ -402,7 +402,7 @@ export async function cancelSessionAction(
   try {
     target = transitionForCancel(loaded.current);
   } catch (e) {
-    return { error: e instanceof Error ? e.message : "Cancel tidak diperbolehkan" };
+    return { error: e instanceof Error ? e.message : "Cancel not allowed" };
   }
 
   try {

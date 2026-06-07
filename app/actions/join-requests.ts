@@ -54,7 +54,7 @@ export async function requestJoinAction(
 
   if (!session) return { error: "Session not found" };
   if (session.visibility !== "public") {
-    return { error: "Session ini private, hanya via invite link" };
+    return { error: "This session is private — invite link only" };
   }
   if (session.joinPolicy !== "need_approval") {
     return {
@@ -62,7 +62,7 @@ export async function requestJoinAction(
     };
   }
   if (session.status === "completed" || session.status === "cancelled") {
-    return { error: "Session sudah selesai/dibatalkan" };
+    return { error: "Session is already completed/cancelled" };
   }
 
   // Already participant?
@@ -170,7 +170,7 @@ export async function approveJoinRequestAction(
     return { error: "Hanya host/co-host yang bisa approve" };
   }
   if (req.status !== "pending") {
-    return { error: "Request sudah di-proses" };
+    return { error: "Request already processed" };
   }
 
   try {
@@ -251,7 +251,7 @@ export async function rejectJoinRequestAction(
     return { error: "Hanya host/co-host yang bisa reject" };
   }
   if (req.status !== "pending") {
-    return { error: "Request sudah di-proses" };
+    return { error: "Request already processed" };
   }
 
   try {

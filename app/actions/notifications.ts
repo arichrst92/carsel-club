@@ -165,5 +165,5 @@ export async function updateNotificationPrefsAction(
   }
 
   revalidatePath("/profile/settings/notifications");
-  return { success: "Preferensi disimpan" };
+  return { success: "Preferences saved" };
 }

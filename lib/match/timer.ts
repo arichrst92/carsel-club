@@ -2,7 +2,7 @@
  * Match timer — pure formatter.
  *
  * Display elapsed time dari started_at sampai now (atau ended_at).
- * Format Indonesia-style: "5m 30s", "1j 2m", "baru saja".
+ * Format Indonesia-style: "5m 30s", "1j 2m", "just now".
  *
  * Refs:
  * - GUI: docs/CarselClubPrototype/match-scoring.html (timer di status strip)
@@ -12,15 +12,15 @@
 /**
  * Format elapsed milliseconds → human string.
  *
- * - < 10s   → "baru saja"
+ * - < 10s   → "just now"
  * - < 1 m   → "Ns"
  * - < 1 h   → "Nm Ss" (drop seconds kalau >= 10m)
  * - >= 1 h  → "Hj Mm"
  *
- * @param ms elapsed milliseconds. Negative atau 0 → "baru saja".
+ * @param ms elapsed milliseconds. Negative atau 0 → "just now".
  */
 export function formatElapsed(ms: number): string {
-  if (!Number.isFinite(ms) || ms < 10_000) return "baru saja";
+  if (!Number.isFinite(ms) || ms < 10_000) return "just now";
 
   const totalSeconds = Math.floor(ms / 1000);
   const seconds = totalSeconds % 60;

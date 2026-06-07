@@ -66,7 +66,7 @@ export async function generateRoundAction(
 
   if (!session) return { error: "Session not found" };
   if (session.status === "cancelled" || session.status === "completed") {
-    return { error: "Session sudah selesai/dibatalkan" };
+    return { error: "Session is already completed/cancelled" };
   }
 
   // Get active participants — apply per-round override kalau ada
@@ -252,7 +252,7 @@ export async function regenerateRoundAction(
     .where(eq(matchRoundSets.id, roundSetId))
     .limit(1);
 
-  if (!round) return { error: "Round tidak ditemukan" };
+  if (!round) return { error: "Round not found" };
 
   if (!(await isSessionStaff(round.sessionId, me.id))) {
     return { error: "Hanya host/co-host yang bisa regenerate" };
@@ -281,7 +281,7 @@ export async function regenerateRoundAction(
   if (!allPending) {
     return {
       error:
-        "Ada match yang sudah live/completed. Hanya round dengan semua match pending yang bisa di-regenerate.",
+        "Some matches are already live/completed. Only rounds where every match is pending can be regenerated.",
     };
   }
 
@@ -437,7 +437,7 @@ export async function swapPlayersAction(
     .where(eq(matches.id, matchAId))
     .limit(1);
 
-  if (!rowA) return { error: "Match A tidak ditemukan" };
+  if (!rowA) return { error: "Match A not found" };
 
   if (!(await isSessionStaff(rowA.sessionId, me.id))) {
     return { error: "Only the host/co-host can swap players" };
@@ -465,14 +465,14 @@ export async function swapPlayersAction(
       .from(matches)
       .where(eq(matches.id, matchBId))
       .limit(1);
-    if (!matchB) return { error: "Match B tidak ditemukan" };
+    if (!matchB) return { error: "Match B not found" };
 
     if (matchB.matchRoundSetId !== rowA.matchRoundSetId) {
-      return { error: "Swap hanya boleh dalam round yang sama" };
+      return { error: "Players can only be swapped within the same round" };
     }
     if (matchB.status !== "pending") {
       return {
-        error: "Match B sudah live/completed, tidak bisa di-swap",
+        error: "Match B is already live/completed and cannot be swapped",
       };
     }
     rowB = { ...matchB, sessionId: rowA.sessionId };
@@ -563,16 +563,16 @@ async function loadMatchForMutation(matchId: string): Promise<
     .where(eq(matches.id, matchId))
     .limit(1);
 
-  if (!row) return { error: "Match tidak ditemukan" };
+  if (!row) return { error: "Match not found" };
   return { ok: true, sessionId: row.sessionId, status: row.status };
 }
 
 function validateScore(t1: number, t2: number): string | null {
   if (!Number.isInteger(t1) || !Number.isInteger(t2)) {
-    return "Score harus angka bulat";
+    return "Score must be a whole number";
   }
-  if (t1 < 0 || t2 < 0) return "Score tidak boleh negatif";
-  if (t1 > 99 || t2 > 99) return "Score maksimum 99";
+  if (t1 < 0 || t2 < 0) return "Score cannot be negative";
+  if (t1 > 99 || t2 > 99) return "Score cannot exceed 99";
   return null;
 }
 
@@ -600,7 +600,7 @@ export async function updateMatchScoreAction(
 
   if (loaded.status === "completed") {
     return {
-      error: "Match sudah completed. Pakai Edit Score untuk koreksi.",
+      error: "Match is already completed. Use Edit Score to correct it.",
     };
   }
 
@@ -686,7 +686,7 @@ export async function revertMatchAction(
     .from(matches)
     .where(eq(matches.id, matchId))
     .limit(1);
-  if (!row) return { error: "Match tidak ditemukan" };
+  if (!row) return { error: "Match not found" };
 
   // applyMatchScoreChange dari completed → live akan reverse stats
   // (delta dari completed-impact ke null-impact = negate).
@@ -730,7 +730,7 @@ export async function endMatchAction(
   }
 
   if (loaded.status === "completed") {
-    return { error: "Match sudah completed. Pakai Edit Score." };
+    return { error: "Match is already completed. Use Edit Score." };
   }
 
   try {
@@ -784,7 +784,7 @@ export async function editCompletedMatchScoreAction(
 
   if (loaded.status !== "completed") {
     return {
-      error: "Match belum completed. Pakai +/− buttons saat live atau End Match.",
+      error: "Match is not completed yet. Use the +/− buttons while live or End Match.",
     };
   }
 

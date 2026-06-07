@@ -392,7 +392,7 @@ function drawBody(ctx: CanvasRenderingContext2D, data: ShareCardData) {
     ctx.fillStyle = "rgba(255,255,255,0.85)";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("Match belum dimulai", W / 2, y + 50);
+    ctx.fillText("Matches haven't started", W / 2, y + 50);
     y += 120;
   }
 
@@ -463,7 +463,7 @@ export async function renderSessionShareCard(
   canvas.width = W;
   canvas.height = H;
   const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Canvas 2D context tidak tersedia");
+  if (!ctx) throw new Error("Canvas 2D context not available");
 
   // Background gradient
   const bg = ctx.createLinearGradient(0, 0, 0, H);

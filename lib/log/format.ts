@@ -62,7 +62,7 @@ export function formatTimeOnly(date: Date | string): string {
 }
 
 /**
- * Relative time: "5 menit lalu", "2 jam lalu", "kemarin", "12 Jan".
+ * Relative time: "5 min ago", "2 h ago", "yesterday", "12 Jan".
  */
 export function formatRelative(
   date: Date | string,
@@ -76,10 +76,10 @@ export function formatRelative(
   const days = Math.floor(hours / 24);
 
   if (seconds < 10) return "just now";
-  if (seconds < 60) return `${seconds} detik lalu`;
-  if (minutes < 60) return `${minutes} menit lalu`;
-  if (hours < 24) return `${hours} jam lalu`;
+  if (seconds < 60) return `${seconds}s ago`;
+  if (minutes < 60) return `${minutes} min ago`;
+  if (hours < 24) return `${hours} h ago`;
   if (days === 1) return "yesterday";
-  if (days < 7) return `${days} hari lalu`;
-  return d.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
+  if (days < 7) return `${days} days ago`;
+  return d.toLocaleDateString("en-US", { day: "numeric", month: "short" });
 }

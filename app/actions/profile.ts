@@ -23,7 +23,7 @@ export async function updateProfileAction(
   const visibilityRaw = String(formData.get("profile_visibility") ?? "").trim();
 
   if (displayName.length < 2 || displayName.length > 30) {
-    return { error: "Nama harus 2-30 karakter" };
+    return { error: "Name must be 2-30 characters" };
   }
   if (city && city.length > 50) {
     return { error: "Nama kota maksimal 50 karakter" };

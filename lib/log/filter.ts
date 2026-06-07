@@ -53,13 +53,13 @@ export function normalizeLogFilter(
 
   const rawLimit = filter.limit ?? DEFAULT_LIMIT;
   if (rawLimit < 1) {
-    throw new Error("limit harus >= 1");
+    throw new Error("limit must be >= 1");
   }
   const limit = Math.min(rawLimit, MAX_LIMIT);
 
   const offset = filter.offset ?? 0;
   if (offset < 0) {
-    throw new Error("offset harus >= 0");
+    throw new Error("offset must be >= 0");
   }
 
   const searchQuery = filter.searchQuery?.trim();
