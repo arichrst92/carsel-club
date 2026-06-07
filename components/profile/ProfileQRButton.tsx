@@ -177,7 +177,7 @@ export function ProfileQRButton({ userId, displayName }: Props) {
                 className="btn-primary-lg"
                 style={{ flex: 1, padding: "10px 14px", fontSize: 12 }}
               >
-                Tutup
+                Close
               </button>
             </div>
           </div>

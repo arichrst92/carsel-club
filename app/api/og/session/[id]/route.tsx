@@ -259,7 +259,7 @@ export async function GET(_req: Request, { params }: Props) {
           >
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               <div style={{ fontSize: 18, opacity: 0.85, fontWeight: 700 }}>
-                Pemain
+                Players
               </div>
               <div style={{ fontSize: 40, fontWeight: 800 }}>
                 {participants.length}

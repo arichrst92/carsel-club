@@ -303,7 +303,7 @@ function Step1Info({
       <section className="form-section">
         <div className="form-group">
           <label className="form-label">
-            Nama Sesi <span className="req">*</span>
+            Session Name <span className="req">*</span>
           </label>
           <input
             type="text"
@@ -431,7 +431,7 @@ function Step2Location({
         </div>
         <div className="form-group">
           <label className="form-label">
-            Venue / Lapangan <span className="req">*</span>
+            Venue / Court <span className="req">*</span>
           </label>
           <div className="input-with-icon">
             <svg
@@ -517,7 +517,7 @@ function Step2Location({
         <div className="form-row">
           <div className="form-group">
             <label className="form-label">
-              Jam Mulai <span className="req">*</span>
+              Start Time <span className="req">*</span>
             </label>
             <input
               type="time"
@@ -554,7 +554,7 @@ function Step3Players({
 }) {
   return (
     <>
-      <h2 className="wizard-step-title">Pemain & Format Match</h2>
+      <h2 className="wizard-step-title">Players & Match Format</h2>
 
       <section className="form-section">
         <div className="form-group">
@@ -1047,8 +1047,8 @@ function Step5Review({
               lineHeight: 1.5,
             }}
           >
-            Session will appear in &quot;My Sessions&quot;. Kamu bisa undang
-            pemain via WhatsApp link & atur match di dalam session.
+            Session will appear in &quot;My Sessions&quot;. You can invite
+            players via WhatsApp link & manage matches inside the session.
           </div>
         </div>
       </div>

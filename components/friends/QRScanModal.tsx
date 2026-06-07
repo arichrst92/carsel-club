@@ -31,7 +31,7 @@ export function QRScanModal({
   onScan,
   onClose,
   title = "Scan Friend QR",
-  subtitle = "Arahkan kamera ke QR Code di halaman Profil teman kamu.",
+  subtitle = "Point the camera at the QR code on your friend's Profile page.",
 }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -49,7 +49,7 @@ export function QRScanModal({
       try {
         if (!navigator.mediaDevices?.getUserMedia) {
           setError(
-            "Browser ini tidak mendukung akses kamera. Coba update browser kamu."
+            "This browser doesn't support camera access. Try updating your browser."
           );
           setBusy(false);
           return;
@@ -74,7 +74,7 @@ export function QRScanModal({
         canvasRef.current = canvas;
         const ctx = canvas.getContext("2d", { willReadFrequently: true });
         if (!ctx) {
-          setError("Browser tidak mendukung Canvas 2D.");
+          setError("Browser doesn't support Canvas 2D.");
           return;
         }
 
@@ -120,16 +120,16 @@ export function QRScanModal({
         const err = e as Error;
         if (err.name === "NotAllowedError") {
           setError(
-            "Akses kamera ditolak. Izinkan kamera di setting browser, lalu coba lagi."
+            "Camera access denied. Allow camera in your browser settings, then try again."
           );
         } else if (err.name === "NotFoundError") {
-          setError("Kamera tidak ditemukan di perangkat ini.");
+          setError("No camera found on this device.");
         } else if (err.name === "NotReadableError") {
           setError(
-            "Kamera sedang dipakai aplikasi lain. Tutup aplikasi tsb lalu coba lagi."
+            "Camera is being used by another app. Close that app and try again."
           );
         } else {
-          setError(err.message || "Gagal membuka kamera.");
+          setError(err.message || "Failed to open camera.");
         }
         setBusy(false);
       }
@@ -253,7 +253,7 @@ export function QRScanModal({
                 fontWeight: 600,
               }}
             >
-              Memuat kamera…
+              Loading camera…
             </div>
           )}
           {!busy && !error && (
@@ -283,7 +283,7 @@ export function QRScanModal({
                 fontSize: 16,
               }}
             >
-              ✓ Terdeteksi
+              ✓ Detected
             </div>
           )}
         </div>
@@ -321,7 +321,7 @@ export function QRScanModal({
             cursor: "pointer",
           }}
         >
-          Tutup
+          Close
         </button>
       </div>
     </div>

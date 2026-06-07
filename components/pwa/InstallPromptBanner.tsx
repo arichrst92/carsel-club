@@ -138,7 +138,7 @@ export function InstallPromptBanner() {
             color: "var(--text-900)",
           }}
         >
-          Pasang Carsel Club
+          Install Carsel Club
         </div>
         <div
           style={{
@@ -149,8 +149,8 @@ export function InstallPromptBanner() {
           }}
         >
           {mode === "ios"
-            ? "Tap ikon Bagikan → Tambahkan ke Layar Awal"
-            : "Akses cepat dari layar utama, seperti app asli."}
+            ? "Tap the Share icon → Add to Home Screen"
+            : "Quick access from your home screen, just like a native app."}
         </div>
       </div>
       <div style={{ display: "flex", gap: "var(--s-1)" }}>
@@ -164,7 +164,7 @@ export function InstallPromptBanner() {
               fontSize: 12,
             }}
           >
-            Pasang
+            Install
           </button>
         )}
         <button

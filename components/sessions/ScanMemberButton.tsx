@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Tombol "Scan Player QR" di halaman Tambah Pemain sesi.
+ * "Scan Player QR" button on the Add Player page of a session.
  *
  * Flow:
  * 1. Host buka modal scan
@@ -41,7 +41,7 @@ export function ScanMemberButton({ sessionId }: Props) {
         setError(result.error);
         return;
       }
-      setSuccess("✓ Pemain ditambahkan ke sesi.");
+      setSuccess("✓ Player added to session.");
       router.refresh();
     });
   }

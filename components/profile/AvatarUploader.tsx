@@ -41,7 +41,7 @@ export function AvatarUploader({ currentAvatarUrl, initial }: Props) {
         setPreview(currentAvatarUrl); // rollback
       } else if (result?.avatarUrl) {
         setPreview(result.avatarUrl);
-        setSuccess(result.success ?? "Tersimpan!");
+        setSuccess(result.success ?? "Saved!");
         router.refresh();
       }
     });
@@ -55,14 +55,14 @@ export function AvatarUploader({ currentAvatarUrl, initial }: Props) {
 
   function handleRemove() {
     if (!preview) return;
-    if (!confirm("Hapus avatar?")) return;
+    if (!confirm("Remove avatar?")) return;
     startTransition(async () => {
       const result = await removeAvatarAction();
       if (result?.error) {
         setError(result.error);
       } else {
         setPreview(null);
-        setSuccess(result?.success ?? "Avatar dihapus.");
+        setSuccess(result?.success ?? "Avatar removed.");
         router.refresh();
       }
     });
@@ -176,7 +176,7 @@ export function AvatarUploader({ currentAvatarUrl, initial }: Props) {
               disabled={isPending}
               style={{ display: "none" }}
             />
-            {isPending ? "Uploading..." : preview ? "Ganti foto" : "Pilih foto"}
+            {isPending ? "Uploading..." : preview ? "Change photo" : "Choose photo"}
           </label>
 
           {preview && !isPending && (
@@ -195,7 +195,7 @@ export function AvatarUploader({ currentAvatarUrl, initial }: Props) {
                 cursor: "pointer",
               }}
             >
-              Hapus
+              Remove
             </button>
           )}
         </div>
@@ -209,7 +209,7 @@ export function AvatarUploader({ currentAvatarUrl, initial }: Props) {
             maxWidth: 240,
           }}
         >
-          Foto akan di-crop square (1:1) otomatis dan dikompres untuk performa.
+          Photo will be auto-cropped square (1:1) and compressed for performance.
         </div>
       </div>
     </>

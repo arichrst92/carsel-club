@@ -325,7 +325,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
                 .sort((a, b) => b.sessionPoints - a.sessionPoints)
                 .map((p) => ({
                   name:
-                    p.userDisplayName ?? p.guestName ?? "Pemain",
+                    p.userDisplayName ?? p.guestName ?? "Player",
                   wins: p.sessionWins,
                   draws: p.sessionDraws,
                   losses: p.sessionLosses,
@@ -338,7 +338,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
         {/* PLAYERS */}
         <section>
           <div className="section-head">
-            <h3>Pemain ({participants.length})</h3>
+            <h3>Players ({participants.length})</h3>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               {/* Leaderboard link disini hanya muncul kalau quick-actions
                   Share tidak di-render (terminal session / bukan peserta) */}
@@ -367,8 +367,8 @@ export default async function SessionDetailPage({ params }: PageProps) {
                 <div className="empty-state-title">No players yet</div>
                 <div className="empty-state-text">
                   {staff
-                    ? "Tambah pemain via WhatsApp atau invite link untuk mulai session."
-                    : "Host belum invite pemain. Tunggu invitation atau hubungi host."}
+                    ? "Add players via WhatsApp or invite link to start the session."
+                    : "The host hasn't invited players yet. Wait for an invitation or contact the host."}
                 </div>
                 {staff && !isTerminal && (
                   <Link
@@ -387,7 +387,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
                       boxShadow: "var(--shadow-sm)",
                     }}
                   >
-                    + Tambah Pemain
+                    + Add Players
                   </Link>
                 )}
               </div>

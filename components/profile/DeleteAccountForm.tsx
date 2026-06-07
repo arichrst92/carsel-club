@@ -44,9 +44,9 @@ export function DeleteAccountForm() {
           margin: 0,
         }}
       >
-        Akun kamu akan di-anonim secara permanen: nama jadi "[Akun dihapus]",
-        avatar dihapus, friend request mati. Stats historical akan tetap
-        untuk integritas data sesi yang sudah kamu ikuti.
+        Your account will be permanently anonymized: name becomes "[Account deleted]",
+        avatar removed, friend requests disabled. Historical stats are kept
+        to preserve data integrity for sessions you've joined.
       </p>
       <label
         style={{

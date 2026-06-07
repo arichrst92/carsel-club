@@ -371,7 +371,7 @@ export async function GET(_req: Request, { params }: Props) {
             }}
           >
             <StatTile
-              label="Pemain"
+              label="Players"
               value={String(top.length || lb.length)}
             />
             <StatTile label="Match" value={String(completedMatches)} />

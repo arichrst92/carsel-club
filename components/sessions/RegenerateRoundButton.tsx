@@ -18,7 +18,7 @@ export function RegenerateRoundButton({ roundSetId, roundNumber }: Props) {
   function handleClick() {
     if (
       !confirm(
-        `Regenerate Round ${roundNumber}?\n\nMatches existing akan dihapus dan pairing baru di-generate. Hanya bisa kalau semua match masih pending.`
+        `Regenerate Round ${roundNumber}?\n\nExisting matches will be deleted and new pairings will be generated. Only allowed when all matches are still pending.`
       )
     )
       return;

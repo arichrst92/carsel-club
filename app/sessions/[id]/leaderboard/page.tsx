@@ -182,7 +182,7 @@ export default async function SessionLeaderboardPage({
               gap: 8,
             }}
           >
-            <HeroStat label="Pemain" value={hero.playerCount} />
+            <HeroStat label="Players" value={hero.playerCount} />
             <HeroStat label="Match Done" value={hero.completedMatches} />
             <HeroStat label="Total Pts" value={hero.totalPoints} />
           </div>

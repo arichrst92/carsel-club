@@ -155,7 +155,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
           </div>
           <div className="form-group">
             <label className="form-label">
-              Nama Sesi <span className="req">*</span>
+              Session Name <span className="req">*</span>
             </label>
             <input
               type="text"
@@ -205,7 +205,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <div className="form-group">
               <label className="form-label">
-                Jam Mulai <span className="req">*</span>
+                Start Time <span className="req">*</span>
               </label>
               <input
                 type="time"

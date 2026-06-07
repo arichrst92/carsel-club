@@ -97,7 +97,7 @@ export function MatchSwapProvider({
       if (result?.error) {
         setError(result.error);
       } else {
-        setSuccess("Pemain ditukar");
+        setSuccess("Players swapped");
         router.refresh();
       }
       setSelected(null);
@@ -153,7 +153,7 @@ export function MatchSwapProvider({
                   color: "var(--text-900)",
                 }}
               >
-                Tukar Pemain?
+                Swap Players?
               </div>
             </div>
 
