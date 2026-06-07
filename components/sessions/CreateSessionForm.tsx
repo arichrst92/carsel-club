@@ -13,6 +13,7 @@ type FormData = {
   format: "americano" | "mexicano" | "tournament";
   venueName: string;
   mapsUrl: string;
+  description: string;
   date: string; // YYYY-MM-DD
   timeStart: string; // HH:mm
   timeEnd: string; // HH:mm (optional)
@@ -50,6 +51,7 @@ const INITIAL: FormData = {
   format: "americano",
   venueName: "",
   mapsUrl: "",
+  description: "",
   date: defaultDateStr(),
   timeStart: defaultTimeStart(),
   timeEnd: defaultTimeEnd(),
@@ -135,6 +137,7 @@ export function CreateSessionForm() {
     fd.set("visibility", data.visibility);
     fd.set("venue_name", data.venueName);
     fd.set("maps_url", data.mapsUrl);
+    if (data.description.trim()) fd.set("description", data.description.trim());
     // Cover photo: upload via session detail after create (Sprint 9 flow)
     fd.set("scheduled_at", scheduledAt.toISOString());
     if (scheduledEndAt) fd.set("scheduled_end_at", scheduledEndAt.toISOString());
@@ -157,7 +160,7 @@ export function CreateSessionForm() {
         <section className="wizard-progress">
           <div className="wizard-progress-meta">
             <span className="wizard-step-label">
-              Step {step} dari {TOTAL_STEPS}
+              Step {step} of {TOTAL_STEPS}
             </span>
             <span
               className="wizard-step-label"
@@ -316,6 +319,20 @@ function Step1Info({
           <p className="form-help">
             Give your session a memorable name.
           </p>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Description (Optional)</label>
+          <textarea
+            className="form-input"
+            placeholder="Any details players should know — dress code, after-session plans, etc."
+            value={data.description}
+            onChange={(e) => setField("description", e.target.value)}
+            maxLength={500}
+            rows={3}
+            style={{ resize: "vertical", fontFamily: "inherit", lineHeight: 1.5 }}
+          />
+          <p className="form-help">{data.description.length}/500</p>
         </div>
 
         <div className="form-group">

@@ -135,7 +135,7 @@ export async function requestJoinAction(
     .where(eq(sessions.id, sessionId))
     .limit(1);
   if (sessionInfo) {
-    notifyJoinRequested(sessionInfo.hostId, {
+    await notifyJoinRequested(sessionInfo.hostId, {
       sessionId,
       sessionTitle: sessionInfo.title,
       requesterUserId: me!.id,
@@ -218,7 +218,7 @@ export async function approveJoinRequestAction(
     .where(eq(sessions.id, req.sessionId))
     .limit(1);
   if (sessionInfo) {
-    notifyJoinApproved(req.userId, {
+    await notifyJoinApproved(req.userId, {
       sessionId: req.sessionId,
       sessionTitle: sessionInfo.title,
     });
@@ -276,7 +276,7 @@ export async function rejectJoinRequestAction(
     .where(eq(sessions.id, req.sessionId))
     .limit(1);
   if (sessionInfo) {
-    notifyJoinRejected(req.userId, {
+    await notifyJoinRejected(req.userId, {
       sessionId: req.sessionId,
       sessionTitle: sessionInfo.title,
     });

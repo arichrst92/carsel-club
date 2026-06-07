@@ -35,6 +35,13 @@ import { db as dbClient } from "@/lib/db/client";
 import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
+/**
+ * Persist the in-app notification row, then fire off best-effort secondary
+ * deliveries (push + WA). Returns once the DB insert is durable so callers
+ * can `await` it — important for Server Actions where the response is sent
+ * to the client immediately after the action returns; unawaited promises
+ * may be cancelled before the row lands in Postgres.
+ */
 async function createNotification<T extends NotificationType>(
   userId: string,
   type: T,
@@ -57,39 +64,49 @@ async function createNotification<T extends NotificationType>(
   }
   if (!notificationId) return;
 
-  // Sprint 27-28: dispatch push + WA if user pref + outside quiet hours
-  try {
-    const prefs = await getNotificationPrefs(userId);
-    const currentHour = new Date().getHours();
-    const pushAllowed = shouldDeliver(
-      prefs.settings,
-      type,
-      "push",
-      currentHour,
-      prefs.quietStartHour,
-      prefs.quietEndHour
-    );
-    const waAllowed = shouldDeliver(
-      prefs.settings,
-      type,
-      "wa",
-      currentHour,
-      prefs.quietStartHour,
-      prefs.quietEndHour
-    );
-    if (pushAllowed) {
-      const fmt = formatNotification(
-        type,
-        payload as unknown as Record<string, unknown>
-      );
-      const pushPayload = buildPushPayload(type, notificationId, fmt);
-      await sendToUser(userId, pushPayload);
+  // Fire-and-forget secondary delivery (push + WA). These can be slow (WA
+  // gateway timeout up to 8s) and shouldn't block the action response.
+  void dispatchSecondaryDelivery(userId, type, payload, notificationId).catch(
+    (e) => {
+      console.error(`[notify:${type}] secondary dispatch failed:`, e);
     }
-    if (waAllowed) {
-      await dispatchWa(userId, type, payload);
-    }
-  } catch (e) {
-    console.error(`[notify:${type}] secondary dispatch failed:`, e);
+  );
+}
+
+async function dispatchSecondaryDelivery<T extends NotificationType>(
+  userId: string,
+  type: T,
+  payload: NotificationPayloadByType[T],
+  notificationId: string
+): Promise<void> {
+  const prefs = await getNotificationPrefs(userId);
+  const currentHour = new Date().getHours();
+  const pushAllowed = shouldDeliver(
+    prefs.settings,
+    type,
+    "push",
+    currentHour,
+    prefs.quietStartHour,
+    prefs.quietEndHour
+  );
+  const waAllowed = shouldDeliver(
+    prefs.settings,
+    type,
+    "wa",
+    currentHour,
+    prefs.quietStartHour,
+    prefs.quietEndHour
+  );
+  if (pushAllowed) {
+    const fmt = formatNotification(
+      type,
+      payload as unknown as Record<string, unknown>
+    );
+    const pushPayload = buildPushPayload(type, notificationId, fmt);
+    await sendToUser(userId, pushPayload);
+  }
+  if (waAllowed) {
+    await dispatchWa(userId, type, payload);
   }
 }
 
@@ -130,66 +147,68 @@ function dispatch<T extends NotificationType>(
   userId: string,
   type: T,
   payload: NotificationPayloadByType[T]
-): void {
-  void createNotification(userId, type, payload);
+): Promise<void> {
+  return createNotification(userId, type, payload);
 }
 
 // ============================================================
-// Typed generators — semua fire-and-forget (void return)
+// Typed generators — return Promise<void> so callers can await
+// the DB insert. Secondary delivery (push/WA) still fires-and-forgets
+// internally.
 // ============================================================
 
 export function notifySessionInvite(
   userId: string,
   payload: SessionInvitePayload
-): void {
-  dispatch(userId, "session_invite", payload);
+): Promise<void> {
+  return dispatch(userId, "session_invite", payload);
 }
 
 export function notifySessionReminder(
   userId: string,
   payload: SessionReminderPayload
-): void {
-  dispatch(userId, "session_reminder", payload);
+): Promise<void> {
+  return dispatch(userId, "session_reminder", payload);
 }
 
 export function notifySessionCancelled(
   userId: string,
   payload: SessionCancelledPayload
-): void {
-  dispatch(userId, "session_cancelled", payload);
+): Promise<void> {
+  return dispatch(userId, "session_cancelled", payload);
 }
 
 export function notifyFriendRequest(
   userId: string,
   payload: FriendRequestPayload
-): void {
-  dispatch(userId, "friend_request", payload);
+): Promise<void> {
+  return dispatch(userId, "friend_request", payload);
 }
 
 export function notifyFriendAccepted(
   userId: string,
   payload: FriendAcceptedPayload
-): void {
-  dispatch(userId, "friend_accepted", payload);
+): Promise<void> {
+  return dispatch(userId, "friend_accepted", payload);
 }
 
 export function notifyJoinRequested(
   userId: string,
   payload: JoinRequestedPayload
-): void {
-  dispatch(userId, "join_requested", payload);
+): Promise<void> {
+  return dispatch(userId, "join_requested", payload);
 }
 
 export function notifyJoinApproved(
   userId: string,
   payload: JoinApprovedPayload
-): void {
-  dispatch(userId, "join_approved", payload);
+): Promise<void> {
+  return dispatch(userId, "join_approved", payload);
 }
 
 export function notifyJoinRejected(
   userId: string,
   payload: JoinRejectedPayload
-): void {
-  dispatch(userId, "join_rejected", payload);
+): Promise<void> {
+  return dispatch(userId, "join_rejected", payload);
 }

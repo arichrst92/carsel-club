@@ -90,10 +90,10 @@ export async function searchUserForRequestAction(
   if (!me) redirect("/login");
 
   const rawPhone = String(formData.get("phone") ?? "").trim();
-  if (!rawPhone) return { error: "Nomor WhatsApp required" };
+  if (!rawPhone) return { error: "WhatsApp number is required" };
   const phone = normalizePhone(rawPhone);
   if (!isValidIndonesianPhone(phone)) {
-    return { error: "Nomor WhatsApp Indonesia tidak valid" };
+    return { error: "Invalid Indonesian WhatsApp number" };
   }
 
   const [user] = await db
@@ -106,8 +106,8 @@ export async function searchUserForRequestAction(
     .from(users)
     .where(eq(users.whatsappNumber, phone))
     .limit(1);
-  if (!user) return { error: "User dengan nomor itu belum daftar Carsel Club" };
-  if (user.id === me.id) return { error: "That’s your own number 😅" };
+  if (!user) return { error: "No Carsel Club user found for that number" };
+  if (user.id === me.id) return { error: "That's your own number 😅" };
 
   return { foundUser: user };
 }
@@ -118,7 +118,7 @@ export async function sendFriendRequestAction(
 ): Promise<FriendRequestState> {
   const me = await getCurrentUser();
   if (!me) redirect("/login");
-  if (toUserId === me.id) return { error: "Tidak bisa add diri sendiri" };
+  if (toUserId === me.id) return { error: "Cannot add yourself" };
 
   // Target user exists?
   const [target] = await db
@@ -130,7 +130,7 @@ export async function sendFriendRequestAction(
     .from(users)
     .where(eq(users.id, toUserId))
     .limit(1);
-  if (!target) return { error: "User tidak ditemukan" };
+  if (!target) return { error: "User not found" };
 
   // Sprint 38: enforce target's friend request policy
   if (target.friendRequestPolicy === "off") {
@@ -185,7 +185,7 @@ export async function sendFriendRequestAction(
     .where(and(eq(friendships.userIdLo, lo), eq(friendships.userIdHi, hi)))
     .limit(1);
   if (existingFriendship)
-    return { error: `${target.displayName} sudah jadi friend` };
+    return { error: `${target.displayName} is already a friend` };
 
   // Existing pending? (either direction)
   const [existingReq] = await db
@@ -241,7 +241,7 @@ export async function sendFriendRequestAction(
       });
     } catch (e) {
       console.error("[sendFriendRequestAction]", e);
-      return { error: "Gagal kirim request. Coba lagi." };
+      return { error: "Failed to send request. Please try again." };
     }
   }
 
@@ -249,14 +249,14 @@ export async function sendFriendRequestAction(
     fromUserId: me.id,
     toUserId,
   });
-  notifyFriendRequest(toUserId, {
+  await notifyFriendRequest(toUserId, {
     fromUserId: me.id,
     fromDisplayName: me.displayName,
     message: message?.trim() || null,
   });
 
   revalidatePath("/friends");
-  return { success: `Permintaan terkirim ke ${target.displayName}!` };
+  return { success: `Request sent to ${target.displayName}!` };
 }
 
 export async function acceptFriendRequestAction(
@@ -306,7 +306,7 @@ export async function acceptFriendRequestAction(
     fromUserId: req.fromUserId,
     toUserId: req.toUserId,
   });
-  notifyFriendAccepted(req.fromUserId, {
+  await notifyFriendAccepted(req.fromUserId, {
     byUserId: me.id,
     byDisplayName: me.displayName,
   });

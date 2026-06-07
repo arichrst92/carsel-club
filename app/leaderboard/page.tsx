@@ -428,7 +428,18 @@ function PodiumSlot({
       </div>
       <div
         className={`lb-avatar ${avatarClass(player.id)}`}
-        style={{ width: 48, height: 48, margin: "0 auto 8px", fontSize: 18 }}
+        style={{
+          width: 48,
+          height: 48,
+          margin: "0 auto 8px",
+          fontSize: 18,
+          ...(player.avatarUrl
+            ? {
+                background: `url(${player.avatarUrl}) center/cover no-repeat`,
+                color: "transparent",
+              }
+            : {}),
+        }}
       >
         {(player.displayName.trim()[0] ?? "?").toUpperCase()}
       </div>
@@ -488,7 +499,17 @@ function LbItem({
       style={{ textDecoration: "none", color: "inherit" }}
     >
       <div className="lb-rank">#{row.rank}</div>
-      <div className={`lb-avatar ${avatarClass(row.id)}`}>
+      <div
+        className={`lb-avatar ${avatarClass(row.id)}`}
+        style={
+          row.avatarUrl
+            ? {
+                background: `url(${row.avatarUrl}) center/cover no-repeat`,
+                color: "transparent",
+              }
+            : undefined
+        }
+      >
         {(row.displayName.trim()[0] ?? "?").toUpperCase()}
       </div>
       <div className="lb-info">

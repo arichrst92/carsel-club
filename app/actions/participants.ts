@@ -138,7 +138,7 @@ export async function addMemberAction(
     .where(eq(sessions.id, sessionId))
     .limit(1);
   if (session) {
-    notifySessionInvite(userId, {
+    await notifySessionInvite(userId, {
       sessionId,
       sessionTitle: session.title,
       inviterName: me!.displayName,
