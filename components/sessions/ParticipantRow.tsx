@@ -84,7 +84,7 @@ export function ParticipantRow({
         </div>
         <div className="player-meta-row">
           <span style={{ fontSize: 12, color: "var(--text-500)" }}>
-            {!participant.isPlaying && "🚫 not playing"}
+            {!participant.isPlaying && "Resting"}
             {participant.role === "player" && participant.isPlaying && "Player"}
             {participant.role === "guest" && participant.isPlaying && "Guest player"}
           </span>

@@ -24,14 +24,14 @@ export function EndSessionButton({
   function handleClick() {
     const warning =
       pendingMatches > 0
-        ? `Masih ada ${pendingMatches} match yang belum selesai. Mereka tidak akan di-skor. `
+        ? `${pendingMatches} match${pendingMatches > 1 ? "es" : ""} still pending — they won't be scored. `
         : "";
-    // Sprint 50: wording lebih jelas — "Selesaikan" (sukses, dihitung)
-    // vs "Batalkan" (gagal, di-skip). Hindari ambiguitas End vs Cancel.
+    // Sprint 50: clearer wording — "End" (success, counted) vs "Cancel" (failed,
+    // skipped). Avoid the End-vs-Cancel ambiguity.
     const msg =
-      `Selesaikan sesi ini?\n\n${warning}` +
-      `${completedMatches} match selesai akan tetap dihitung sebagai statistik.\n\n` +
-      `Status berubah ke SELESAI. Bisa dibuka kembali nanti kalau perlu.`;
+      `End this session?\n\n${warning}` +
+      `${completedMatches} completed match${completedMatches === 1 ? "" : "es"} will stay counted in stats.\n\n` +
+      `Status will change to COMPLETED. You can reopen it later if needed.`;
     if (!confirm(msg)) return;
     setError(null);
     startTransition(async () => {

@@ -264,6 +264,41 @@ export default async function SessionDetailPage({ params }: PageProps) {
           <SessionDescription description={session.description} />
         )}
 
+        {/* Sprint 53: compact stats strip — replaces the verbose "Match Settings"
+            section. 4 numbers at a glance, no extra scroll. */}
+        <section>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(4, 1fr)",
+              gap: 8,
+            }}
+          >
+            <StatTile
+              label="Players"
+              value={participants.length}
+              accent="primary"
+            />
+            <StatTile
+              label="Rounds"
+              value={rounds.length}
+              hint={
+                session.maxRounds ? `of ${session.maxRounds}` : undefined
+              }
+            />
+            <StatTile
+              label="Matches"
+              value={`${completedMatches}/${totalMatches}`}
+              hint={pendingMatches > 0 ? `${pendingMatches} pending` : "done"}
+            />
+            <StatTile
+              label="Co-hosts"
+              value={cohostCount}
+              hint={cohostCount === 0 ? "none yet" : undefined}
+            />
+          </div>
+        </section>
+
         {/* JOIN PUBLIC SESSION (non-participants) */}
         {canJoinPublic && (
           <section>
@@ -571,111 +606,6 @@ export default async function SessionDetailPage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* MATCH SETTINGS RECAP */}
-        <section>
-          <div className="section-head">
-            <h3>Match Settings</h3>
-          </div>
-          <div className="info-row-list">
-            <div className="info-row">
-              <div className="ir-icon teal">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect x="3" y="3" width="18" height="18" rx="2" />
-                  <path d="M3 12h18M12 3v18" />
-                </svg>
-              </div>
-              <div className="ir-info">
-                <div className="ir-label">Court</div>
-                <div className="ir-value">
-                  {session.numCourts} Court{session.numCourts > 1 ? "s" : ""}{" "}
-                  {session.numCourts > 1 && "(paralel)"}
-                </div>
-              </div>
-            </div>
-            <div className="info-row">
-              <div className="ir-icon coral">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M9 11l3 3L22 4" />
-                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-                </svg>
-              </div>
-              <div className="ir-info">
-                <div className="ir-label">Match End</div>
-                <div className="ir-value">Manual oleh host/co-host</div>
-              </div>
-            </div>
-            <div className="info-row">
-              <div className="ir-icon yellow">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M21 12a9 9 0 1 1-3-6.7L21 8" />
-                  <path d="M21 3v5h-5" />
-                </svg>
-              </div>
-              <div className="ir-info">
-                <div className="ir-label">Round</div>
-                <div className="ir-value">
-                  {session.maxRounds
-                    ? `${session.maxRounds} round (manual)`
-                    : "Auto count"}
-                </div>
-              </div>
-            </div>
-            <div className="info-row">
-              <div className="ir-icon purple">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="9" cy="7" r="4" />
-                  <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
-                  <circle cx="17" cy="7" r="3" />
-                </svg>
-              </div>
-              <div className="ir-info">
-                <div className="ir-label">Co-Host</div>
-                <div className="ir-value">
-                  {cohostCount === 0
-                    ? "No co-host yet"
-                    : `${cohostCount} co-host`}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* SPRINT 31: TOURNAMENT BRACKET */}
         {session.format === "tournament" && bracketData && (
           <BracketView data={bracketData} />
@@ -756,16 +686,16 @@ export default async function SessionDetailPage({ params }: PageProps) {
           </section>
         )}
 
-        {/* MATCH STATUS */}
+        {/* MATCHES */}
         <section>
           <div className="section-head">
-            <h3>Match Round Set</h3>
+            <h3>Matches</h3>
             {rounds.length > 0 && (
               <Link
                 href={`/sessions/${session.id}/matches`}
                 className="section-link"
               >
-                View All
+                View all
               </Link>
             )}
           </div>
@@ -787,12 +717,11 @@ export default async function SessionDetailPage({ params }: PageProps) {
                 </svg>
               </div>
               <div className="empty-state-title">
-                No matches created yet
+                No matches yet
               </div>
               <div className="empty-state-text">
-                Click &quot;Generate Match&quot; below once all players have
-                arrived. You can create extra matches anytime while the session
-                is running.
+                Tap &quot;Generate Round 1&quot; below once players have
+                arrived. You can add more rounds while the session is running.
               </div>
             </div>
           ) : (
@@ -825,7 +754,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
                   }}
                 >
                   {rounds.length} round{rounds.length > 1 ? "s" : ""} ·{" "}
-                  {completedMatches}/{totalMatches} matches completed
+                  {completedMatches}/{totalMatches} done
                 </div>
                 <svg
                   width="20"
@@ -949,6 +878,74 @@ export default async function SessionDetailPage({ params }: PageProps) {
             </svg>
             <span>View Matches & Scores</span>
           </Link>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Sprint 53: compact stat tile used in the session detail header strip.
+function StatTile({
+  label,
+  value,
+  hint,
+  accent,
+}: {
+  label: string;
+  value: string | number;
+  hint?: string;
+  accent?: "primary";
+}) {
+  return (
+    <div
+      style={{
+        background: accent === "primary" ? "var(--primary-50)" : "var(--bg)",
+        border:
+          accent === "primary"
+            ? "1px solid var(--primary-100)"
+            : "1px solid var(--border-light)",
+        borderRadius: "var(--r-md)",
+        padding: "10px 8px",
+        textAlign: "center",
+        minWidth: 0,
+      }}
+    >
+      <div
+        style={{
+          fontFamily: "var(--font-display)",
+          fontWeight: 800,
+          fontSize: 18,
+          color:
+            accent === "primary"
+              ? "var(--primary-700)"
+              : "var(--text-900)",
+          lineHeight: 1.1,
+        }}
+      >
+        {value}
+      </div>
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 700,
+          color: "var(--text-500)",
+          textTransform: "uppercase",
+          letterSpacing: 0.4,
+          marginTop: 2,
+        }}
+      >
+        {label}
+      </div>
+      {hint && (
+        <div
+          style={{
+            fontSize: 9,
+            fontWeight: 600,
+            color: "var(--text-500)",
+            marginTop: 1,
+          }}
+        >
+          {hint}
         </div>
       )}
     </div>

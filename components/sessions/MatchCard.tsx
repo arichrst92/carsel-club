@@ -142,7 +142,7 @@ export function MatchCard({
   function handleRevert() {
     if (
       !confirm(
-        "Batalkan penyelesaian match ini?\n\nSkor tetap, statistik akan diputar mundur. Bisa diedit setelah itu."
+        "Revert this match back to LIVE?\n\nThe score stays, but stats earned will be reversed. You can re-edit afterwards."
       )
     )
       return;
@@ -447,13 +447,13 @@ export function MatchCard({
               cursor: "pointer",
             }}
           >
-            ✏️ Ubah Skor
+            ✏️ Edit Score
           </button>
           <button
             type="button"
             onClick={handleRevert}
             disabled={isPending}
-            title="Revert ke LIVE — reverse stats yg sudah accrued"
+            title="Revert to LIVE — reverses any stats earned"
             style={{
               padding: "8px 12px",
               borderRadius: "var(--r-md)",
