@@ -241,6 +241,25 @@ export default async function SessionDetailPage({ params }: PageProps) {
               </span>
             </div>
           </div>
+          {session.description && (
+            <div
+              style={{
+                marginTop: "var(--s-3)",
+                padding: "var(--s-3) var(--s-4)",
+                background: "var(--bg-soft)",
+                borderRadius: "var(--r-md)",
+                border: "1px solid var(--border-light)",
+                fontSize: 13,
+                color: "var(--text-700)",
+                fontWeight: 600,
+                lineHeight: 1.5,
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-word",
+              }}
+            >
+              {session.description}
+            </div>
+          )}
           <div className="hero-format-chips">
             <span className="format-chip" style={{ textTransform: "capitalize" }}>
               {session.format}

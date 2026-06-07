@@ -21,6 +21,7 @@ type FormData = {
   roundMode: "auto" | "manual";
   roundCount: number;
   visibility: "private" | "public";
+  joinPolicy: "auto_join" | "need_approval";
   hostIsPlaying: boolean;
   fixPartners: boolean;
 };
@@ -60,6 +61,7 @@ const INITIAL: FormData = {
   roundMode: "auto",
   roundCount: 7,
   visibility: "private",
+  joinPolicy: "auto_join",
   hostIsPlaying: true,
   fixPartners: false,
 };
@@ -147,6 +149,9 @@ export function CreateSessionForm() {
     if (data.roundMode === "manual") fd.set("max_rounds", String(data.roundCount));
     fd.set("host_is_playing", data.hostIsPlaying ? "on" : "off");
     fd.set("fix_partners", data.fixPartners ? "on" : "off");
+    if (data.visibility === "public") {
+      fd.set("join_policy", data.joinPolicy);
+    }
 
     startTransition(async () => {
       const result = await createSessionAction(fd);
@@ -817,10 +822,40 @@ function Step4Visibility({
           </div>
           <p className="form-help">
             {data.visibility === "public"
-              ? "Session shows up in Find Session for padel players — anyone can join directly."
+              ? "Session shows up in Find Session for padel players."
               : "Only players who get the WA link can join."}
           </p>
         </div>
+
+        {/* Join Policy — only relevant when Public */}
+        {data.visibility === "public" && (
+          <div className="form-group">
+            <label className="form-label">Join Policy</label>
+            <div className="segmented">
+              <button
+                type="button"
+                className={`segmented-option ${data.joinPolicy === "auto_join" ? "active" : ""}`}
+                onClick={() => setField("joinPolicy", "auto_join")}
+              >
+                <span>✅ Auto-join</span>
+                <span className="seg-sub">Join directly</span>
+              </button>
+              <button
+                type="button"
+                className={`segmented-option ${data.joinPolicy === "need_approval" ? "active" : ""}`}
+                onClick={() => setField("joinPolicy", "need_approval")}
+              >
+                <span>📩 Approval</span>
+                <span className="seg-sub">Host reviews</span>
+              </button>
+            </div>
+            <p className="form-help">
+              {data.joinPolicy === "auto_join"
+                ? "Players can join the session instantly without your approval."
+                : "Players request to join — you approve or reject from the session detail page."}
+            </p>
+          </div>
+        )}
       </section>
 
       <section className="form-section">
@@ -1029,6 +1064,13 @@ function Step5Review({
                   ? "Host (you) playing"
                   : "Host is organizer only (not playing)"}
               </span>
+              {data.visibility === "public" && (
+                <span style={{ color: "var(--text-500)" }}>
+                  {data.joinPolicy === "auto_join"
+                    ? "✅ Auto-join · players join directly"
+                    : "📩 Approval · you review join requests"}
+                </span>
+              )}
               <span style={{ color: "var(--text-500)" }}>No co-host yet</span>
             </div>
           </div>
