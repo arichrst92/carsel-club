@@ -34,7 +34,9 @@ type ParticipantLookup = Record<
   {
     name: string;
     isMember: boolean;
-    /** Sprint 53: session match count, used for "(N)" chip next to name */
+    /** Sprint 53: avatar URL for display next to player name */
+    avatarUrl?: string | null;
+    /** Sprint 53: session match count, used for "×N" chip next to name */
     sessionMatches?: number;
   }
 >;
@@ -577,184 +579,162 @@ function TeamRow({
     match[slotKeys[1]],
   ];
 
+  // Sprint 53: unified player row. Avatar + name + ×N chip + small pencil/tap
+  // affordance. Same layout used for all three states (read-only, swap-mode,
+  // edit-mode) — only the on-click behavior changes.
   function PlayerName({ idx }: { idx: 0 | 1 }) {
     const slot = slotKeys[idx];
     const pid = slotIds[idx];
     const name = playerNames[idx];
+    const meta = lookup[pid];
+    const matchesPlayed = meta?.sessionMatches ?? 0;
+    const avatarUrl = meta?.avatarUrl ?? null;
     const isSelected =
       swap?.selected?.matchId === match.id && swap?.selected?.slot === slot;
 
-    if (!swapEnabled) {
-      // Sprint 53: when caller provides onEditSlot, render the Edit chip
-      // next to the name. Clicking opens the replace-player modal.
-      const sessionMatchCount = lookup[pid]?.sessionMatches ?? 0;
-      const nameNode = (
-        <span
+    const dim = won ? "var(--text-900)" : "var(--text-700)";
+    const nameColor = isSelected ? "var(--primary-700)" : dim;
+
+    const avatar = (
+      <Avatar
+        url={avatarUrl}
+        name={name}
+        size={28}
+        ring={isSelected ? "var(--primary)" : undefined}
+      />
+    );
+
+    const nameBlock = (
+      <div
+        style={{
+          minWidth: 0,
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          gap: 1,
+        }}
+      >
+        <div
           style={{
-            fontSize: idx === 0 ? 14 : 12,
-            fontWeight: idx === 0 ? 700 : 600,
-            color:
-              idx === 0
-                ? won
-                  ? "var(--text-900)"
-                  : "var(--text-700)"
-                : "var(--text-500)",
-            lineHeight: 1.3,
+            fontFamily: "var(--font-display)",
+            fontWeight: 700,
+            fontSize: 14,
+            color: nameColor,
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            flex: 1,
-            minWidth: 0,
+            lineHeight: 1.2,
           }}
         >
+          {isSelected && "✓ "}
           {name}
-          {sessionMatchCount > 0 && (
-            <span
-              style={{
-                marginLeft: 6,
-                fontSize: 10,
-                fontWeight: 700,
-                color: "var(--text-500)",
-              }}
-              title={`Has played ${sessionMatchCount} match${sessionMatchCount === 1 ? "" : "es"} in this session`}
-            >
-              ×{sessionMatchCount}
-            </span>
-          )}
-        </span>
-      );
-      if (!onEditSlot) {
-        return (
+        </div>
+        {matchesPlayed > 0 && (
           <div
             style={{
-              fontSize: idx === 0 ? 14 : 12,
-              fontWeight: idx === 0 ? 700 : 600,
-              color:
-                idx === 0
-                  ? won
-                    ? "var(--text-900)"
-                    : "var(--text-700)"
-                  : "var(--text-500)",
-              lineHeight: 1.3,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {name}
-            {sessionMatchCount > 0 && (
-              <span
-                style={{
-                  marginLeft: 6,
-                  fontSize: 10,
-                  fontWeight: 700,
-                  color: "var(--text-500)",
-                }}
-                title={`Has played ${sessionMatchCount} match${sessionMatchCount === 1 ? "" : "es"} in this session`}
-              >
-                ×{sessionMatchCount}
-              </span>
-            )}
-          </div>
-        );
-      }
-      return (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            minWidth: 0,
-          }}
-        >
-          {nameNode}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onEditSlot(slot);
-            }}
-            aria-label={`Replace ${name}`}
-            title={`Replace ${name}`}
-            style={{
-              flexShrink: 0,
-              padding: "2px 8px",
-              fontSize: 10,
-              fontFamily: "var(--font-display)",
-              fontWeight: 800,
-              letterSpacing: 0.3,
-              textTransform: "uppercase",
-              color: "var(--primary-700)",
-              background: "var(--primary-50)",
-              border: "1px solid var(--primary-200)",
-              borderRadius: "var(--r-full)",
-              cursor: "pointer",
-              lineHeight: 1.4,
-            }}
-          >
-            Edit
-          </button>
-        </div>
-      );
-    }
-
-    const sessionMatchCountSwap = lookup[pid]?.sessionMatches ?? 0;
-    return (
-      <button
-        type="button"
-        onClick={() =>
-          swap!.handleTap({
-            matchId: match.id,
-            slot,
-            participantId: pid,
-            name,
-          })
-        }
-        disabled={swap!.isPending}
-        title="Tap to swap players"
-        style={{
-          background: isSelected
-            ? "var(--primary-50)"
-            : "transparent",
-          border: isSelected
-            ? "1.5px dashed var(--primary)"
-            : "1.5px dashed transparent",
-          padding: "2px 6px",
-          borderRadius: "var(--r-sm)",
-          fontFamily: "inherit",
-          fontSize: idx === 0 ? 14 : 12,
-          fontWeight: idx === 0 ? 700 : 600,
-          color: isSelected
-            ? "var(--primary-700)"
-            : idx === 0
-              ? won
-                ? "var(--text-900)"
-                : "var(--text-700)"
-              : "var(--text-500)",
-          textAlign: "left",
-          width: "100%",
-          cursor: swap!.isPending ? "wait" : "pointer",
-          lineHeight: 1.3,
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {isSelected && "✓ "}
-        {name}
-        {sessionMatchCountSwap > 0 && (
-          <span
-            style={{
-              marginLeft: 6,
               fontSize: 10,
               fontWeight: 700,
               color: "var(--text-500)",
+              lineHeight: 1.3,
             }}
+            title={`Has played ${matchesPlayed} match${matchesPlayed === 1 ? "" : "es"} in this session`}
           >
-            ×{sessionMatchCountSwap}
-          </span>
+            🎾 {matchesPlayed} match{matchesPlayed === 1 ? "" : "es"}
+          </div>
         )}
-      </button>
+      </div>
+    );
+
+    // Edit/swap action affordance — a small pencil icon, no text label.
+    const action =
+      onEditSlot && match.status === "pending" ? (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onEditSlot(slot);
+          }}
+          aria-label={`Replace ${name}`}
+          title={`Replace ${name}`}
+          style={{
+            flexShrink: 0,
+            display: "grid",
+            placeItems: "center",
+            width: 28,
+            height: 28,
+            borderRadius: "var(--r-full)",
+            background: "var(--primary-50)",
+            color: "var(--primary-700)",
+            border: "1px solid var(--primary-100)",
+            cursor: "pointer",
+          }}
+        >
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4z" />
+          </svg>
+        </button>
+      ) : null;
+
+    // Whole row is clickable in the legacy swap-mode path
+    if (swapEnabled) {
+      return (
+        <button
+          type="button"
+          onClick={() =>
+            swap!.handleTap({
+              matchId: match.id,
+              slot,
+              participantId: pid,
+              name,
+            })
+          }
+          disabled={swap!.isPending}
+          title="Tap to swap players"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            padding: "4px 6px",
+            borderRadius: "var(--r-md)",
+            background: isSelected ? "var(--primary-50)" : "transparent",
+            border: isSelected
+              ? "1.5px dashed var(--primary)"
+              : "1.5px dashed transparent",
+            width: "100%",
+            cursor: swap!.isPending ? "wait" : "pointer",
+            fontFamily: "inherit",
+            textAlign: "left",
+          }}
+        >
+          {avatar}
+          {nameBlock}
+        </button>
+      );
+    }
+
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          minWidth: 0,
+        }}
+      >
+        {avatar}
+        {nameBlock}
+        {action}
+      </div>
     );
   }
 
@@ -768,7 +748,15 @@ function TeamRow({
           gap: "var(--s-3)",
         }}
       >
-        <div style={{ minWidth: 0, flex: 1 }}>
+        <div
+          style={{
+            minWidth: 0,
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+          }}
+        >
           <PlayerName idx={0} />
           <PlayerName idx={1} />
           {won && (
@@ -885,6 +873,49 @@ function TeamRow({
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+// Sprint 53: small avatar circle for match card. Falls back to initial when
+// no avatarUrl. Optional ring color = subtle highlight (used by swap mode).
+function Avatar({
+  url,
+  name,
+  size = 28,
+  ring,
+}: {
+  url: string | null;
+  name: string;
+  size?: number;
+  ring?: string;
+}) {
+  const initial = (name?.trim()?.[0] ?? "?").toUpperCase();
+  return (
+    <div
+      style={{
+        flexShrink: 0,
+        width: size,
+        height: size,
+        borderRadius: "50%",
+        background: url
+          ? `url(${url}) center/cover no-repeat`
+          : "linear-gradient(135deg, var(--primary-300), var(--primary-600))",
+        color: "#fff",
+        display: "grid",
+        placeItems: "center",
+        fontFamily: "var(--font-display)",
+        fontWeight: 800,
+        fontSize: Math.round(size * 0.42),
+        boxShadow: "var(--shadow-sm)",
+        border: ring ? `2px solid ${ring}` : "1.5px solid var(--bg)",
+        outline: ring
+          ? `1px solid ${ring}`
+          : "1px solid var(--border-light)",
+      }}
+      aria-hidden
+    >
+      {!url && initial}
     </div>
   );
 }

@@ -11,6 +11,7 @@ type Participant = {
   guestName: string | null;
   isPlaying: boolean;
   userDisplayName: string | null;
+  userAvatarUrl?: string | null;
   /** Sprint 53: total matches in this session so far (for "(N)" chip on match cards) */
   sessionMatches?: number;
 };
@@ -40,13 +41,19 @@ export async function MatchesSection({
   const lookup = participants.reduce<
     Record<
       string,
-      { name: string; isMember: boolean; sessionMatches: number }
+      {
+        name: string;
+        isMember: boolean;
+        avatarUrl: string | null;
+        sessionMatches: number;
+      }
     >
   >((acc, p) => {
     const name = p.guestName ?? p.userDisplayName ?? "?";
     acc[p.id] = {
       name,
       isMember: p.userId !== null,
+      avatarUrl: p.userAvatarUrl ?? null,
       sessionMatches: p.sessionMatches ?? 0,
     };
     return acc;
