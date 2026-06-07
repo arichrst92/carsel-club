@@ -88,7 +88,7 @@ export function ParticipantActions({
           disabled={isPending}
           variant={isPlaying ? "primary" : "muted"}
         >
-          {isPlaying ? "Bermain" : "Istirahat"}
+          {isPlaying ? "Playing" : "Resting"}
         </PillBtn>
 
         {canRemove && (
