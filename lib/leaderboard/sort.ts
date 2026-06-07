@@ -12,6 +12,10 @@ import type {
   RankedEntry,
 } from "./types";
 
+/**
+ * @deprecated Sprint 52: threshold dropped to keep ordering correct for small
+ * leaderboards. Kept exported for backwards compat with tests / unused calls.
+ */
 export const WINRATE_MIN_MATCHES = 5;
 
 /**
@@ -26,7 +30,7 @@ export function computeWinRate(wins: number, matches: number): number {
 /**
  * Sort metric value untuk given metric.
  * - point: totalPoints
- * - winrate: winRate (require ≥ WINRATE_MIN_MATCHES, else -1 to sink)
+ * - winrate: winRate (Sprint 52 — no threshold, raw value)
  * - match: totalMatches
  */
 export function getSortValue(
@@ -35,12 +39,34 @@ export function getSortValue(
 ): number {
   if (sort === "point") return row.totalPoints;
   if (sort === "match") return row.totalMatches;
-  // winrate
-  return row.totalMatches >= WINRATE_MIN_MATCHES ? row.winRate : -1;
+  // winrate — Sprint 52: drop ≥5-matches threshold. With small communities
+  // (2–4 players, all <5 matches) it forced everyone to sort value -1,
+  // making rank order alphabetical by UUID — i.e. 0% WR ahead of 100% WR.
+  // Now the secondary tie-break (totalMatches DESC) handles the credibility
+  // angle: 100% WR with more matches beats 100% WR with fewer.
+  return row.winRate;
 }
 
 /**
- * Sort + assign ranks. Stable order untuk same-value rows via id asc.
+ * Tie-break metric — used when primary sort value ties.
+ * Mirrors session-leaderboard logic (Sprint 50):
+ * - point + winrate → tie-break by totalMatches DESC
+ *   (sample size strengthens credibility for both)
+ * - match → tie-break by totalPoints DESC
+ */
+function getTieBreakValue(
+  row: LeaderboardEntry,
+  sort: LeaderboardSort
+): number {
+  if (sort === "match") return row.totalPoints;
+  return row.totalMatches;
+}
+
+/**
+ * Sort + assign ranks. Smart tie-breaks:
+ *   1. Primary metric DESC
+ *   2. Complementary metric DESC (matches for point/winrate, points for match)
+ *   3. Alphabetical by displayName (then id) for fully-tied rows
  */
 export function sortAndRank(
   entries: LeaderboardEntry[],
@@ -48,8 +74,12 @@ export function sortAndRank(
 ): RankedEntry[] {
   const copy = entries.map((e) => ({ ...e }));
   copy.sort((a, b) => {
-    const diff = getSortValue(b, sort) - getSortValue(a, sort);
-    if (diff !== 0) return diff;
+    const primary = getSortValue(b, sort) - getSortValue(a, sort);
+    if (primary !== 0) return primary;
+    const tie = getTieBreakValue(b, sort) - getTieBreakValue(a, sort);
+    if (tie !== 0) return tie;
+    const byName = a.displayName.localeCompare(b.displayName);
+    if (byName !== 0) return byName;
     return a.id.localeCompare(b.id);
   });
   return copy.map((e, i) => ({ ...e, rank: i + 1 }));

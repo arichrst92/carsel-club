@@ -54,19 +54,36 @@ describe("getSortValue", () => {
     expect(getSortValue(make("a", { totalMatches: 42 }), "match")).toBe(42);
   });
 
-  it("winrate requires min matches", () => {
+  it("winrate returns raw value (Sprint 52: no threshold)", () => {
+    // Pre-Sprint 52 this returned -1 for < 5 matches, which made
+    // 0% WR rank ahead of 100% WR alphabetically by UUID on small
+    // leaderboards. Now returns raw winRate; tie-break by matches DESC
+    // handles credibility.
     const high = make("a", {
       totalMatches: 1,
       totalWins: 1,
       winRate: 100,
     });
-    expect(getSortValue(high, "winrate")).toBe(-1);
+    expect(getSortValue(high, "winrate")).toBe(100);
     const ok = make("b", {
       totalMatches: WINRATE_MIN_MATCHES,
       totalWins: 4,
       winRate: 80,
     });
     expect(getSortValue(ok, "winrate")).toBe(80);
+  });
+
+  it("winrate sort: 100% WR ranks above 0% WR regardless of match count", () => {
+    const list = [
+      make("low0", { totalMatches: 1, totalWins: 0, winRate: 0 }),
+      make("low100", { totalMatches: 1, totalWins: 1, winRate: 100 }),
+      make("zero0", { totalMatches: 3, totalWins: 0, winRate: 0 }),
+    ];
+    const r = sortAndRank(list, "winrate");
+    expect(r[0].id).toBe("low100");
+    // both 0% — credibility tie-break by totalMatches DESC
+    expect(r[1].id).toBe("zero0");
+    expect(r[2].id).toBe("low0");
   });
 });
 
@@ -143,7 +160,11 @@ describe("sortAndRank", () => {
     expect(r.map((x) => x.id)).toEqual(["b", "c", "a"]);
   });
 
-  it("winrate sort respects min matches", () => {
+  it("winrate sort: higher WR wins regardless of match count (Sprint 52)", () => {
+    // Pre-Sprint 52 the ≥5-matches threshold pushed `a` below `b`. The user
+    // expectation on small leaderboards is the opposite: 100% WR > 60% WR.
+    // Credibility is preserved via the tie-break (matches DESC) when winRate
+    // ties; see test above.
     const list = [
       make("a", {
         totalPoints: 1,
@@ -159,8 +180,8 @@ describe("sortAndRank", () => {
       }),
     ];
     const r = sortAndRank(list, "winrate");
-    expect(r[0].id).toBe("b");
-    expect(r[1].id).toBe("a");
+    expect(r[0].id).toBe("a");
+    expect(r[1].id).toBe("b");
   });
 
   it("returns cloned entries (no mutation)", () => {
