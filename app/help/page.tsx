@@ -87,7 +87,7 @@ const FAQ_SECTIONS: { title: string; items: { q: string; a: string }[] }[] = [
         a: "Tier mengikuti stats riil. Setelah recompute via revert/edit, tier akan adjust juga (bisa naik atau turun).",
       },
       {
-        q: "Achievement apa saja yang ada?",
+        q: "Pencapaian apa saja yang ada?",
         a: "Total 15+ badge: milestone match, win count, host count, streak, tier, perfect day, hot session. Lihat lengkap di Profile → Achievements.",
       },
       {

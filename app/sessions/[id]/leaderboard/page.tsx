@@ -202,7 +202,7 @@ export default async function SessionLeaderboardPage({
             current={sort}
             target="point"
             emoji="🏆"
-            label="Point"
+            label="Poin"
             sub="Total poin"
           />
           <SortTab
@@ -210,7 +210,7 @@ export default async function SessionLeaderboardPage({
             current={sort}
             target="winrate"
             emoji="📈"
-            label="Win Rate"
+            label="Tingkat Menang"
             sub="% menang"
           />
           <SortTab

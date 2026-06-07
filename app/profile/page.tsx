@@ -306,7 +306,7 @@ export default async function ProfilePage() {
         {/* TIER JOURNEY */}
         <section>
           <div className="section-head">
-            <h3>Tier Journey</h3>
+            <h3>Perjalanan Tier</h3>
           </div>
           <div
             style={{
@@ -528,7 +528,7 @@ export default async function ProfilePage() {
         {/* RECENT MATCHES */}
         <section>
           <div className="section-head">
-            <h3>Recent Matches</h3>
+            <h3>Pertandingan Terbaru</h3>
             <Link href="/profile/matches" className="section-link">
               View All
             </Link>
@@ -768,7 +768,7 @@ function ProfileAchievements({
     <section>
       <div className="section-head">
         <h3>
-          Achievements{" "}
+          Pencapaian{" "}
           <span
             style={{
               color: "var(--text-500)",

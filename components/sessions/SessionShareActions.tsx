@@ -69,8 +69,8 @@ export function SessionShareActions({
     text += `⏰ ${timeStr}\n`;
     if (venueName) text += `📍 ${venueName}\n`;
     if (hostName) text += `👤 Host: ${hostName}\n`;
-    text += `\n🔗 Live score & info:\n${liveUrl}\n`;
-    text += `\nJoin via Carsel Club ⚡`;
+    text += `\n🔗 Skor live & info:\n${liveUrl}\n`;
+    text += `\nGabung via Carsel Club ⚡`;
     return text;
   }
 
@@ -89,7 +89,7 @@ export function SessionShareActions({
       setTimeout(() => setCopied(false), 2000);
     } catch (e) {
       console.error("Failed to copy:", e);
-      setError("Gagal copy link. Coba lagi.");
+      setError("Gagal salin tautan. Coba lagi.");
     }
   }
 
@@ -153,7 +153,7 @@ export function SessionShareActions({
       if ((e as Error).name !== "AbortError") {
         console.error("Share card failed:", e);
         setError(
-          `Gagal generate share card. ${(e as Error).message || "Coba lagi."}`
+          `Gagal membuat kartu sesi. ${(e as Error).message || "Coba lagi."}`
         );
       }
     } finally {
@@ -188,7 +188,7 @@ export function SessionShareActions({
           </svg>
         </div>
         <div className="qa-title">
-          {downloading ? "Generating…" : "Share Story Card"}
+          {downloading ? "Membuat…" : "Bagikan Kartu Sesi"}
         </div>
         <div className="qa-sub">Sampul + papan peringkat utk IG/WA</div>
       </button>

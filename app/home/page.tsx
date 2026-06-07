@@ -188,7 +188,7 @@ export default async function HomePage() {
         {nextSession && (
           <section>
             <div className="section-head">
-              <h3>Session Berikutnya</h3>
+              <h3>Sesi Berikutnya</h3>
               <Link href="/sessions" className="section-link">
                 Lihat Semua
               </Link>
@@ -269,7 +269,7 @@ export default async function HomePage() {
         {/* RECENT ACTIVITY */}
         <section>
           <div className="section-head">
-            <h3>Recent Matches</h3>
+            <h3>Pertandingan Terbaru</h3>
           </div>
           {recent.length === 0 ? (
             <div

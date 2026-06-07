@@ -245,7 +245,7 @@ export default async function PublicProfilePage({ params }: Props) {
           }}
         >
           <Stat label="Total Pts" value={profile.totalPoints} />
-          <Stat label="Win Rate" value={`${wr}%`} />
+          <Stat label="Tingkat Menang" value={`${wr}%`} />
           <Stat label="Matches" value={profile.totalMatches} />
         </section>
 

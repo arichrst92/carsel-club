@@ -248,7 +248,7 @@ export function CreateSessionForm() {
             {step === TOTAL_STEPS
               ? isPending
                 ? "Creating..."
-                : "Create Session"
+                : "Buat Sesi"
               : "Lanjut"}
           </span>
           {step !== TOTAL_STEPS && (
@@ -981,7 +981,7 @@ function Step5Review({
             <div className="review-value">
               {data.visibility === "public"
                 ? "🌍 Public — discoverable"
-                : "🔒 Private — invite only"}
+                : "🔒 Privat — undangan saja"}
             </div>
             <div className="review-value-list" style={{ marginTop: 4 }}>
               <span>

@@ -21,7 +21,7 @@ type Props = {
 };
 
 const STATUS_PILL: Record<string, { label: string; cls: string }> = {
-  upcoming: { label: "Upcoming", cls: "upcoming" },
+  upcoming: { label: "Mendatang", cls: "upcoming" },
   live: { label: "🔴 LIVE", cls: "live" },
   completed: { label: "Selesai", cls: "past" },
   cancelled: { label: "Dibatalkan", cls: "past" },
