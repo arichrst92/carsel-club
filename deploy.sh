@@ -128,8 +128,15 @@ ssh "$VPS_HOST" bash -se <<EOSSH
 set -euo pipefail
 cd $VPS_PATH
 
-echo "▶ git pull"
-git pull origin $CURRENT_BRANCH
+echo "▶ sync to origin/$CURRENT_BRANCH (hard reset — VPS is deploy-only, no local work)"
+# Why hard-reset instead of plain pull: when 'npm ci' falls back to 'npm install'
+# (e.g. transient network blip or peer-dep change), npm mutates package-lock.json
+# in-place. The next deploy's 'git pull' then fails with
+# "local changes would be overwritten". Since the VPS is purely a deploy target
+# and never holds work-in-progress, force-aligning to remote is correct & safe.
+# node_modules and .next are gitignored, so reset doesn't touch them.
+git fetch origin $CURRENT_BRANCH
+git reset --hard origin/$CURRENT_BRANCH
 
 echo "▶ npm ci"
 npm ci --silent || npm install --silent

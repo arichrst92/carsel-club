@@ -8,6 +8,7 @@ import {
 } from "@/app/actions/avatar";
 import { Toast } from "@/components/ui/Toast";
 import { compressImageClient } from "@/lib/image/compress-client";
+import { ImageCropModal } from "@/components/ui/ImageCropModal";
 
 type Props = {
   currentAvatarUrl: string | null;
@@ -20,19 +21,23 @@ export function AvatarUploader({ currentAvatarUrl, initial }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  // Sprint 52: pick file → buka crop modal dulu sebelum upload
+  const [pickedFile, setPickedFile] = useState<File | null>(null);
 
-  function onFileSelect(file: File) {
+  async function uploadCroppedFile(croppedFile: File) {
     setError(null);
     setSuccess(null);
 
-    // Optimistic preview (data URL)
+    // Optimistic preview from the cropped file
     const reader = new FileReader();
     reader.onload = (e) => setPreview(String(e.target?.result ?? ""));
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(croppedFile);
+
+    setPickedFile(null);
 
     startTransition(async () => {
-      // Sprint 48: compress dulu — avatar cukup 800px square
-      const compressed = await compressImageClient(file, { maxSide: 800 });
+      // Crop sudah square 800. Compress untuk re-encode.
+      const compressed = await compressImageClient(croppedFile, { maxSide: 800 });
       const fd = new FormData();
       fd.set("file", compressed);
       const result = await updateAvatarAction(null, fd);
@@ -49,7 +54,7 @@ export function AvatarUploader({ currentAvatarUrl, initial }: Props) {
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (file) onFileSelect(file);
+    if (file) setPickedFile(file); // open crop modal
     e.target.value = "";
   }
 
@@ -70,6 +75,21 @@ export function AvatarUploader({ currentAvatarUrl, initial }: Props) {
 
   return (
     <>
+      {/* Crop modal — Sprint 52 — square 1:1 for avatar */}
+      {pickedFile && (
+        <ImageCropModal
+          file={pickedFile}
+          aspectRatio={1}
+          outputWidth={800}
+          circular
+          title="Crop your photo"
+          description="Drag and zoom to position. The visible circle is what your friends will see."
+          outputSuffix="avatar"
+          onConfirm={uploadCroppedFile}
+          onCancel={() => setPickedFile(null)}
+        />
+      )}
+
       <Toast message={error} onDismiss={() => setError(null)} />
       <Toast
         message={success}
@@ -209,7 +229,7 @@ export function AvatarUploader({ currentAvatarUrl, initial }: Props) {
             maxWidth: 240,
           }}
         >
-          Photo will be auto-cropped square (1:1) and compressed for performance.
+          Crop your photo to fit a perfect circle before saving.
         </div>
       </div>
     </>

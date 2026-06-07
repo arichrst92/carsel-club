@@ -28,6 +28,14 @@ type Props = {
   outputWidth?: number;
   /** JPEG quality 0-1. Default 0.88. */
   quality?: number;
+  /** Modal title (default "Crop photo") */
+  title?: string;
+  /** Subtitle below title (default depends on aspect ratio) */
+  description?: string;
+  /** Round preview shape (for avatar crop). Default false. */
+  circular?: boolean;
+  /** Override the suffix added to the cropped filename. Default "cover" or "avatar" based on circular. */
+  outputSuffix?: string;
   onConfirm: (croppedFile: File) => void | Promise<void>;
   onCancel: () => void;
 };
@@ -37,6 +45,10 @@ export function ImageCropModal({
   aspectRatio = 2,
   outputWidth = 1600,
   quality = 0.88,
+  title,
+  description,
+  circular = false,
+  outputSuffix,
   onConfirm,
   onCancel,
 }: Props) {
@@ -49,9 +61,22 @@ export function ImageCropModal({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Preview area: max 360 wide (fit phone narrow), match aspect ratio
-  const PREVIEW_W = 360;
+  // Preview area: max 360 wide (fit phone narrow), match aspect ratio.
+  // For circular (square 1:1) crop, cap at 280 so the round preview fits
+  // comfortably in narrow viewports without forcing horizontal scroll.
+  const PREVIEW_W = circular ? 280 : 360;
   const PREVIEW_H = Math.round(PREVIEW_W / aspectRatio);
+  const ratioLabel =
+    aspectRatio === 1
+      ? "1:1"
+      : aspectRatio === 2
+        ? "2:1"
+        : `${aspectRatio.toFixed(2)}:1`;
+  const resolvedTitle = title ?? "Crop photo";
+  const resolvedDescription =
+    description ??
+    `Drag and zoom to choose the part. Aspect ratio ${ratioLabel}.`;
+  const resolvedSuffix = outputSuffix ?? (circular ? "avatar" : "cover");
 
   // Drag state
   const dragRef = useRef<{ active: boolean; startX: number; startY: number; baseX: number; baseY: number }>(
@@ -72,7 +97,7 @@ export function ImageCropModal({
       requestAnimationFrame(draw);
     };
     img.onerror = () => {
-      setError("Gagal load gambar");
+      setError("Failed to load image");
       setLoading(false);
     };
     img.src = url;
@@ -183,14 +208,14 @@ export function ImageCropModal({
       if (!blob) throw new Error("Toblob null");
 
       const base = file.name.replace(/\.[^./\\]+$/, "");
-      const croppedFile = new File([blob], `${base}-cover.jpg`, {
+      const croppedFile = new File([blob], `${base}-${resolvedSuffix}.jpg`, {
         type: "image/jpeg",
         lastModified: Date.now(),
       });
       await onConfirm(croppedFile);
     } catch (e) {
       console.error("[ImageCropModal] confirm failed:", e);
-      setError(e instanceof Error ? e.message : "Crop gagal");
+      setError(e instanceof Error ? e.message : "Crop failed");
       setConfirming(false);
     }
   }
@@ -229,7 +254,7 @@ export function ImageCropModal({
             color: "var(--text-900)",
           }}
         >
-          Crop foto cover
+          {resolvedTitle}
         </div>
         <div
           style={{
@@ -239,7 +264,7 @@ export function ImageCropModal({
             marginBottom: 12,
           }}
         >
-          Geser foto + zoom utk pilih bagian. Aspect rasio 2:1.
+          {resolvedDescription}
         </div>
 
         {/* Crop area */}
@@ -249,10 +274,11 @@ export function ImageCropModal({
             width: PREVIEW_W,
             maxWidth: "100%",
             margin: "0 auto",
-            borderRadius: 8,
+            borderRadius: circular ? "50%" : 8,
             overflow: "hidden",
             background: "#000",
             touchAction: "none",
+            aspectRatio: circular ? "1 / 1" : undefined,
           }}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
@@ -275,7 +301,7 @@ export function ImageCropModal({
                 fontWeight: 600,
               }}
             >
-              Memuat…
+              Loading…
             </div>
           )}
           {/* Frame overlay */}
@@ -284,6 +310,7 @@ export function ImageCropModal({
               position: "absolute",
               inset: 0,
               border: "2px solid rgba(255,255,255,0.9)",
+              borderRadius: circular ? "50%" : 0,
               pointerEvents: "none",
               boxShadow: "0 0 0 9999px rgba(0,0,0,0.35) inset",
             }}
@@ -350,7 +377,7 @@ export function ImageCropModal({
               cursor: confirming ? "not-allowed" : "pointer",
             }}
           >
-            Batal
+            Cancel
           </button>
           <button
             type="button"
@@ -371,7 +398,7 @@ export function ImageCropModal({
               opacity: confirming || loading ? 0.6 : 1,
             }}
           >
-            {confirming ? "Mengunggah…" : "Pakai foto"}
+            {confirming ? "Uploading…" : "Use photo"}
           </button>
         </div>
       </div>
