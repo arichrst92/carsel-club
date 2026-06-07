@@ -9,6 +9,7 @@ import {
   editCompletedMatchScoreAction,
   startMatchAction,
   revertMatchAction,
+  deleteMatchAction,
 } from "@/app/actions/matches";
 import { ShareMatchButton } from "./ShareMatchButton";
 import { MatchTimer } from "./MatchTimer";
@@ -30,7 +31,12 @@ export type ReplaceContext = {
 
 type ParticipantLookup = Record<
   string,
-  { name: string; isMember: boolean }
+  {
+    name: string;
+    isMember: boolean;
+    /** Sprint 53: session match count, used for "(N)" chip next to name */
+    sessionMatches?: number;
+  }
 >;
 
 const STATUS_STYLES: Record<
@@ -255,6 +261,54 @@ export function MatchCard({
               <path d="M9 18l6-6-6-6" />
             </svg>
           </Link>
+          {/* Sprint 53: delete this match (staff + pending only) */}
+          {canManage && isPending_ && (
+            <button
+              type="button"
+              onClick={() => {
+                if (
+                  !confirm(
+                    `Delete this match (Court ${match.courtNumber})? Players will become sit-outs for this round.`
+                  )
+                )
+                  return;
+                startTransition(async () => {
+                  const result = await deleteMatchAction(match.id);
+                  if (result?.error) setError(result.error);
+                });
+              }}
+              disabled={isPending}
+              aria-label="Delete match"
+              title="Delete match"
+              style={{
+                display: "grid",
+                placeItems: "center",
+                width: 28,
+                height: 28,
+                borderRadius: "var(--r-full)",
+                background: "var(--accent-50)",
+                color: "var(--accent-600)",
+                border: "1px solid var(--accent-100)",
+                cursor: isPending ? "wait" : "pointer",
+              }}
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6" />
+                <path d="M10 11v6M14 11v6" />
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 
@@ -272,6 +326,7 @@ export function MatchCard({
         match={match}
         slotKeys={["team1P1Id", "team1P2Id"]}
         playerNames={team1Names}
+        lookup={lookup}
         onEditSlot={
           canManage && match.status === "pending" && replaceContext
             ? setReplaceSlot
@@ -316,6 +371,7 @@ export function MatchCard({
         match={match}
         slotKeys={["team2P1Id", "team2P2Id"]}
         playerNames={team2Names}
+        lookup={lookup}
         onEditSlot={
           canManage && match.status === "pending" && replaceContext
             ? setReplaceSlot
@@ -490,6 +546,7 @@ function TeamRow({
   match,
   slotKeys,
   playerNames,
+  lookup,
   onEditSlot,
 }: {
   names: string[];
@@ -504,12 +561,16 @@ function TeamRow({
   match: Match;
   slotKeys: [MatchSlotKey, MatchSlotKey];
   playerNames: [string, string];
+  lookup: ParticipantLookup;
   /** Sprint 53: when set, render an Edit chip on each player */
   onEditSlot?: (slot: MatchSlotKey) => void;
 }) {
   const swap = useMatchSwap();
-  // Sprint 15: swap-mode tap targets pada nama pemain (kalau match pending)
-  const swapEnabled = !!swap && swap.enabled && match.status === "pending";
+  // Sprint 15: swap-mode tap targets pada nama pemain (kalau match pending).
+  // Sprint 53: when the new Edit-chip flow is wired (onEditSlot provided),
+  // bypass the tap-to-swap path so the two UX don't conflict.
+  const swapEnabled =
+    !!swap && swap.enabled && match.status === "pending" && !onEditSlot;
 
   const slotIds: [string, string] = [
     match[slotKeys[0]],
@@ -526,6 +587,7 @@ function TeamRow({
     if (!swapEnabled) {
       // Sprint 53: when caller provides onEditSlot, render the Edit chip
       // next to the name. Clicking opens the replace-player modal.
+      const sessionMatchCount = lookup[pid]?.sessionMatches ?? 0;
       const nameNode = (
         <span
           style={{
@@ -546,6 +608,19 @@ function TeamRow({
           }}
         >
           {name}
+          {sessionMatchCount > 0 && (
+            <span
+              style={{
+                marginLeft: 6,
+                fontSize: 10,
+                fontWeight: 700,
+                color: "var(--text-500)",
+              }}
+              title={`Has played ${sessionMatchCount} match${sessionMatchCount === 1 ? "" : "es"} in this session`}
+            >
+              ×{sessionMatchCount}
+            </span>
+          )}
         </span>
       );
       if (!onEditSlot) {
@@ -567,6 +642,19 @@ function TeamRow({
             }}
           >
             {name}
+            {sessionMatchCount > 0 && (
+              <span
+                style={{
+                  marginLeft: 6,
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: "var(--text-500)",
+                }}
+                title={`Has played ${sessionMatchCount} match${sessionMatchCount === 1 ? "" : "es"} in this session`}
+              >
+                ×{sessionMatchCount}
+              </span>
+            )}
           </div>
         );
       }
@@ -610,6 +698,7 @@ function TeamRow({
       );
     }
 
+    const sessionMatchCountSwap = lookup[pid]?.sessionMatches ?? 0;
     return (
       <button
         type="button"
@@ -653,6 +742,18 @@ function TeamRow({
       >
         {isSelected && "✓ "}
         {name}
+        {sessionMatchCountSwap > 0 && (
+          <span
+            style={{
+              marginLeft: 6,
+              fontSize: 10,
+              fontWeight: 700,
+              color: "var(--text-500)",
+            }}
+          >
+            ×{sessionMatchCountSwap}
+          </span>
+        )}
       </button>
     );
   }

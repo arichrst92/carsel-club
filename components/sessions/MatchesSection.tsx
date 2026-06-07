@@ -3,6 +3,7 @@ import { MatchCard } from "./MatchCard";
 import { GenerateRoundButton } from "./GenerateRoundButton";
 import { RegenerateRoundButton } from "./RegenerateRoundButton";
 import { MatchSwapProvider } from "./MatchSwapProvider";
+import { DeleteRoundButton } from "./DeleteRoundButton";
 
 type Participant = {
   id: string;
@@ -10,6 +11,8 @@ type Participant = {
   guestName: string | null;
   isPlaying: boolean;
   userDisplayName: string | null;
+  /** Sprint 53: total matches in this session so far (for "(N)" chip on match cards) */
+  sessionMatches?: number;
 };
 
 type Props = {
@@ -35,10 +38,17 @@ export async function MatchesSection({
   const activeCount = participants.filter((p) => p.isPlaying).length;
 
   const lookup = participants.reduce<
-    Record<string, { name: string; isMember: boolean }>
+    Record<
+      string,
+      { name: string; isMember: boolean; sessionMatches: number }
+    >
   >((acc, p) => {
     const name = p.guestName ?? p.userDisplayName ?? "?";
-    acc[p.id] = { name, isMember: p.userId !== null };
+    acc[p.id] = {
+      name,
+      isMember: p.userId !== null,
+      sessionMatches: p.sessionMatches ?? 0,
+    };
     return acc;
   }, {});
 
@@ -83,6 +93,9 @@ export async function MatchesSection({
     );
   }
 
+  // Sprint 53: only the latest round may be deleted (avoid numbering gaps)
+  const lastRoundNumber = rounds.at(-1)?.roundNumber ?? 0;
+
   return (
     <MatchSwapProvider enabled={staff && !isTerminal}>
       {rounds.map((round) => {
@@ -125,6 +138,17 @@ export async function MatchesSection({
                     roundNumber={round.roundNumber}
                   />
                 )}
+                {/* Sprint 53: latest round only — server also enforces */}
+                {staff &&
+                  !isTerminal &&
+                  round.status === "pending" &&
+                  allPending &&
+                  round.roundNumber === lastRoundNumber && (
+                    <DeleteRoundButton
+                      roundSetId={round.id}
+                      roundNumber={round.roundNumber}
+                    />
+                  )}
                 <span
                   style={{
                     fontSize: 11,

@@ -7,7 +7,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { and, eq, inArray, ne } from "drizzle-orm";
+import { and, eq, inArray, ne, sql } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
   matches,
@@ -773,6 +773,143 @@ export async function setMatchPlayerAction(
 
   revalidatePath(`/sessions/${target.sessionId}`);
   revalidatePath(`/sessions/${target.sessionId}/matches`);
+  return null;
+}
+
+// ============================================================
+// Sprint 53: delete pending matches
+//
+// Two flavors:
+// - deleteMatchAction(matchId): drop a single match (e.g. host generated an
+//   extra court by accident). Pending only — live/completed matches have
+//   stats accrued onto participants that we'd have to reverse, so we refuse.
+// - deleteRoundAction(roundSetId): drop the entire round and all its matches.
+//   Guarded to only the LATEST round so round numbering doesn't get gaps,
+//   and only when every match in the round is pending.
+// ============================================================
+
+export async function deleteMatchAction(
+  matchId: string
+): Promise<{ error?: string } | null> {
+  const me = await getCurrentUser();
+  if (!me) redirect("/login");
+
+  const [target] = await db
+    .select({
+      id: matches.id,
+      status: matches.status,
+      matchRoundSetId: matches.matchRoundSetId,
+      sessionId: matchRoundSets.sessionId,
+    })
+    .from(matches)
+    .innerJoin(matchRoundSets, eq(matches.matchRoundSetId, matchRoundSets.id))
+    .where(eq(matches.id, matchId))
+    .limit(1);
+
+  if (!target) return { error: "Match not found" };
+
+  if (!(await isSessionStaff(target.sessionId, me.id))) {
+    return { error: "Only host/co-host can delete matches" };
+  }
+
+  if (target.status !== "pending") {
+    return {
+      error:
+        "Only matches that haven't started can be deleted. Revert it first.",
+    };
+  }
+
+  try {
+    await db.delete(matches).where(eq(matches.id, matchId));
+  } catch (e) {
+    console.error("[deleteMatchAction] error:", e);
+    return { error: "Failed to delete match. Try again." };
+  }
+
+  event("match_deleted", {
+    sessionId: target.sessionId,
+    matchId,
+    roundSetId: target.matchRoundSetId,
+  });
+
+  revalidatePath(`/sessions/${target.sessionId}`);
+  revalidatePath(`/sessions/${target.sessionId}/matches`);
+  return null;
+}
+
+export async function deleteRoundAction(
+  roundSetId: string
+): Promise<{ error?: string } | null> {
+  const me = await getCurrentUser();
+  if (!me) redirect("/login");
+
+  const [round] = await db
+    .select({
+      id: matchRoundSets.id,
+      sessionId: matchRoundSets.sessionId,
+      roundNumber: matchRoundSets.roundNumber,
+      status: matchRoundSets.status,
+    })
+    .from(matchRoundSets)
+    .where(eq(matchRoundSets.id, roundSetId))
+    .limit(1);
+
+  if (!round) return { error: "Round not found" };
+
+  if (!(await isSessionStaff(round.sessionId, me.id))) {
+    return { error: "Only host/co-host can delete rounds" };
+  }
+
+  // Must be the latest round to avoid numbering gaps
+  const [{ value: maxRoundNumber }] = await db
+    .select({
+      value: sql<number>`COALESCE(MAX(${matchRoundSets.roundNumber}), 0)::int`,
+    })
+    .from(matchRoundSets)
+    .where(eq(matchRoundSets.sessionId, round.sessionId));
+
+  if (round.roundNumber !== Number(maxRoundNumber)) {
+    return {
+      error:
+        "Only the latest round can be deleted. Delete newer rounds first.",
+    };
+  }
+
+  // All matches must be pending — never silently lose live/completed stats
+  const childMatches = await db
+    .select({ id: matches.id, status: matches.status })
+    .from(matches)
+    .where(eq(matches.matchRoundSetId, roundSetId));
+
+  const nonPending = childMatches.filter((m) => m.status !== "pending");
+  if (nonPending.length > 0) {
+    return {
+      error:
+        "Some matches in this round are live or completed. Revert or finish them first.",
+    };
+  }
+
+  try {
+    await db.transaction(async (tx) => {
+      await tx.delete(matches).where(eq(matches.matchRoundSetId, roundSetId));
+      await tx
+        .delete(matchRoundSets)
+        .where(eq(matchRoundSets.id, roundSetId));
+    });
+  } catch (e) {
+    console.error("[deleteRoundAction] error:", e);
+    return { error: "Failed to delete round. Try again." };
+  }
+
+  event("round_deleted", {
+    sessionId: round.sessionId,
+    roundSetId,
+    roundNumber: round.roundNumber,
+    matchesRemoved: childMatches.length,
+  });
+
+  revalidatePath(`/sessions/${round.sessionId}`);
+  revalidatePath(`/sessions/${round.sessionId}/matches`);
   return null;
 }
 

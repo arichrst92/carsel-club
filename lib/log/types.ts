@@ -23,6 +23,8 @@ export type EventName =
   | "round_regenerated" // Sprint 14
   | "match_swap" // Sprint 15
   | "match_player_set" // Sprint 53 — replace one player in a pending match
+  | "match_deleted" // Sprint 53 — single pending match deleted
+  | "round_deleted" // Sprint 53 — whole pending round deleted
   | "session_edited" // Sprint 18
   | "guest_joined" // Sprint 19
   | "join_requested" // Sprint 20
