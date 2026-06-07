@@ -62,6 +62,7 @@ const CreateSessionSchema = z.object({
   fixPartners: z.coerce.boolean().default(false),
   description: z.string().trim().max(500).optional(),
   hostIsPlaying: z.coerce.boolean().default(true),
+  joinPolicy: z.enum(["auto_join", "need_approval"]).optional(),
 });
 
 // ============================================================
@@ -93,6 +94,7 @@ export async function createSessionAction(
     fixPartners: formData.get("fix_partners") === "on",
     description: s("description"),
     hostIsPlaying: formData.get("host_is_playing") !== "off",
+    joinPolicy: s("join_policy"),
   };
 
   const parsed = CreateSessionSchema.safeParse(raw);
@@ -130,6 +132,11 @@ export async function createSessionAction(
           maxRounds: input.maxRounds ?? null,
           fixPartners: input.fixPartners,
           description: input.description || null,
+          // Sprint 52: persist join policy on create (was edit-only before)
+          joinPolicy:
+            input.visibility === "public"
+              ? (input.joinPolicy ?? "auto_join")
+              : "auto_join",
           format: input.format,
           // Sprint 44: playType section removed dari create form.
           // Hardcoded 'freeplay' — concept deprecated, tournament jadi

@@ -873,6 +873,7 @@ h4 { font-size: 15px; line-height: 1.4; }
 input[type="date"].form-input,
 input[type="time"].form-input,
 input[type="datetime-local"].form-input {
+  display: block;
   width: 100%;
   min-width: 0;
   max-width: 100%;
@@ -880,6 +881,34 @@ input[type="datetime-local"].form-input {
   -moz-appearance: none;
   appearance: none;
   box-sizing: border-box;
+}
+/* Sprint 52 v2: defeat WebKit's intrinsic content sizing on the inner
+   pseudo-elements. iOS Safari renders date/time value + calendar indicator
+   as flex children inside the input; their intrinsic widths can still push
+   the input wider than its grid cell even when min-width:0 is set on the
+   input itself. Force them to shrink-fit. */
+input[type="date"]::-webkit-date-and-time-value,
+input[type="time"]::-webkit-date-and-time-value,
+input[type="datetime-local"]::-webkit-date-and-time-value {
+  text-align: left;
+  min-width: 0;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  margin-left: 4px;
+  padding: 0;
+  flex-shrink: 0;
+}
+input[type="date"]::-webkit-datetime-edit,
+input[type="time"]::-webkit-datetime-edit,
+input[type="datetime-local"]::-webkit-datetime-edit {
+  min-width: 0;
+  padding: 0;
 }
 .input-with-icon {
   position: relative;
