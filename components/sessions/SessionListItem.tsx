@@ -52,10 +52,10 @@ function relativeLabel(d: Date): string {
   const now = new Date();
   const diffMs = d.getTime() - now.getTime();
   const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
-  if (diffDays === 0) return "Hari ini";
-  if (diffDays === 1) return "Besok";
-  if (diffDays > 1 && diffDays <= 14) return `${diffDays} hari`;
-  if (diffDays < 0 && diffDays >= -14) return `${-diffDays} hari lalu`;
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Tomorrow";
+  if (diffDays > 1 && diffDays <= 14) return `In ${diffDays}d`;
+  if (diffDays < 0 && diffDays >= -14) return `${-diffDays}d ago`;
   return "";
 }
 
@@ -154,7 +154,7 @@ export function SessionListItem({ session, participantInitials = [] }: Props) {
             ))}
           </div>
           <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-500)" }}>
-            {session.participantCount} pemain
+            {session.participantCount} players
           </span>
         </div>
       </div>

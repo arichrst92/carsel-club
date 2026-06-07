@@ -75,7 +75,7 @@ export function ReopenSessionButton({
         <span>
           {isPending
             ? "Reopening..."
-            : `Buka Ulang Sesi${hasRounds ? " (Live)" : ""}`}
+            : `Reopen Session${hasRounds ? " (Live)" : ""}`}
         </span>
       </button>
     </>

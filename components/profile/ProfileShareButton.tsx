@@ -32,7 +32,7 @@ export function ProfileShareButton({
     // text + url. WA fallback (wa.me) tetap perlu URL di text karena
     // tidak ada parameter url terpisah.
     const bodyText =
-      `🎾 *${displayName}* di Carsel Club${tierBit}\n` +
+      `🎾 *${displayName}* on Carsel Club${tierBit}\n` +
       `${totalPoints} pts\n\n` +
       `Padel community Indonesia ⚡`;
 
@@ -49,10 +49,10 @@ export function ProfileShareButton({
       }
     }
     // Fallback: WhatsApp share intent (URL inline karena param tunggal)
-    const waText = `${bodyText}\n\nLihat profile:\n${url}`;
+    const waText = `${bodyText}\n\nView profile:\n${url}`;
     const waUrl = `https://wa.me/?text=${encodeURIComponent(waText)}`;
     window.open(waUrl, "_blank", "noopener,noreferrer");
-    setToast("Membuka WhatsApp...");
+    setToast("Opening WhatsApp...");
   }
 
   return (

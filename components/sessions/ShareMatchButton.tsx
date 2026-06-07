@@ -33,11 +33,11 @@ function buildText({
   let text = `🎾 *Match Result · ${sessionTitle}*\n\n`;
 
   if (team1Score > team2Score) {
-    text += `🏆 *${team1}* menang ${team1Score} - ${team2Score} vs ${team2}\n`;
+    text += `🏆 *${team1}* won ${team1Score} - ${team2Score} vs ${team2}\n`;
   } else if (team2Score > team1Score) {
-    text += `🏆 *${team2}* menang ${team2Score} - ${team1Score} vs ${team1}\n`;
+    text += `🏆 *${team2}* won ${team2Score} - ${team1Score} vs ${team1}\n`;
   } else {
-    text += `🤝 *${team1}* seri ${team1Score} - ${team2Score} vs *${team2}*\n`;
+    text += `🤝 *${team1}* drew ${team1Score} - ${team2Score} vs *${team2}*\n`;
   }
 
   text += `\nvia Carsel Club ⚡`;

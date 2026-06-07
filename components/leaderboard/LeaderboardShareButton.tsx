@@ -39,8 +39,8 @@ export function LeaderboardShareButton(props: {
     // supaya tidak duplikat saat WhatsApp gabungkan text + url.
     const bodyText =
       `🏆 *Top 10 Padel Players ${scopeLabel}*\n` +
-      `Leaderboard ${periodLabel} di Carsel Club ⚡\n\n` +
-      `See who is on top — Indonesia padel community!`;
+      `Leaderboard ${periodLabel} on Carsel Club ⚡\n\n` +
+      `See who is on top — Indonesia's padel community!`;
 
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
@@ -50,8 +50,8 @@ export function LeaderboardShareButton(props: {
         // user cancelled or unsupported → fall to wa.me
       }
     }
-    // Fallback wa.me — URL inline di akhir
-    const waText = `${bodyText}\n\nLihat selengkapnya:\n${url}`;
+    // Fallback wa.me — URL inline at the end
+    const waText = `${bodyText}\n\nSee more:\n${url}`;
     window.open(
       `https://wa.me/?text=${encodeURIComponent(waText)}`,
       "_blank",
@@ -82,7 +82,7 @@ export function LeaderboardShareButton(props: {
         gap: "var(--s-1)",
       }}
     >
-      {copied ? "✓ Tersalin" : "🔗 Bagikan Top 10"}
+      {copied ? "✓ Copied" : "🔗 Share Top 10"}
     </button>
   );
 }

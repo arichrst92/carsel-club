@@ -91,13 +91,13 @@ export function ScanMemberButton({ sessionId }: Props) {
           <rect x="3" y="14" width="7" height="7" rx="1" />
           <path d="M14 14h3M20 14h1M14 17v3M14 21h7M21 17v4" />
         </svg>
-        Pindai QR Pemain
+        Scan Player QR
       </button>
 
       {open && (
         <QRScanModal
           title="Scan Player QR"
-          subtitle="Arahkan kamera ke QR Code di halaman Profil pemain. Pemain otomatis ditambahkan ke sesi."
+          subtitle="Point your camera at the QR code on the player's profile. They will be auto-added to the session."
           onScan={handleScan}
           onClose={() => setOpen(false)}
         />

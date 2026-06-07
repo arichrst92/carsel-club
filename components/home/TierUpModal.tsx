@@ -56,15 +56,15 @@ export function TierUpModal({
     // Sprint 50: body text TANPA URL — URL via param tunggal navigator.share.
     // Hindari duplikat saat WhatsApp gabung text + url.
     const bodyText =
-      `🎉 *Naik Tier!*\n\n` +
-      `${displayName} naik ke tier *${newTierName}* ${emoji}\n` +
-      `${totalPoints} poin · ${totalMatches} pertandingan\n\n` +
+      `🎉 *Tier Up!*\n\n` +
+      `${displayName} reached *${newTierName}* tier ${emoji}\n` +
+      `${totalPoints} pts · ${totalMatches} matches\n\n` +
       `via Carsel Club ⚡`;
 
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
-          title: `Naik Tier! ${newTierName}`,
+          title: `Tier Up! ${newTierName}`,
           text: bodyText,
           url,
         });
@@ -77,8 +77,8 @@ export function TierUpModal({
         }
       }
     }
-    // Fallback wa.me — URL inline di akhir
-    const waText = `${bodyText}\n\nLihat profil:\n${url}`;
+    // Fallback wa.me — URL inline at the end
+    const waText = `${bodyText}\n\nView profile:\n${url}`;
     window.open(
       `https://wa.me/?text=${encodeURIComponent(waText)}`,
       "_blank",
