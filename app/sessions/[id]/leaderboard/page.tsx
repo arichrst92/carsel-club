@@ -234,7 +234,7 @@ export default async function SessionLeaderboardPage({
               fontWeight: 600,
             }}
           >
-            Belum ada pemain aktif di session ini.
+            Belum ada pemain aktif di sesi ini.
           </div>
         ) : (
           <section

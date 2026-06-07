@@ -45,7 +45,7 @@ export function CoverPhotoUploader({ sessionId, currentCoverUrl }: Props) {
         setPreview(currentCoverUrl);
       } else if (result?.coverPhotoUrl) {
         setPreview(result.coverPhotoUrl);
-        setSuccess(result.success ?? "Cover updated!");
+        setSuccess(result.success ?? "Cover berhasil diubah!");
         router.refresh();
       }
     });

@@ -6,7 +6,7 @@ import { BottomNav } from "@/components/nav/BottomNav";
 import { formatDate, formatTimeRange } from "@/lib/utils";
 
 export const metadata = {
-  title: "Find Session",
+  title: "Cari Sesi",
 };
 
 type PageProps = {
@@ -63,10 +63,10 @@ export default async function FindSessionPage({ searchParams }: PageProps) {
               marginBottom: 2,
             }}
           >
-            Find Public Sessions
+            Cari Sesi Publik
           </div>
           <div style={{ fontSize: 12, opacity: 0.85, fontWeight: 600 }}>
-            {allSessions.length} session aktif di Indonesia
+            {allSessions.length} sesi aktif di Indonesia
           </div>
         </section>
 
@@ -106,12 +106,12 @@ export default async function FindSessionPage({ searchParams }: PageProps) {
             <div className="empty-state">
               <div className="empty-state-icon">🔍</div>
               <div className="empty-state-title">
-                Tidak ada public session aktif
+                Belum ada sesi publik aktif
               </div>
               <div className="empty-state-text">
                 {cityFilter
-                  ? "Coba reset filter atau create session sendiri di kota kamu."
-                  : "Be the first — create public session untuk komunitas padel!"}
+                  ? "Coba reset filter atau buat sesi sendiri di kotamu."
+                  : "Jadi yang pertama — buat sesi publik untuk komunitas padel!"}
               </div>
               <Link
                 href="/sessions/new"
@@ -129,7 +129,7 @@ export default async function FindSessionPage({ searchParams }: PageProps) {
                   boxShadow: "var(--shadow-sm)",
                 }}
               >
-                + Create Public Session
+                + Buat Sesi Publik
               </Link>
             </div>
           ) : (
@@ -213,7 +213,7 @@ function PublicSessionCard({
       <div className="session-banner">
         <div className="session-banner-text">
           <div className="session-banner-tag">
-            🌍 {session.status === "live" ? "LIVE NOW" : "Public"}
+            🌍 {session.status === "live" ? "BERLANGSUNG" : "Publik"}
           </div>
           <div className="session-banner-title">{session.title}</div>
         </div>
@@ -315,7 +315,7 @@ function PublicSessionCard({
                 : "var(--primary-700)",
             }}
           >
-            {session.isAlreadyMember ? "✓ Joined" : "Tap to view →"}
+            {session.isAlreadyMember ? "✓ Sudah Gabung" : "Lihat detail →"}
           </span>
         </div>
       </div>

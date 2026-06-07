@@ -72,7 +72,7 @@ export default async function AdminUserDetailPage({
             label="Created"
             value={u.createdAt.toISOString().slice(0, 10)}
           />
-          <Field label="Admin?" value={u.isAdmin ? "Yes" : "No"} />
+          <Field label="Admin?" value={u.isAdmin ? "Ya" : "Tidak"} />
         </section>
 
         <section

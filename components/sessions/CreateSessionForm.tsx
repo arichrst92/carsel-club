@@ -78,7 +78,7 @@ export function CreateSessionForm() {
   }
 
   function validateStep(s: number): string | null {
-    if (s === 1 && !data.name.trim()) return "Nama session wajib diisi";
+    if (s === 1 && !data.name.trim()) return "Nama sesi wajib diisi";
     if (s === 2) {
       if (!data.venueName.trim()) return "Venue wajib diisi";
       if (!data.date) return "Tanggal wajib diisi";
@@ -157,7 +157,7 @@ export function CreateSessionForm() {
         <section className="wizard-progress">
           <div className="wizard-progress-meta">
             <span className="wizard-step-label">
-              Step {step} of {TOTAL_STEPS}
+              Langkah {step} dari {TOTAL_STEPS}
             </span>
             <span
               className="wizard-step-label"
@@ -231,7 +231,7 @@ export function CreateSessionForm() {
             >
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
-            <span>Back</span>
+            <span>Kembali</span>
           </button>
         ) : (
           <Link href="/sessions" className="btn-secondary-lg">
@@ -249,7 +249,7 @@ export function CreateSessionForm() {
               ? isPending
                 ? "Creating..."
                 : "Create Session"
-              : "Next"}
+              : "Lanjut"}
           </span>
           {step !== TOTAL_STEPS && (
             <svg

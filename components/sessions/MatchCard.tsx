@@ -26,7 +26,7 @@ const STATUS_STYLES: Record<
   { label: string; color: string; bg: string }
 > = {
   pending: {
-    label: "Pending",
+    label: "Menunggu",
     color: "var(--text-500)",
     bg: "var(--bg-soft)",
   },
@@ -118,7 +118,7 @@ export function MatchCard({
   function handleRevert() {
     if (
       !confirm(
-        "Revert match ini ke LIVE?\n\nScores tetap, tapi stats yg sudah accrued akan di-reverse. Kamu bisa edit lagi setelah revert."
+        "Batalkan penyelesaian match ini?\n\nSkor tetap, statistik akan diputar mundur. Bisa diedit setelah itu."
       )
     )
       return;
@@ -130,7 +130,7 @@ export function MatchCard({
   }
 
   function handleEnd() {
-    if (!confirm(`End match dengan score ${t1} - ${t2}?`)) return;
+    if (!confirm(`Akhiri match dengan skor ${t1} - ${t2}?`)) return;
     setError(null);
     startTransition(async () => {
       const result = await endMatchAction(match.id, t1, t2);
@@ -323,7 +323,7 @@ export function MatchCard({
           >
             <path d="M5 3l14 9-14 9V3z" />
           </svg>
-          <span>{isPending ? "Memulai..." : "Start Game"}</span>
+          <span>{isPending ? "Memulai…" : "Mulai Match"}</span>
         </button>
       )}
 
@@ -340,7 +340,7 @@ export function MatchCard({
             width: "100%",
           }}
         >
-          {isPending ? "Saving..." : "End Match"}
+          {isPending ? "Menyimpan…" : "Akhiri Match"}
         </button>
       )}
 
@@ -363,7 +363,7 @@ export function MatchCard({
               cursor: "pointer",
             }}
           >
-            ✏️ Edit Score
+            ✏️ Ubah Skor
           </button>
           <button
             type="button"

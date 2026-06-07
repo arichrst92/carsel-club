@@ -38,7 +38,7 @@ export function FollowBlockActions({
         setError(result.error);
       } else {
         setFollowing(!following);
-        setSuccess(result?.success ?? "Done");
+        setSuccess(result?.success ?? "Selesai");
         router.refresh();
       }
     });
@@ -63,7 +63,7 @@ export function FollowBlockActions({
       } else {
         setBlocked(!blocked);
         if (!blocked) setFollowing(false);
-        setSuccess(result?.success ?? "Done");
+        setSuccess(result?.success ?? "Selesai");
         router.refresh();
       }
     });

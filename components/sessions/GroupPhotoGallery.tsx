@@ -410,7 +410,7 @@ function Lightbox({
             onPrev();
           }}
           disabled={!hasPrev}
-          aria-label="Previous"
+          aria-label="Sebelumnya"
           style={{
             background: hasPrev ? "rgba(255,255,255,0.18)" : "transparent",
             color: "#fff",
@@ -435,7 +435,7 @@ function Lightbox({
             onNext();
           }}
           disabled={!hasNext}
-          aria-label="Next"
+          aria-label="Berikutnya"
           style={{
             background: hasNext ? "rgba(255,255,255,0.18)" : "transparent",
             color: "#fff",

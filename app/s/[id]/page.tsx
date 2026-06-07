@@ -329,7 +329,7 @@ export default async function PublicLiveView({ params }: PageProps) {
                 {currentRound.status === "completed"
                   ? "Selesai"
                   : currentRound.status === "in_progress"
-                    ? "Live"
+                    ? "Berlangsung"
                     : "Pending"}
               </span>
             </div>

@@ -190,9 +190,9 @@ export function OnboardingForm({
           <span>
             {step === TOTAL_STEPS
               ? isPending
-                ? "Menyimpan..."
+                ? "Menyimpan…"
                 : "Mulai Main"
-              : "Next"}
+              : "Lanjut"}
           </span>
           {!isPending && (
             <svg
@@ -459,7 +459,7 @@ function Step3Welcome({
 }) {
   return (
     <>
-      <h2 className="wizard-step-title">Welcome! 🎾</h2>
+      <h2 className="wizard-step-title">Selamat datang! 🎾</h2>
       <p
         style={{
           color: "var(--text-500)",

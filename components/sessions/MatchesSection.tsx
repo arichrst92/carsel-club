@@ -134,8 +134,8 @@ export async function MatchesSection({
                   {round.status === "completed"
                     ? "Selesai"
                     : round.status === "in_progress"
-                      ? "Live"
-                      : "Pending"}
+                      ? "Berlangsung"
+                      : "Menunggu"}
                 </span>
               </div>
             </div>
