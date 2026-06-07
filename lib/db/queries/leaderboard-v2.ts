@@ -12,7 +12,7 @@
  * - Pure helpers: lib/leaderboard/sort.ts + period.ts
  */
 
-import { and, eq, gte, isNotNull, sql } from "drizzle-orm";
+import { and, eq, gte, inArray, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
   users,
@@ -136,7 +136,7 @@ async function getPeriodEntries(
   // Step 2: read user rows
   const userIds = [...merged.keys()];
   const userConditions = [
-    sql`${users.id} = ANY(${userIds})`,
+    inArray(users.id, userIds),
     ...(city ? [eq(users.city, city)] : []),
   ];
   const userRows = await db

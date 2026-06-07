@@ -260,6 +260,8 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
           />
         </section>
 
+        {/* Podium only renders if there are at least 3 players. If fewer,
+            everyone goes into the list section below. */}
         {top3.length === 3 && (
           <section>
             <div className="section-head">
@@ -269,13 +271,19 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
           </section>
         )}
 
-        {rest.length > 0 && (
+        {/* When podium hidden (< 3 players), render all rows here. Otherwise
+            render only ranks 4+. */}
+        {rows.length > 0 && (
           <section>
             <div className="section-head">
-              <h3>Rank 4 – {rest[rest.length - 1].rank}</h3>
+              <h3>
+                {top3.length === 3
+                  ? `Rank 4 – ${rest[rest.length - 1]?.rank ?? 4}`
+                  : "Rankings"}
+              </h3>
             </div>
             <div className="leaderboard-list">
-              {rest.map((row) => (
+              {(top3.length === 3 ? rest : rows).map((row) => (
                 <LbItem
                   key={row.id}
                   row={row}

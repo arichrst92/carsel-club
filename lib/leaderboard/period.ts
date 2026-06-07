@@ -29,10 +29,10 @@ export function periodSinceDate(
 export function periodLabel(period: LeaderboardPeriod): string {
   switch (period) {
     case "all_time":
-      return "Sepanjang masa";
+      return "All-time";
     case "monthly":
-      return "30 hari terakhir";
+      return "Last 30 days";
     case "weekly":
-      return "7 hari terakhir";
+      return "Last 7 days";
   }
 }
