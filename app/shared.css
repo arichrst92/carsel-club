@@ -855,7 +855,25 @@ h4 { font-size: 15px; line-height: 1.4; }
   border-color: var(--primary);
   box-shadow: 0 0 0 3px var(--primary-100);
 }
-.form-row { display: grid; gap: var(--s-3); grid-template-columns: 1fr 1fr; }
+/* Sprint 52: use minmax(0, 1fr) instead of plain 1fr so date/time
+   inputs with iOS Safari intrinsic min-width can shrink to fit.
+   `1fr` resolves to `minmax(auto, 1fr)` where auto = content size,
+   which lets WebKit's UA min-width spill out of the grid cell.
+   `minmax(0, 1fr)` forces the column to shrink. */
+.form-row {
+  display: grid;
+  gap: var(--s-3);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-width: 0;
+}
+.form-row > .form-group { min-width: 0; }
+.form-row input[type="date"],
+.form-row input[type="time"] {
+  width: 100%;
+  min-width: 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
 .input-with-icon {
   position: relative;
 }

@@ -202,7 +202,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
             />
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div className="form-row">
             <div className="form-group">
               <label className="form-label">
                 Start Time <span className="req">*</span>

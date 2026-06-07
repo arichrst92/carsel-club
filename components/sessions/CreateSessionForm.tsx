@@ -912,7 +912,7 @@ function Step5Review({
       <div className="review-card">
         <div className="review-section">
           <div className="review-info">
-            <div className="review-label">Info Session</div>
+            <div className="review-label">Session Info</div>
             <div className="review-value">{data.name || "—"}</div>
             <div className="review-value-list" style={{ marginTop: 4 }}>
               <span>
@@ -952,8 +952,8 @@ function Step5Review({
               >
                 📍{" "}
                 {data.mapsUrl
-                  ? "Maps link tersedia"
-                  : "Maps link belum ditambahkan"}
+                  ? "Maps link added"
+                  : "Maps link not added"}
               </span>
             </div>
           </div>
@@ -979,7 +979,7 @@ function Step5Review({
                   : `${data.roundCount} round (manual)`}
               </span>
               <span style={{ color: "var(--text-500)" }}>
-                No player limit · match end manual
+                No player limit · manual match end
               </span>
             </div>
           </div>
@@ -998,13 +998,13 @@ function Step5Review({
             <div className="review-value">
               {data.visibility === "public"
                 ? "🌍 Public — discoverable"
-                : "🔒 Privat — invite only"}
+                : "🔒 Private — invite only"}
             </div>
             <div className="review-value-list" style={{ marginTop: 4 }}>
               <span>
                 {data.hostIsPlaying
-                  ? "Host (kamu) ikut main"
-                  : "Host hanya organizer (tidak ikut main)"}
+                  ? "Host (you) playing"
+                  : "Host is organizer only (not playing)"}
               </span>
               <span style={{ color: "var(--text-500)" }}>No co-host yet</span>
             </div>
