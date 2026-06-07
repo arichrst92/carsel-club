@@ -71,7 +71,7 @@ export async function addFriendAction(
 
   const friendId = String(formData.get("friend_id") ?? "").trim();
   if (!friendId) return { error: "Friend ID invalid" };
-  if (friendId === me.id) return { error: "Tidak bisa add diri sendiri" };
+  if (friendId === me.id) return { error: "Cannot add yourself" };
 
   // Verify friend exists
   const [friend] = await db
@@ -79,7 +79,7 @@ export async function addFriendAction(
     .from(users)
     .where(eq(users.id, friendId))
     .limit(1);
-  if (!friend) return { error: "User tidak ditemukan" };
+  if (!friend) return { error: "User not found" };
 
   const [lo, hi] = canonicalPair(me.id, friendId);
 

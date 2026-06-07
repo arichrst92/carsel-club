@@ -331,7 +331,7 @@ export async function editSessionAction(
     await db.update(sessions).set(updates).where(eq(sessions.id, sessionId));
   } catch (e) {
     console.error("[editSessionAction] error:", e);
-    return { error: "Gagal simpan. Coba lagi." };
+    return { error: "Failed to save. Try again." };
   }
 
   event("session_edited", {

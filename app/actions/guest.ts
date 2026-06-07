@@ -53,7 +53,7 @@ export async function joinAsGuestAction(
     .from(sessions)
     .where(eq(sessions.id, sessionId))
     .limit(1);
-  if (!session) return { error: "Session tidak ditemukan" };
+  if (!session) return { error: "Session not found" };
   if (session.status === "cancelled" || session.status === "completed") {
     return { error: "Session sudah selesai/dibatalkan" };
   }
@@ -73,7 +73,7 @@ export async function joinAsGuestAction(
     participantId = inserted.id;
   } catch (e) {
     console.error("[joinAsGuestAction]", e);
-    return { error: "Gagal join sebagai guest. Coba lagi." };
+    return { error: "Failed to join as guest. Try again." };
   }
 
   await addGuestSession({ sessionId, participantId, name });

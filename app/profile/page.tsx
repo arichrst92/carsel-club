@@ -564,7 +564,7 @@ export default async function ProfilePage() {
                         ? "Menang"
                         : m.outcome === "draw"
                           ? "Seri"
-                          : "Kalah"}{" "}
+                          : "Loss"}{" "}
                       {m.myScore}-{m.oppScore}
                     </div>
                   </div>

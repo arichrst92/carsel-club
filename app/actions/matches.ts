@@ -64,7 +64,7 @@ export async function generateRoundAction(
     .where(eq(sessions.id, sessionId))
     .limit(1);
 
-  if (!session) return { error: "Session tidak ditemukan" };
+  if (!session) return { error: "Session not found" };
   if (session.status === "cancelled" || session.status === "completed") {
     return { error: "Session sudah selesai/dibatalkan" };
   }
@@ -317,7 +317,7 @@ export async function regenerateRoundAction(
     .from(sessions)
     .where(eq(sessions.id, round.sessionId))
     .limit(1);
-  if (!session) return { error: "Session tidak ditemukan" };
+  if (!session) return { error: "Session not found" };
 
   // Pair history dari rounds LAIN (exclude current round yang sedang
   // di-regenerate, supaya pasangan di round ini tidak jadi self-reference).

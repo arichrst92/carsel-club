@@ -52,7 +52,7 @@ export async function requestJoinAction(
     .where(eq(sessions.id, sessionId))
     .limit(1);
 
-  if (!session) return { error: "Session tidak ditemukan" };
+  if (!session) return { error: "Session not found" };
   if (session.visibility !== "public") {
     return { error: "Session ini private, hanya via invite link" };
   }
@@ -76,7 +76,7 @@ export async function requestJoinAction(
       )
     )
     .limit(1);
-  if (existing) return { error: "Kamu sudah join session ini" };
+  if (existing) return { error: "You already joined this session" };
 
   // Existing request?
   const [existingReq] = await db
@@ -165,7 +165,7 @@ export async function approveJoinRequestAction(
     .where(eq(sessionJoinRequests.id, requestId))
     .limit(1);
 
-  if (!req) return { error: "Request tidak ditemukan" };
+  if (!req) return { error: "Request not found" };
   if (!(await isSessionStaff(req.sessionId, me!.id))) {
     return { error: "Hanya host/co-host yang bisa approve" };
   }
@@ -246,7 +246,7 @@ export async function rejectJoinRequestAction(
     .where(eq(sessionJoinRequests.id, requestId))
     .limit(1);
 
-  if (!req) return { error: "Request tidak ditemukan" };
+  if (!req) return { error: "Request not found" };
   if (!(await isSessionStaff(req.sessionId, me!.id))) {
     return { error: "Hanya host/co-host yang bisa reject" };
   }

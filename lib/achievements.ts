@@ -39,7 +39,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     code: "first_match",
     name: "First Match",
-    description: "Selesaikan match pertama",
+    description: "Complete your first match",
     emoji: "🎾",
     category: "milestone",
     threshold: 1,
@@ -48,8 +48,8 @@ export const ACHIEVEMENTS: Achievement[] = [
   },
   {
     code: "matches_10",
-    name: "10 Match",
-    description: "Selesaikan 10 match",
+    name: "10 Matches",
+    description: "Complete 10 matches",
     emoji: "⚡",
     category: "milestone",
     threshold: 10,
@@ -58,8 +58,8 @@ export const ACHIEVEMENTS: Achievement[] = [
   },
   {
     code: "matches_50",
-    name: "50 Match",
-    description: "Selesaikan 50 match",
+    name: "50 Matches",
+    description: "Complete 50 matches",
     emoji: "🎯",
     category: "milestone",
     threshold: 50,
@@ -69,7 +69,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     code: "matches_100",
     name: "Centurion",
-    description: "100 match selesai",
+    description: "Complete 100 matches",
     emoji: "💯",
     category: "milestone",
     threshold: 100,
@@ -81,7 +81,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     code: "first_win",
     name: "First Win",
-    description: "Menang match pertama",
+    description: "Win your first match",
     emoji: "🏆",
     category: "milestone",
     threshold: 1,
@@ -91,7 +91,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     code: "wins_25",
     name: "25 Wins",
-    description: "Menang 25 match",
+    description: "Win 25 matches",
     emoji: "🔥",
     category: "milestone",
     threshold: 25,
@@ -101,7 +101,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     code: "wins_100",
     name: "Champion",
-    description: "Menang 100 match",
+    description: "Win 100 matches",
     emoji: "🌟",
     category: "milestone",
     threshold: 100,
@@ -113,7 +113,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     code: "tier_bronze",
     name: "Bronze Tier",
-    description: "Naik ke tier Bronze",
+    description: "Reach Bronze tier",
     emoji: "🥉",
     category: "tier",
     threshold: 2,
@@ -122,7 +122,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     code: "tier_silver",
     name: "Silver Tier",
-    description: "Naik ke tier Silver",
+    description: "Reach Silver tier",
     emoji: "🥈",
     category: "tier",
     threshold: 3,
@@ -131,7 +131,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     code: "tier_gold",
     name: "Gold Tier",
-    description: "Naik ke tier Gold",
+    description: "Reach Gold tier",
     emoji: "🥇",
     category: "tier",
     threshold: 4,
@@ -140,7 +140,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     code: "tier_platinum",
     name: "Platinum Tier",
-    description: "Naik ke tier Platinum",
+    description: "Reach Platinum tier",
     emoji: "💎",
     category: "tier",
     threshold: 5,
@@ -149,7 +149,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     code: "tier_master",
     name: "Master Tier",
-    description: "Naik ke tier Master (tier tertinggi!)",
+    description: "Reach Master tier (the highest!)",
     emoji: "👑",
     category: "tier",
     threshold: 6,
@@ -159,8 +159,8 @@ export const ACHIEVEMENTS: Achievement[] = [
   // ============ Host achievements ============
   {
     code: "hosted_first",
-    name: "Pertama Hosting",
-    description: "Buat session pertama",
+    name: "First Host",
+    description: "Create your first session",
     emoji: "🎪",
     category: "host",
     threshold: 1,
@@ -192,7 +192,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     code: "win_streak_3",
     name: "Streak 3",
-    description: "3 menang berturut-turut",
+    description: "3 wins in a row",
     emoji: "🔥",
     category: "streak",
     threshold: 3,
@@ -205,7 +205,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     code: "win_streak_5",
     name: "Streak 5",
-    description: "5 menang berturut-turut",
+    description: "5 wins in a row",
     emoji: "🚀",
     category: "streak",
     threshold: 5,
@@ -218,7 +218,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     code: "win_streak_10",
     name: "Unstoppable",
-    description: "10 menang berturut-turut",
+    description: "10 wins in a row",
     emoji: "⚡",
     category: "streak",
     threshold: 10,
@@ -231,7 +231,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     code: "perfect_day",
     name: "Perfect Day",
-    description: "Menang semua match dalam 1 session (≥3 match)",
+    description: "Win all matches in 1 session (≥3 matches)",
     emoji: "🌟",
     category: "streak",
     threshold: 3,
@@ -244,7 +244,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     code: "hot_session",
     name: "Hot Session",
-    description: "5 wins dalam satu session",
+    description: "5 wins in one session",
     emoji: "🌶️",
     category: "streak",
     threshold: 5,

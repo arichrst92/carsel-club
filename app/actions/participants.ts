@@ -102,7 +102,7 @@ export async function addMemberAction(
   const { sessionId, userId } = parsed.data;
 
   if (!(await isSessionStaff(sessionId, me.id))) {
-    return { error: "Hanya host/co-host yang bisa tambah pemain" };
+    return { error: "Only host/co-host can add players" };
   }
 
   // Pre-check duplicate (UNIQUE constraint would catch, but UX cleaner)
@@ -128,7 +128,7 @@ export async function addMemberAction(
     });
   } catch (e) {
     console.error("[addMemberAction]", e);
-    return { error: "Gagal tambah pemain. Coba lagi." };
+    return { error: "Failed to add player. Try again." };
   }
 
   // Sprint 25: notify invited user
@@ -193,7 +193,7 @@ export async function addGuestAction(
     });
   } catch (e) {
     console.error("[addGuestAction]", e);
-    return { error: "Gagal tambah guest." };
+    return { error: "Failed to add guest." };
   }
 
   revalidatePath(`/sessions/${sessionId}`);
@@ -213,7 +213,7 @@ export async function removeParticipantAction(
   if (!me) redirect("/login");
 
   if (!(await isSessionStaff(sessionId, me.id))) {
-    return { error: "Tidak punya akses" };
+    return { error: "No access" };
   }
 
   const [p] = await db
@@ -222,7 +222,7 @@ export async function removeParticipantAction(
     .where(eq(sessionParticipants.id, participantId))
     .limit(1);
 
-  if (!p) return { error: "Participant tidak ditemukan" };
+  if (!p) return { error: "Participant not found" };
   if (p.role === "host") return { error: "Host tidak bisa di-remove" };
 
   try {
@@ -231,7 +231,7 @@ export async function removeParticipantAction(
       .where(eq(sessionParticipants.id, participantId));
   } catch (e) {
     console.error("[removeParticipantAction]", e);
-    return { error: "Gagal remove pemain." };
+    return { error: "Failed to remove player." };
   }
 
   revalidatePath(`/sessions/${sessionId}`);
@@ -250,7 +250,7 @@ export async function toggleCohostAction(
   if (!me) redirect("/login");
 
   if (!(await isSessionStaff(sessionId, me.id))) {
-    return { error: "Tidak punya akses" };
+    return { error: "No access" };
   }
 
   const [p] = await db
@@ -262,7 +262,7 @@ export async function toggleCohostAction(
     .where(eq(sessionParticipants.id, participantId))
     .limit(1);
 
-  if (!p) return { error: "Participant tidak ditemukan" };
+  if (!p) return { error: "Participant not found" };
   if (p.role === "host") return { error: "Host gak perlu di-toggle" };
   if (p.role === "guest" || !p.userId) {
     return { error: "Guest tidak bisa jadi co-host" };
@@ -277,7 +277,7 @@ export async function toggleCohostAction(
       .where(eq(sessionParticipants.id, participantId));
   } catch (e) {
     console.error("[toggleCohostAction]", e);
-    return { error: "Gagal toggle co-host." };
+    return { error: "Failed to toggle co-host." };
   }
 
   revalidatePath(`/sessions/${sessionId}`);
@@ -296,7 +296,7 @@ export async function togglePlayingAction(
   if (!me) redirect("/login");
 
   if (!(await isSessionStaff(sessionId, me.id))) {
-    return { error: "Tidak punya akses" };
+    return { error: "No access" };
   }
 
   const [p] = await db
@@ -305,7 +305,7 @@ export async function togglePlayingAction(
     .where(eq(sessionParticipants.id, participantId))
     .limit(1);
 
-  if (!p) return { error: "Participant tidak ditemukan" };
+  if (!p) return { error: "Participant not found" };
 
   try {
     await db
@@ -314,7 +314,7 @@ export async function togglePlayingAction(
       .where(eq(sessionParticipants.id, participantId));
   } catch (e) {
     console.error("[togglePlayingAction]", e);
-    return { error: "Gagal toggle." };
+    return { error: "Failed to toggle." };
   }
 
   revalidatePath(`/sessions/${sessionId}`);

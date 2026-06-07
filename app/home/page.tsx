@@ -309,7 +309,7 @@ export default async function HomePage() {
                         ? "Menang"
                         : m.outcome === "draw"
                           ? "Seri"
-                          : "Kalah"}{" "}
+                          : "Loss"}{" "}
                       {m.myScore}-{m.oppScore}
                     </div>
                   </div>

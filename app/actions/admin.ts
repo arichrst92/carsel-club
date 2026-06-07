@@ -67,7 +67,7 @@ export async function recomputeUserStatsAction(
     .from(users)
     .where(eq(users.id, targetUserId))
     .limit(1);
-  if (!target) return { error: "User tidak ditemukan" };
+  if (!target) return { error: "User not found" };
 
   // Need outcomes ordered ascending by completion time for streak correctness
   const outcomes = await getUserMatchOutcomes(targetUserId);
@@ -107,7 +107,7 @@ export async function recomputeUserStatsAction(
       .where(eq(users.id, targetUserId));
   } catch (e) {
     console.error("[recomputeUserStatsAction]", e);
-    return { error: "Gagal update user stats" };
+    return { error: "Failed to update user stats" };
   }
 
   // Re-index achievements untuk catch any new ones from corrected stats

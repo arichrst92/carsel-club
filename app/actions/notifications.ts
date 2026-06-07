@@ -45,7 +45,7 @@ export async function markNotificationReadAction(
       );
   } catch (e) {
     console.error("[markNotificationReadAction]", e);
-    return { error: "Gagal mark read" };
+    return { error: "Failed to mark as read" };
   }
 
   revalidatePath("/notifications");
@@ -69,7 +69,7 @@ export async function markAllNotificationsReadAction(): Promise<ActionState> {
       );
   } catch (e) {
     console.error("[markAllNotificationsReadAction]", e);
-    return { error: "Gagal mark all read" };
+    return { error: "Failed to mark all as read" };
   }
 
   revalidatePath("/notifications");
@@ -161,7 +161,7 @@ export async function updateNotificationPrefsAction(
       });
   } catch (e) {
     console.error("[updateNotificationPrefsAction]", e);
-    return { error: "Gagal simpan prefs. Coba lagi." };
+    return { error: "Failed to save preferences. Try again." };
   }
 
   revalidatePath("/profile/settings/notifications");

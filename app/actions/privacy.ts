@@ -67,7 +67,7 @@ export async function updatePrivacyPrefsAction(
       .where(eq(users.id, me.id));
   } catch (e) {
     console.error("[updatePrivacyPrefsAction]", e);
-    return { error: "Gagal simpan. Coba lagi." };
+    return { error: "Failed to save. Try again." };
   }
 
   event("privacy_prefs_updated", {
@@ -117,7 +117,7 @@ export async function deleteAccountAction(
       .where(eq(users.id, me.id));
   } catch (e) {
     console.error("[deleteAccountAction]", e);
-    return { error: "Gagal hapus akun. Hubungi support." };
+    return { error: "Failed to delete account. Contact support." };
   }
 
   event("account_deleted", { userId: me.id });

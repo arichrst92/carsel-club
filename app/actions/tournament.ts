@@ -58,7 +58,7 @@ export async function generateBracketAction(
     .from(sessions)
     .where(eq(sessions.id, sessionId))
     .limit(1);
-  if (!session) return { error: "Session tidak ditemukan" };
+  if (!session) return { error: "Session not found" };
   if (session.format !== "tournament") {
     return { error: "Session ini bukan tournament format" };
   }
@@ -142,7 +142,7 @@ export async function generateBracketAction(
     });
   } catch (e) {
     console.error("[generateBracketAction]", e);
-    return { error: "Gagal generate bracket" };
+    return { error: "Failed to generate bracket" };
   }
 
   event("bracket_generated", {

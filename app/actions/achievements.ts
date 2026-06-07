@@ -35,7 +35,7 @@ export async function dismissAchievementAction(
       );
   } catch (e) {
     console.error("[dismissAchievementAction]", e);
-    return { error: "Gagal dismiss" };
+    return { error: "Failed to dismiss" };
   }
 
   revalidatePath("/home");
@@ -61,7 +61,7 @@ export async function dismissAllAchievementsAction(): Promise<
       );
   } catch (e) {
     console.error("[dismissAllAchievementsAction]", e);
-    return { error: "Gagal dismiss" };
+    return { error: "Failed to dismiss" };
   }
 
   revalidatePath("/home");

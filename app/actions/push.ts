@@ -58,7 +58,7 @@ export async function savePushSubscriptionAction(
       });
   } catch (e) {
     console.error("[savePushSubscriptionAction]", e);
-    return { error: "Gagal simpan subscription" };
+    return { error: "Failed to save subscription" };
   }
   return { success: "Push enabled" };
 }
@@ -80,7 +80,7 @@ export async function removePushSubscriptionAction(
       );
   } catch (e) {
     console.error("[removePushSubscriptionAction]", e);
-    return { error: "Gagal hapus subscription" };
+    return { error: "Failed to remove subscription" };
   }
   return { success: "Push disabled" };
 }

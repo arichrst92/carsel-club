@@ -39,19 +39,19 @@ export async function updateCoverPhotoAction(
 
   // Staff check (host atau co-host)
   if (!(await isSessionStaff(sessionId, user!.id))) {
-    return { error: "Hanya host/co-host yang bisa ubah cover" };
+    return { error: "Only host/co-host can change cover" };
   }
 
   // Rate limit per user
   const rate = checkUploadRate(user!.id);
   if (!rate.ok) {
     const min = Math.ceil(rate.retryAfterMs / 60000);
-    return { error: `Upload terlalu sering. Coba lagi dalam ${min} menit.` };
+    return { error: `Upload too frequent. Try again in ${min} minutes.` };
   }
 
   const file = formData.get("file");
   if (!file || !(file instanceof File) || file.size === 0) {
-    return { error: "Pick file dulu" };
+    return { error: "Pick a file first" };
   }
   if (file.size > MAX_UPLOAD_BYTES) {
     const mb = Math.round(MAX_UPLOAD_BYTES / 1024 / 1024);
@@ -63,7 +63,7 @@ export async function updateCoverPhotoAction(
     buffer = Buffer.from(await file.arrayBuffer());
   } catch (e) {
     logError("cover_upload_read_failed", { error: e });
-    return { error: "Gagal baca file." };
+    return { error: "Failed to read file." };
   }
 
   // Sprint 50 fix: unique filename per upload supaya browser tidak
@@ -76,7 +76,7 @@ export async function updateCoverPhotoAction(
     savedUrl = saved.url;
   } catch (e) {
     logError("cover_upload_save_failed", { error: e, sessionId });
-    const msg = e instanceof Error ? e.message : "Gagal upload cover.";
+    const msg = e instanceof Error ? e.message : "Failed to upload cover.";
     return { error: msg };
   }
 
@@ -87,7 +87,7 @@ export async function updateCoverPhotoAction(
       .where(eq(sessions.id, sessionId));
   } catch (e) {
     logError("cover_db_update_failed", { error: e });
-    return { error: "Gagal simpan ke sesi. Coba lagi." };
+    return { error: "Failed to save session. Try again." };
   }
 
   event("upload_success", { kind: "cover", sessionId, url: savedUrl });
@@ -107,7 +107,7 @@ export async function removeCoverPhotoAction(
   if (!user) redirect("/login");
 
   if (!(await isSessionStaff(sessionId, user!.id))) {
-    return { error: "Hanya host/co-host yang bisa hapus cover" };
+    return { error: "Only host/co-host can remove cover" };
   }
 
   try {
@@ -123,7 +123,7 @@ export async function removeCoverPhotoAction(
       .where(eq(sessions.id, sessionId));
   } catch (e) {
     logError("cover_remove_db_failed", { error: e });
-    return { error: "Gagal hapus cover." };
+    return { error: "Failed to remove cover." };
   }
 
   revalidatePath(`/sessions/${sessionId}`);
@@ -155,7 +155,7 @@ export async function addGroupPhotoAction(
   if (!user) redirect("/login");
 
   if (!(await isSessionStaff(sessionId, user!.id))) {
-    return { error: "Hanya host/co-host yang bisa upload foto grup" };
+    return { error: "Only host/co-host can upload group photo" };
   }
 
   // Count check (max 5)
@@ -169,12 +169,12 @@ export async function addGroupPhotoAction(
   const rate = checkUploadRate(user!.id);
   if (!rate.ok) {
     const min = Math.ceil(rate.retryAfterMs / 60000);
-    return { error: `Upload terlalu sering. Coba lagi dalam ${min} menit.` };
+    return { error: `Upload too frequent. Try again in ${min} minutes.` };
   }
 
   const file = formData.get("file");
   if (!file || !(file instanceof File) || file.size === 0) {
-    return { error: "Pick file dulu" };
+    return { error: "Pick a file first" };
   }
   if (file.size > MAX_UPLOAD_BYTES) {
     const mb = Math.round(MAX_UPLOAD_BYTES / 1024 / 1024);
@@ -186,7 +186,7 @@ export async function addGroupPhotoAction(
     buffer = Buffer.from(await file.arrayBuffer());
   } catch (e) {
     logError("group_photo_read_failed", { error: e });
-    return { error: "Gagal baca file." };
+    return { error: "Failed to read file." };
   }
 
   const photoId = nanoid(12);
@@ -197,7 +197,7 @@ export async function addGroupPhotoAction(
     savedUrl = saved.url;
   } catch (e) {
     logError("group_photo_save_failed", { error: e, sessionId });
-    const msg = e instanceof Error ? e.message : "Gagal upload foto.";
+    const msg = e instanceof Error ? e.message : "Failed to upload photo.";
     return { error: msg };
   }
 
@@ -214,7 +214,7 @@ export async function addGroupPhotoAction(
     try {
       await storage.deleteFile(storageKey);
     } catch {}
-    return { error: "Gagal simpan ke sesi. Coba lagi." };
+    return { error: "Failed to save session. Try again." };
   }
 
   event("upload_success", {
@@ -245,7 +245,7 @@ export async function removeGroupPhotoAction(
     .where(eq(sessionGroupPhotos.id, photoId))
     .limit(1);
 
-  if (!photo) return { error: "Foto tidak ditemukan" };
+  if (!photo) return { error: "Photo not found" };
 
   if (!(await isSessionStaff(photo.sessionId, user!.id))) {
     return { error: "Hanya host/co-host yang bisa hapus foto" };
@@ -263,7 +263,7 @@ export async function removeGroupPhotoAction(
       .where(eq(sessionGroupPhotos.id, photoId));
   } catch (e) {
     logError("group_photo_delete_db_failed", { error: e });
-    return { error: "Gagal hapus foto." };
+    return { error: "Failed to remove photo." };
   }
 
   revalidatePath(`/sessions/${photo.sessionId}`);

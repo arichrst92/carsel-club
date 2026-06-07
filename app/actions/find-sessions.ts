@@ -27,7 +27,7 @@ export async function joinPublicSessionAction(
     .where(eq(sessions.id, sessionId))
     .limit(1);
 
-  if (!session) return { error: "Session tidak ditemukan" };
+  if (!session) return { error: "Session not found" };
   if (session.visibility !== "public") {
     return { error: "Session ini private, hanya bisa join via invite link" };
   }
@@ -46,7 +46,7 @@ export async function joinPublicSessionAction(
       )
     )
     .limit(1);
-  if (existing) return { error: "Kamu sudah join session ini" };
+  if (existing) return { error: "You already joined this session" };
 
   try {
     await db.insert(sessionParticipants).values({

@@ -45,12 +45,12 @@ export async function updateAvatarAction(
   const rate = checkUploadRate(user!.id);
   if (!rate.ok) {
     const min = Math.ceil(rate.retryAfterMs / 60000);
-    return { error: `Upload terlalu sering. Coba lagi dalam ${min} menit.` };
+    return { error: `Upload too frequent. Try again in ${min} minutes.` };
   }
 
   const file = formData.get("file");
   if (!file || !(file instanceof File) || file.size === 0) {
-    return { error: "Pick file dulu" };
+    return { error: "Pick a file first" };
   }
   if (file.size > MAX_UPLOAD_BYTES) {
     const mb = Math.round(MAX_UPLOAD_BYTES / 1024 / 1024);
@@ -63,7 +63,7 @@ export async function updateAvatarAction(
     buffer = Buffer.from(await file.arrayBuffer());
   } catch (e) {
     logError("avatar_upload_read_failed", { error: e });
-    return { error: "Gagal baca file." };
+    return { error: "Failed to read file." };
   }
 
   // Process + persist via storage helper

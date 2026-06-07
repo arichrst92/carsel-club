@@ -7,7 +7,7 @@ import { getSession } from "@/lib/auth/session";
 import { acceptInviteAction } from "@/app/actions/invite";
 
 export const metadata = {
-  title: "Kamu diundang ke Carsel Club!",
+  title: "You're invited to Carsel Club!",
 };
 
 type PageProps = {

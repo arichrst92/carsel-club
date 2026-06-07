@@ -33,7 +33,7 @@ export async function blockUserAction(
 ): Promise<SocialActionState> {
   const me = await getCurrentUser();
   if (!me) redirect("/login");
-  if (targetUserId === me.id) return { error: "Tidak bisa block diri sendiri" };
+  if (targetUserId === me.id) return { error: "Cannot block yourself" };
 
   try {
     await db.transaction(async (tx) => {
@@ -134,7 +134,7 @@ export async function followUserAction(
 ): Promise<SocialActionState> {
   const me = await getCurrentUser();
   if (!me) redirect("/login");
-  if (targetUserId === me.id) return { error: "Tidak bisa follow diri sendiri" };
+  if (targetUserId === me.id) return { error: "Cannot follow yourself" };
 
   // Block check (either direction)
   const [block] = await db
@@ -153,7 +153,7 @@ export async function followUserAction(
       )
     )
     .limit(1);
-  if (block) return { error: "Tidak bisa follow user yang di-block" };
+  if (block) return { error: "Cannot follow blocked user" };
 
   try {
     const [existing] = await db
