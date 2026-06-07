@@ -70,7 +70,7 @@ export async function searchMemberAction(
 
   if (!user) {
     return {
-      error: `User dengan nomor ini belum daftar. Tambah sebagai Guest dengan namanya saja.`,
+      error: `No user is registered with this number yet. Add them as a Guest using just their name.`,
     };
   }
 

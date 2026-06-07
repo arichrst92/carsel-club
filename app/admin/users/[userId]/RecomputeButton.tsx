@@ -8,7 +8,7 @@ export function RecomputeButton({ userId }: { userId: string }) {
   const [result, setResult] = useState<string | null>(null);
 
   function run() {
-    if (!confirm("Recompute user stats? Akan overwrite current values.")) return;
+    if (!confirm("Recompute user stats? This will overwrite current values.")) return;
     setResult(null);
     startTransition(async () => {
       const r = await recomputeUserStatsAction(userId);

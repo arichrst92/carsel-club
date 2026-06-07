@@ -60,11 +60,11 @@ export function AddFriendForm() {
   return (
     <section>
       <div className="section-head">
-        <h3>Tambah Friend</h3>
+        <h3>Add Friend</h3>
       </div>
       <form onSubmit={handleSearch}>
         <div className="form-group">
-          <label className="form-label">Cari via Nomor WhatsApp</label>
+          <label className="form-label">Search by WhatsApp Number</label>
           <div className="input-with-icon">
             <svg
               width="18"
@@ -101,7 +101,7 @@ export function AddFriendForm() {
               fontSize: 13,
             }}
           >
-            {isPending ? "Searching..." : "Cari User"}
+            {isPending ? "Searching..." : "Search User"}
           </button>
         </div>
       </form>

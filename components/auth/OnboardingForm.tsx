@@ -191,7 +191,7 @@ export function OnboardingForm({
             {step === TOTAL_STEPS
               ? isPending
                 ? "Saving..."
-                : "Mulai Main"
+                : "Start Playing"
               : "Next"}
           </span>
           {!isPending && (
@@ -231,7 +231,7 @@ function Step1Name({
 }) {
   return (
     <>
-      <h2 className="wizard-step-title">Halo! Siapa namamu?</h2>
+      <h2 className="wizard-step-title">Hi! What's your name?</h2>
       <p
         style={{
           color: "var(--text-500)",
@@ -241,7 +241,7 @@ function Step1Name({
           marginBottom: "var(--s-4)",
         }}
       >
-        Pilih nama display + upload foto (opsional). Bisa diubah nanti.
+        Choose a display name + upload a photo (optional). Can be changed later.
       </p>
 
       {/* Avatar uploader — uses existing avatar action */}
@@ -253,19 +253,19 @@ function Step1Name({
       <section className="form-section">
         <div className="form-group">
           <label className="form-label">
-            Nama Display <span className="req">*</span>
+            Display Name <span className="req">*</span>
           </label>
           <input
             type="text"
             className="form-input"
-            placeholder="Contoh: Ari Christian"
+            placeholder="e.g. Ari Christian"
             value={displayName}
             onChange={(e) => onChange(e.target.value)}
             maxLength={30}
             autoFocus
           />
           <p className="form-help">
-            Maksimum 30 karakter. Bisa diubah nanti.
+            Maximum 30 characters. Can be changed later.
           </p>
         </div>
       </section>
@@ -296,7 +296,7 @@ function Step2CityBio({
 
   return (
     <>
-      <h2 className="wizard-step-title">Tentang kamu</h2>
+      <h2 className="wizard-step-title">About you</h2>
       <p
         style={{
           color: "var(--text-500)",
@@ -306,13 +306,13 @@ function Step2CityBio({
           marginBottom: "var(--s-4)",
         }}
       >
-        Kota untuk Regional Leaderboard, bio singkat untuk profil publik.
-        Keduanya optional — bisa skip.
+        City for the Regional Leaderboard, short bio for your public profile.
+        Both optional — feel free to skip.
       </p>
 
       <section className="form-section">
         <div className="form-group">
-          <label className="form-label">Pilih Kota</label>
+          <label className="form-label">Choose City</label>
           <div
             style={{
               display: "grid",
@@ -387,14 +387,14 @@ function Step2CityBio({
               marginBottom: 8,
             }}
           >
-            {customCity ? "✓ Custom city aktif" : "+ Kota lain (custom)"}
+            {customCity ? "✓ Custom city active" : "+ Other city (custom)"}
           </button>
 
           {customCity && (
             <input
               type="text"
               className="form-input"
-              placeholder="Ketik nama kota kamu"
+              placeholder="Type your city name"
               value={city}
               onChange={(e) => onCityChange(e.target.value)}
               maxLength={50}
@@ -404,10 +404,10 @@ function Step2CityBio({
         </div>
 
         <div className="form-group">
-          <label className="form-label">Bio singkat</label>
+          <label className="form-label">Short bio</label>
           <textarea
             className="form-input"
-            placeholder="Contoh: Padel addict. Weekend warrior. Banding sama AI gabakal sebagus aku."
+            placeholder="e.g. Padel addict. Weekend warrior. Better than AI on a court."
             value={bio}
             onChange={(e) => onBioChange(e.target.value)}
             maxLength={BIO_MAX}
@@ -419,7 +419,7 @@ function Step2CityBio({
             }}
           />
           <p className="form-help">
-            {bio.length}/{BIO_MAX} karakter · ditampilkan di profil publik
+            {bio.length}/{BIO_MAX} characters · shown on your public profile
           </p>
         </div>
       </section>
@@ -469,7 +469,7 @@ function Step3Welcome({
           marginBottom: "var(--s-4)",
         }}
       >
-        Profil siap. Naik tier dengan main + menang — semua tracked otomatis.
+        Profile is ready. Climb tiers by playing + winning — everything is tracked automatically.
       </p>
 
       {/* Profile preview card */}
@@ -516,7 +516,7 @@ function Step3Welcome({
           {displayName}
         </div>
         <div style={{ fontSize: 13, opacity: 0.9, fontWeight: 600 }}>
-          {city ? `📍 ${city}` : "Belum set kota"}
+          {city ? `📍 ${city}` : "City not set"}
         </div>
         {bio && (
           <div
@@ -609,8 +609,8 @@ function Step3Welcome({
           lineHeight: 1.5,
         }}
       >
-        💡 Tap &quot;Mulai Main&quot; → buka home. Bisa langsung create
-        session, atau gabung via invite link teman.
+        💡 Tap &quot;Start Playing&quot; → opens home. You can create a
+        session right away, or join via a friend's invite link.
       </div>
     </>
   );

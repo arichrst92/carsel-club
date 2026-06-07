@@ -136,7 +136,7 @@ export function JoinPublicSessionButton({
             cursor: "pointer",
           }}
         >
-          + Tambah pesan untuk host
+          + Add a message for the host
         </button>
       )}
 

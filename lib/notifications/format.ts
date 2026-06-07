@@ -26,8 +26,8 @@ function fmtSessionInvite(
 ): FormattedNotification {
   return {
     icon: "📅",
-    title: "Diundang ke session",
-    body: `${p.inviterName} mengundang kamu ke ${p.sessionTitle}`,
+    title: "Session invite",
+    body: `${p.inviterName} invited you to ${p.sessionTitle}`,
     href: `/sessions/${p.sessionId}`,
   };
 }
@@ -35,14 +35,14 @@ function fmtSessionInvite(
 function fmtSessionReminder(
   p: NotificationPayloadByType["session_reminder"]
 ): FormattedNotification {
-  const venue = p.venueName ? ` di ${p.venueName}` : "";
+  const venue = p.venueName ? ` at ${p.venueName}` : "";
   const when =
     p.inMinutes >= 60
-      ? `${Math.round(p.inMinutes / 60)} jam lagi`
-      : `${p.inMinutes} menit lagi`;
+      ? `in ${Math.round(p.inMinutes / 60)} hours`
+      : `in ${p.inMinutes} minutes`;
   return {
     icon: "⏰",
-    title: "Session sebentar lagi",
+    title: "Session starting soon",
     body: `${p.sessionTitle}${venue} • ${when}`,
     href: `/sessions/${p.sessionId}`,
   };
@@ -53,8 +53,8 @@ function fmtSessionCancelled(
 ): FormattedNotification {
   return {
     icon: "🚫",
-    title: "Session dibatalkan",
-    body: `${p.sessionTitle} di-cancel oleh host`,
+    title: "Session cancelled",
+    body: `${p.sessionTitle} was cancelled by the host`,
     href: `/sessions/${p.sessionId}`,
   };
 }
@@ -64,10 +64,10 @@ function fmtFriendRequest(
 ): FormattedNotification {
   return {
     icon: "👋",
-    title: "Friend request baru",
+    title: "New friend request",
     body: p.message
       ? `${p.fromDisplayName}: "${p.message}"`
-      : `${p.fromDisplayName} ingin jadi friend`,
+      : `${p.fromDisplayName} wants to be friends`,
     href: "/friends",
   };
 }
@@ -77,8 +77,8 @@ function fmtFriendAccepted(
 ): FormattedNotification {
   return {
     icon: "🤝",
-    title: "Friend request di-accept",
-    body: `${p.byDisplayName} dan kamu sekarang friends`,
+    title: "Friend request accepted",
+    body: `${p.byDisplayName} and you are now friends`,
     href: `/u/${p.byUserId}`,
   };
 }
@@ -88,8 +88,8 @@ function fmtJoinRequested(
 ): FormattedNotification {
   return {
     icon: "✋",
-    title: "Join request baru",
-    body: `${p.requesterDisplayName} mau gabung ke ${p.sessionTitle}`,
+    title: "New join request",
+    body: `${p.requesterDisplayName} wants to join ${p.sessionTitle}`,
     href: `/sessions/${p.sessionId}/participants`,
   };
 }
@@ -99,8 +99,8 @@ function fmtJoinApproved(
 ): FormattedNotification {
   return {
     icon: "✅",
-    title: "Join request di-approve",
-    body: `Kamu sekarang gabung ${p.sessionTitle}`,
+    title: "Join request approved",
+    body: `You’ve joined ${p.sessionTitle}`,
     href: `/sessions/${p.sessionId}`,
   };
 }
@@ -110,8 +110,8 @@ function fmtJoinRejected(
 ): FormattedNotification {
   return {
     icon: "❌",
-    title: "Join request di-reject",
-    body: `Request kamu ke ${p.sessionTitle} ditolak`,
+    title: "Join request rejected",
+    body: `Your request to ${p.sessionTitle} was rejected`,
     href: `/sessions/${p.sessionId}`,
   };
 }

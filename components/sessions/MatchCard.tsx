@@ -130,7 +130,7 @@ export function MatchCard({
   }
 
   function handleEnd() {
-    if (!confirm(`Akhiri match dengan skor ${t1} - ${t2}?`)) return;
+    if (!confirm(`End match with score ${t1} - ${t2}?`)) return;
     setError(null);
     startTransition(async () => {
       const result = await endMatchAction(match.id, t1, t2);
@@ -212,8 +212,8 @@ export function MatchCard({
           </span>
           <Link
             href={`/sessions/${sessionId}/matches/${match.id}`}
-            aria-label="Lihat detail match"
-            title="Lihat detail match"
+            aria-label="View match details"
+            title="View match details"
             style={{
               display: "grid",
               placeItems: "center",
@@ -406,7 +406,7 @@ export function MatchCard({
               cursor: "pointer",
             }}
           >
-            Batal
+            Cancel
           </button>
           <button
             type="button"
@@ -518,7 +518,7 @@ function TeamRow({
           })
         }
         disabled={swap!.isPending}
-        title="Tap untuk swap pemain"
+        title="Tap to swap players"
         style={{
           background: isSelected
             ? "var(--primary-50)"

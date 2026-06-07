@@ -55,7 +55,7 @@ export async function searchUserForFriendAction(
   }
 
   if (user.id === me.id) {
-    return { error: "Itu nomor kamu sendiri 😅" };
+    return { error: "That’s your own number 😅" };
   }
 
   return { foundUser: user };

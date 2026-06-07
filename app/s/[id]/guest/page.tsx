@@ -77,7 +77,7 @@ export default async function GuestJoinPage({ params }: PageProps) {
             textDecoration: "none",
           }}
         >
-          Lihat Session
+          See Session
         </Link>
       </header>
 
@@ -104,7 +104,7 @@ export default async function GuestJoinPage({ params }: PageProps) {
               marginBottom: 8,
             }}
           >
-            🎾 Diundang ke session padel
+            🎾 Invited to a padel session
           </div>
           <h1
             style={{
@@ -155,9 +155,9 @@ export default async function GuestJoinPage({ params }: PageProps) {
         {isTerminal ? (
           <div className="empty-state">
             <div className="empty-state-icon">🚫</div>
-            <div className="empty-state-title">Session sudah selesai</div>
+            <div className="empty-state-title">Session is over</div>
             <div className="empty-state-text">
-              Session ini sudah {session.status === "completed" ? "selesai" : "dibatalkan"}, tidak bisa join.
+              This session is already {session.status === "completed" ? "completed" : "cancelled"} — you can't join.
             </div>
           </div>
         ) : existingGuest ? (
@@ -179,7 +179,7 @@ export default async function GuestJoinPage({ params }: PageProps) {
                 marginBottom: 4,
               }}
             >
-              ✓ Kamu sudah join sebagai {existingGuest.name}
+              ✓ You've joined as {existingGuest.name}
             </div>
             <Link
               href={`/s/${id}`}
@@ -196,7 +196,7 @@ export default async function GuestJoinPage({ params }: PageProps) {
                 textDecoration: "none",
               }}
             >
-              Lihat Live View →
+              See Live View →
             </Link>
           </section>
         ) : (
@@ -223,7 +223,7 @@ export default async function GuestJoinPage({ params }: PageProps) {
                   marginBottom: 4,
                 }}
               >
-                Sudah punya akun?
+                Already have an account?
               </div>
               <div
                 style={{
@@ -233,8 +233,8 @@ export default async function GuestJoinPage({ params }: PageProps) {
                   marginBottom: 12,
                 }}
               >
-                Akun member dapat tier, leaderboard global, match history,
-                dan profile share.
+                Members get tier progression, global leaderboard, match history,
+                and profile share.
               </div>
               <Link
                 href={
@@ -255,7 +255,7 @@ export default async function GuestJoinPage({ params }: PageProps) {
                   textDecoration: "none",
                 }}
               >
-                {authSession ? "Buka di App" : "Login / Daftar"}
+                {authSession ? "Open in App" : "Log in / Sign Up"}
               </Link>
             </div>
           </>

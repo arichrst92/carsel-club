@@ -42,7 +42,7 @@ function dateBucket(d: Date | string | null): {
   label: string;
   order: number;
 } {
-  if (!d) return { key: "older", label: "📜 Lebih Lama", order: 5 };
+  if (!d) return { key: "older", label: "📜 Older", order: 5 };
   const date = typeof d === "string" ? new Date(d) : d;
   const now = new Date();
   const startOfToday = new Date(
@@ -54,11 +54,11 @@ function dateBucket(d: Date | string | null): {
     (startOfToday.getTime() - new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()) /
       (1000 * 60 * 60 * 24)
   );
-  if (diffDays <= 0) return { key: "today", label: "🟢 Hari Ini", order: 0 };
-  if (diffDays === 1) return { key: "yesterday", label: "📅 Kemarin", order: 1 };
-  if (diffDays <= 7) return { key: "week", label: "🗓 Minggu Ini", order: 2 };
-  if (diffDays <= 30) return { key: "month", label: "📆 Bulan Ini", order: 3 };
-  return { key: "older", label: "📜 Lebih Lama", order: 4 };
+  if (diffDays <= 0) return { key: "today", label: "🟢 Today", order: 0 };
+  if (diffDays === 1) return { key: "yesterday", label: "📅 Yesterday", order: 1 };
+  if (diffDays <= 7) return { key: "week", label: "🗓 This Week", order: 2 };
+  if (diffDays <= 30) return { key: "month", label: "📆 This Month", order: 3 };
+  return { key: "older", label: "📜 Older", order: 4 };
 }
 
 export default async function MatchHistoryPage({
@@ -135,21 +135,21 @@ export default async function MatchHistoryPage({
                 fontWeight: 700,
               }}
             >
-              30 hari terakhir
+              Last 30 days
             </span>
           </div>
           <div className="history-insights">
             <div className="insight-card featured">
               <div className="insight-icon">📈</div>
-              <div className="insight-label">Tingkat Menang</div>
+              <div className="insight-label">Win Rate</div>
               <div className="insight-value">{winRate30}%</div>
               <div className="insight-value-sub">
-                {last30Wins} menang dari {last30.length} match
+                {last30Wins} wins out of {last30.length} matches
               </div>
             </div>
             <div className="insight-card">
               <div className="insight-icon">🏆</div>
-              <div className="insight-label">Total Menang</div>
+              <div className="insight-label">Total Wins</div>
               <div
                 style={{
                   fontFamily: "var(--font-display)",
@@ -174,7 +174,7 @@ export default async function MatchHistoryPage({
             </div>
             <div className="insight-card">
               <div className="insight-icon">⚡</div>
-              <div className="insight-label">Total Pertandingan</div>
+              <div className="insight-label">Total Matches</div>
               <div
                 style={{
                   fontFamily: "var(--font-display)",
@@ -241,8 +241,8 @@ export default async function MatchHistoryPage({
             </div>
             <div className="empty-state-text">
               {filter === "all"
-                ? "Match yang sudah completed akan muncul di sini setelah host end match."
-                : "Ganti filter atau cek lagi nanti."}
+                ? "Completed matches will appear here after the host ends them."
+                : "Change the filter or check back later."}
             </div>
           </div>
         ) : (
@@ -338,7 +338,7 @@ function HistoryItem({ m }: { m: MatchRow }) {
             <span>
               {m.opponentNames.length > 0
                 ? m.opponentNames.join(" · ")
-                : "Lawan"}
+                : "Opponents"}
             </span>
           </div>
         </div>

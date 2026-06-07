@@ -42,7 +42,7 @@ export function generateMexicanoRound(
   isFirstRound: boolean
 ): GeneratorResult {
   if (activePlayers.length < 4) {
-    throw new Error("Butuh minimal 4 pemain aktif untuk generate round");
+    throw new Error("Need at least 4 active players to generate a round");
   }
 
   if (isFirstRound) {

@@ -94,10 +94,10 @@ export async function requestJoinAction(
     .limit(1);
   if (existingReq) {
     if (existingReq.status === "pending") {
-      return { error: "Request kamu sudah masuk, tunggu host approve" };
+      return { error: "Your request is in — waiting for the host to approve" };
     }
     if (existingReq.status === "rejected") {
-      return { error: "Request sebelumnya di-reject oleh host" };
+      return { error: "Your previous request was rejected by the host" };
     }
     // accepted but not participant? Edge case — reset to pending
     await db

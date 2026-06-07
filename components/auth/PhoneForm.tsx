@@ -10,7 +10,7 @@ export function PhoneForm() {
 
   function handleSubmit() {
     if (phone.length < 9) {
-      setError("Masukkan nomor WhatsApp yang valid");
+      setError("Enter a valid WhatsApp number");
       return;
     }
     setError(null);
@@ -26,7 +26,7 @@ export function PhoneForm() {
   return (
     <div>
       <div className="form-group" style={{ marginBottom: 12 }}>
-        <label className="form-label">Nomor WhatsApp</label>
+        <label className="form-label">WhatsApp Number</label>
         <div className="phone-input-row">
           <button type="button" className="country-pill">
             <span className="flag">🇮🇩</span>
@@ -60,7 +60,7 @@ export function PhoneForm() {
             }}
           />
         </div>
-        <p className="form-help">Nomor harus aktif WhatsApp untuk terima OTP.</p>
+        <p className="form-help">Number must have active WhatsApp to receive the OTP.</p>
 
         {error && (
           <div

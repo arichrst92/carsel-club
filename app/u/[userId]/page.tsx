@@ -278,7 +278,7 @@ export default async function PublicProfilePage({ params }: Props) {
               marginBottom: "var(--s-3)",
             }}
           >
-            Padel community Indonesia
+            Padel community
           </div>
           <Link
             href={session ? "/home" : "/login"}
@@ -294,7 +294,7 @@ export default async function PublicProfilePage({ params }: Props) {
               textDecoration: "none",
             }}
           >
-            {session ? "Buka App" : "Daftar Sekarang"}
+            {session ? "Open App" : "Sign Up Now"}
           </Link>
         </section>
       </main>
@@ -308,10 +308,9 @@ function PrivateProfileView({ displayName }: { displayName: string }) {
       <main className="app-content">
         <div className="empty-state" style={{ marginTop: "var(--s-6)" }}>
           <div className="empty-state-icon">🔒</div>
-          <div className="empty-state-title">Profil Privat</div>
+          <div className="empty-state-title">Private Profile</div>
           <div className="empty-state-text">
-            {displayName} memilih untuk tidak menampilkan profilnya secara
-            publik.
+            {displayName} chose not to display their profile publicly.
           </div>
           <Link
             href="/"
@@ -328,7 +327,7 @@ function PrivateProfileView({ displayName }: { displayName: string }) {
               textDecoration: "none",
             }}
           >
-            Beranda
+            Home
           </Link>
         </div>
       </main>

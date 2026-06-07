@@ -128,8 +128,8 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
               fontSize: 12,
             }}
           >
-            🔒 Match config (format, court, fix partners) di-lock karena
-            sudah ada round ter-generate.
+            🔒 Match config (format, court, fix partners) is locked because
+            rounds have already been generated.
           </div>
         )}
 
@@ -192,7 +192,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
 
           <div className="form-group">
             <label className="form-label">
-              Tanggal <span className="req">*</span>
+              Date <span className="req">*</span>
             </label>
             <input
               type="date"
@@ -226,7 +226,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Deskripsi (Optional)</label>
+            <label className="form-label">Description (Optional)</label>
             <textarea
               className="form-input"
               value={description}
@@ -274,7 +274,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
                 onClick={() => setVisibility("public")}
               >
                 <span>🌍 Public</span>
-                <span className="seg-sub">Find di /find</span>
+                <span className="seg-sub">Listed on /find</span>
               </button>
             </div>
           </div>
@@ -289,7 +289,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
                   onClick={() => setJoinPolicy("auto_join")}
                 >
                   <span>✅ Auto-join</span>
-                  <span className="seg-sub">Langsung join</span>
+                  <span className="seg-sub">Join directly</span>
                 </button>
                 <button
                   type="button"
@@ -396,7 +396,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
           className="btn-primary-lg"
           style={{ width: "100%" }}
         >
-          {isPending ? "Menyimpan..." : "Save Changes"}
+          {isPending ? "Saving..." : "Save Changes"}
         </button>
       </div>
     </>

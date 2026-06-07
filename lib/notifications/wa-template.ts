@@ -89,7 +89,7 @@ function fmtFriendAccepted(
 
 🤝 *${p.byDisplayName}* sekarang jadi friend kamu
 
-Lihat profil: ${joinUrl(ctx.appUrl, `/u/${p.byUserId}`)}`;
+See profile: ${joinUrl(ctx.appUrl, `/u/${p.byUserId}`)}`;
 }
 
 function fmtJoinRequested(
@@ -122,7 +122,7 @@ function fmtJoinRejected(
 
 ❌ Request kamu ke *${p.sessionTitle}* di-reject oleh host.
 
-Lihat: ${joinUrl(ctx.appUrl, `/sessions/${p.sessionId}`)}`;
+See: ${joinUrl(ctx.appUrl, `/sessions/${p.sessionId}`)}`;
 }
 
 const TEMPLATES = {

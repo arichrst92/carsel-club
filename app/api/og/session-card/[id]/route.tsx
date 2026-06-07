@@ -138,8 +138,8 @@ const STATUS_BG: Record<string, string> = {
 const STATUS_LABEL: Record<string, string> = {
   upcoming: "📅 Upcoming",
   live: "🔴 LIVE",
-  completed: "✅ Selesai",
-  cancelled: "❌ Dibatalkan",
+  completed: "✅ Completed",
+  cancelled: "❌ Cancelled",
 };
 
 export async function GET(_req: Request, { params }: Props) {

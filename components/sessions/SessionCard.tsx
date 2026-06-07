@@ -126,7 +126,7 @@ export function SessionCard({
                   )}
                 </div>
               )}
-              <div className="player-count">{participantCount} pemain</div>
+              <div className="player-count">{participantCount} players</div>
             </div>
             {!hideViewButton && <span className="btn-outline">View</span>}
           </div>

@@ -64,8 +64,8 @@ export async function MatchesSection({
           <div className="empty-state-title">No matches yet</div>
           <div className="empty-state-text">
             {staff && !isTerminal
-              ? 'Klik "Generate Round 1" di bawah saat semua pemain sudah datang. Kamu bisa buat extra match kapan saja saat session berjalan.'
-              : "Host belum generate round pertama."}
+              ? 'Click "Generate Round 1" below once all players have arrived. You can create extra matches anytime while the session is running.'
+              : "The host hasn't generated the first round yet."}
           </div>
         </div>
         {staff && !isTerminal && (

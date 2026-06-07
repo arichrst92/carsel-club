@@ -101,7 +101,7 @@ export function AddParticipantsTabs({
             className="form-help"
             style={{ marginBottom: "var(--s-3)" }}
           >
-            Cari member via nomor WhatsApp atau pindai QR profil mereka.
+            Search a member by WhatsApp number or scan their profile QR.
           </p>
           <ScanMemberButton sessionId={sessionId} />
           <AddMemberSearch sessionId={sessionId} />
@@ -116,8 +116,8 @@ export function AddParticipantsTabs({
             className="form-help"
             style={{ marginBottom: "var(--s-3)" }}
           >
-            Tambah pemain tanpa akun (nama saja). Point guest hanya muncul di
-            session ini, tidak masuk ke profil lifetime.
+            Add a player without an account (name only). Guest points only
+            count in this session — they don't roll into lifetime stats.
           </p>
           <AddGuestForm sessionId={sessionId} />
         </section>
@@ -142,7 +142,7 @@ export function AddParticipantsTabs({
           >
             <path d="M20 6L9 17l-5-5" />
           </svg>
-          <span>Selesai</span>
+          <span>Done</span>
         </Link>
       </div>
     </>

@@ -73,7 +73,7 @@ export async function searchUserForRequestAction(
     .where(eq(users.whatsappNumber, phone))
     .limit(1);
   if (!user) return { error: "User dengan nomor itu belum daftar Carsel Club" };
-  if (user.id === me.id) return { error: "Itu nomor kamu sendiri 😅" };
+  if (user.id === me.id) return { error: "That’s your own number 😅" };
 
   return { foundUser: user };
 }
@@ -178,10 +178,10 @@ export async function sendFriendRequestAction(
   if (existingReq) {
     if (existingReq.status === "pending") {
       if (existingReq.fromUserId === me.id) {
-        return { error: "Request sudah dikirim, tunggu approval" };
+        return { error: "Request already sent, waiting for approval" };
       }
       return {
-        error: `${target.displayName} sudah kirim request ke kamu — accept dari Incoming`,
+        error: `${target.displayName} already sent you a request — accept it from Incoming`,
       };
     }
     if (existingReq.status === "rejected") {

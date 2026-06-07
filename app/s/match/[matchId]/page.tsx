@@ -117,7 +117,7 @@ export default async function PublicMatchView({ params }: PageProps) {
             textDecoration: "none",
           }}
         >
-          Lihat Session →
+          See Session →
         </Link>
       </header>
 
@@ -298,7 +298,7 @@ export default async function PublicMatchView({ params }: PageProps) {
               marginBottom: "var(--s-3)",
             }}
           >
-            Padel community Indonesia
+            Padel community
           </div>
           <Link
             href="/"
@@ -314,7 +314,7 @@ export default async function PublicMatchView({ params }: PageProps) {
               textDecoration: "none",
             }}
           >
-            Daftar Sekarang
+            Sign Up Now
           </Link>
         </section>
       </main>
@@ -481,7 +481,7 @@ function PublicPlayerRow({
             <span>—</span>
           )}
           <span>·</span>
-          <span>{player.side === "team1" ? "Tim 1" : "Tim 2"}</span>
+          <span>{player.side === "team1" ? "Team 1" : "Team 2"}</span>
           {winRate !== null && (
             <>
               <span>·</span>

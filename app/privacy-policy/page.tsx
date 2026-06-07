@@ -1,118 +1,119 @@
 /**
- * Privacy Policy (Sprint 37) — minimum viable disclosure untuk public launch.
+ * Privacy Policy (Sprint 37) — minimum viable disclosure for public launch.
  *
- * IMPORTANT: Review legal sebelum production. Replace [PT NAMA HOLDING],
- * alamat, dan kontak DPO dengan info real.
+ * IMPORTANT: Review with legal before production. Replace [PT NAMA HOLDING],
+ * address, and DPO contact with the real info.
  */
 
 import { LegalShell } from "@/components/legal/LegalShell";
 
 export const metadata = {
-  title: "Kebijakan Privasi",
+  title: "Privacy Policy",
 };
 
-const LAST_UPDATED = "6 Juni 2026";
+const LAST_UPDATED = "June 6, 2026";
 
 export default function PrivacyPolicyPage() {
   return (
-    <LegalShell title="Kebijakan Privasi">
+    <LegalShell title="Privacy Policy">
       <h1 style={{ fontFamily: "var(--font-display)", fontSize: 22, marginTop: 0 }}>
-        Kebijakan Privasi
+        Privacy Policy
       </h1>
       <p style={{ fontSize: 12, color: "var(--text-500)" }}>
-        Terakhir diperbarui: {LAST_UPDATED}
+        Last updated: {LAST_UPDATED}
       </p>
 
-      <h2 style={h2}>1. Data yang Kami Kumpulkan</h2>
+      <h2 style={h2}>1. Data We Collect</h2>
       <ul>
         <li>
-          <strong>Nomor WhatsApp</strong> — digunakan untuk autentikasi via
-          OTP dan notifikasi opsional.
+          <strong>WhatsApp number</strong> — used for OTP authentication and
+          optional notifications.
         </li>
         <li>
-          <strong>Nama tampilan + kota (opsional)</strong> — ditampilkan di
-          profil + leaderboard.
+          <strong>Display name + city (optional)</strong> — shown on your
+          profile + the leaderboard.
         </li>
         <li>
-          <strong>Foto profil + cover session</strong> — opsional, ditampilkan
-          publik kalau profil kamu Public.
+          <strong>Profile photo + session cover</strong> — optional; shown
+          publicly if your profile is Public.
         </li>
         <li>
-          <strong>Stats permainan</strong> — match, win/loss/draw, points,
-          tier — direkam otomatis saat kamu main.
+          <strong>Gameplay stats</strong> — matches, win/loss/draw, points,
+          tier — recorded automatically as you play.
         </li>
         <li>
-          <strong>Log aktivitas</strong> — event seperti login, create session,
-          tier-up disimpan untuk troubleshooting + monitoring (retensi 30 hari).
+          <strong>Activity logs</strong> — events like logins, session
+          creation, tier-ups are stored for troubleshooting + monitoring
+          (30-day retention).
         </li>
       </ul>
 
-      <h2 style={h2}>2. Cara Data Digunakan</h2>
+      <h2 style={h2}>2. How We Use Your Data</h2>
       <ul>
-        <li>Operasional aplikasi: matchmaking, stats, leaderboard, notifikasi.</li>
+        <li>App operations: matchmaking, stats, leaderboard, notifications.</li>
         <li>
-          Notifikasi: invite session, reminder H-1, hasil match, tier-up
-          (sesuai preferensi kamu di Settings).
+          Notifications: session invites, H-1 reminders, match results, tier-ups
+          (per your preferences in Settings).
         </li>
         <li>
-          Keamanan: detect penyalahgunaan via rate-limit + log review.
+          Security: detecting abuse via rate-limit + log review.
         </li>
       </ul>
 
-      <h2 style={h2}>3. Data yang Tidak Kami Kumpulkan</h2>
+      <h2 style={h2}>3. Data We Don't Collect</h2>
       <p>
-        Lokasi GPS, kontak buku alamat, data pembayaran, foto galeri (kecuali
-        yang kamu upload manual).
+        GPS location, address book contacts, payment data, gallery photos
+        (except what you upload manually).
       </p>
 
-      <h2 style={h2}>4. Dengan Siapa Data Dibagikan</h2>
+      <h2 style={h2}>4. Who We Share Data With</h2>
       <ul>
         <li>
-          <strong>Fonnte</strong> (gateway WhatsApp) — hanya nomor WA + isi
-          pesan notifikasi.
+          <strong>Fonnte</strong> (WhatsApp gateway) — only your WA number +
+          notification message body.
         </li>
         <li>
-          <strong>Web Push provider</strong> (FCM/APNs) — endpoint push tidak
-          identifikasi user secara langsung.
+          <strong>Web Push providers</strong> (FCM/APNs) — the push endpoint
+          doesn't directly identify the user.
         </li>
         <li>
-          Kami <strong>tidak</strong> menjual data ke advertiser.
+          We do <strong>not</strong> sell data to advertisers.
         </li>
       </ul>
 
-      <h2 style={h2}>5. Hak Kamu</h2>
+      <h2 style={h2}>5. Your Rights</h2>
       <ul>
         <li>
-          <strong>Akses</strong> data: lihat semua data via halaman Profil.
+          <strong>Access</strong>: view all your data via the Profile page.
         </li>
         <li>
-          <strong>Koreksi</strong>: edit profile + privacy settings kapan saja.
+          <strong>Correction</strong>: edit your profile + privacy settings any time.
         </li>
         <li>
-          <strong>Hapus akun</strong>: hubungi support@carsel.club untuk
-          permintaan penghapusan (dilaksanakan dalam 14 hari).
+          <strong>Delete account</strong>: email support@carsel.club to request
+          deletion (carried out within 14 days).
         </li>
         <li>
-          <strong>Cabut consent</strong>: matikan notifikasi WA via Settings.
+          <strong>Withdraw consent</strong>: disable WA notifications in Settings.
         </li>
       </ul>
 
-      <h2 style={h2}>6. Retensi</h2>
+      <h2 style={h2}>6. Retention</h2>
       <p>
-        Data akun disimpan selama akun aktif. Log aktivitas dihapus otomatis
-        setelah 30 hari. Backup database disimpan 14 hari (local) + remote
-        sesuai konfigurasi internal.
+        Account data is kept while the account is active. Activity logs are
+        automatically deleted after 30 days. Database backups are kept 14 days
+        (local) + remote per internal configuration.
       </p>
 
-      <h2 style={h2}>7. Anak di Bawah Umur</h2>
+      <h2 style={h2}>7. Minors</h2>
       <p>
-        Carsel Club ditujukan untuk pengguna 17 tahun ke atas. Kami tidak
-        secara sengaja mengumpulkan data dari anak-anak di bawah 17 tahun.
+        Carsel Club is intended for users 17 and older. We do not knowingly
+        collect data from children under 17.
       </p>
 
-      <h2 style={h2}>8. Kontak</h2>
+      <h2 style={h2}>8. Contact</h2>
       <p>
-        Pertanyaan kebijakan privasi:{" "}
+        Privacy policy questions:{" "}
         <a href="mailto:support@carsel.club" style={{ color: "var(--primary-700)" }}>
           support@carsel.club
         </a>
@@ -120,8 +121,9 @@ export default function PrivacyPolicyPage() {
       </p>
 
       <p style={{ marginTop: 28, fontSize: 12, color: "var(--text-500)" }}>
-        Dokumen ini adalah versi minimum viable. Versi lengkap dengan dasar
-        hukum (UU PDP 27/2022) akan dipublikasi sebelum launch publik penuh.
+        This document is a minimum viable version. A full version with the
+        legal basis (Indonesian Personal Data Protection Law, UU PDP 27/2022)
+        will be published before the full public launch.
       </p>
     </LegalShell>
   );

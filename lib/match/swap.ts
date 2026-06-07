@@ -81,7 +81,7 @@ export function validateSwap(
   // Identitas pemain sama (impossible kalau distinct constraint exists,
   // tapi defensive)
   if (matchA[slotA] === matchB[slotB]) {
-    return { ok: false, error: "Pemain yang sama tidak perlu di-swap" };
+    return { ok: false, error: "Same player — no swap needed" };
   }
 
   const { newA, newB } = applySwap(matchA, slotA, matchB, slotB, isSameMatch);
@@ -89,13 +89,13 @@ export function validateSwap(
   if (!hasDistinctPlayers(newA)) {
     return {
       ok: false,
-      error: "Hasil swap menghasilkan pemain duplikat di match A",
+      error: "Swap would create a duplicate player in match A",
     };
   }
   if (!isSameMatch && !hasDistinctPlayers(newB)) {
     return {
       ok: false,
-      error: "Hasil swap menghasilkan pemain duplikat di match B",
+      error: "Swap would create a duplicate player in match B",
     };
   }
   return { ok: true };
@@ -107,12 +107,12 @@ export function validateSwap(
 export function slotLabel(slot: MatchSlotKey): string {
   switch (slot) {
     case "team1P1Id":
-      return "Tim 1 · P1";
+      return "Team 1 · P1";
     case "team1P2Id":
-      return "Tim 1 · P2";
+      return "Team 1 · P2";
     case "team2P1Id":
-      return "Tim 2 · P1";
+      return "Team 2 · P1";
     case "team2P2Id":
-      return "Tim 2 · P2";
+      return "Team 2 · P2";
   }
 }

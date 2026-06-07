@@ -109,7 +109,7 @@ function OutcomePill({
     >
       <span style={{ fontSize: 16 }}>{OUTCOME_EMOJI[outcome]}</span>
       <span>
-        {outcome === "draw" ? "Seri" : `${OUTCOME_LABEL[outcome]}`}
+        {OUTCOME_LABEL[outcome]}
         {subtitle && (
           <span style={{ opacity: 0.7, marginLeft: 6, fontWeight: 700 }}>
             · {subtitle}

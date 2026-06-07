@@ -34,7 +34,7 @@ export function DeleteAccountForm() {
           margin: 0,
         }}
       >
-        ⚠ Hapus akun
+        ⚠ Delete account
       </h3>
       <p
         style={{
@@ -58,13 +58,13 @@ export function DeleteAccountForm() {
           color: "var(--text-700)",
         }}
       >
-        Ketik <strong>HAPUS</strong> untuk konfirmasi
+        Type <strong>DELETE</strong> to confirm
         <input
           name="confirmation"
           type="text"
           autoComplete="off"
           required
-          placeholder="HAPUS"
+          placeholder="DELETE"
           style={{
             padding: "var(--s-2) var(--s-3)",
             border: "1px solid var(--border)",
@@ -100,7 +100,7 @@ export function DeleteAccountForm() {
           cursor: pending ? "default" : "pointer",
         }}
       >
-        {pending ? "Menghapus..." : "Hapus akun permanen"}
+        {pending ? "Deleting..." : "Permanently delete account"}
       </button>
     </form>
   );

@@ -91,7 +91,7 @@ export default async function PrivacySettingsPage() {
           >
             Edit Profile
           </Link>
-          . Halaman ini untuk granular display + data control.
+          . This page handles granular display + data controls.
         </section>
 
         <PrivacyPrefsForm initialFlags={flags} initialPolicy={policy} />
@@ -127,8 +127,8 @@ export default async function PrivacySettingsPage() {
               margin: 0,
             }}
           >
-            Download semua data kamu dalam format JSON: profile, session, match
-            history, achievements.
+            Download all your data in JSON: profile, sessions, match history,
+            achievements.
           </p>
           <a
             href="/api/me/export"

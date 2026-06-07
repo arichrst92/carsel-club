@@ -59,7 +59,7 @@ export function CoverPhotoUploader({ sessionId, currentCoverUrl }: Props) {
 
   function handleRemove() {
     if (!preview) return;
-    if (!confirm("Hapus cover photo session?")) return;
+    if (!confirm("Remove session cover photo?")) return;
     startTransition(async () => {
       const result = await removeCoverPhotoAction(sessionId);
       if (result?.error) {

@@ -61,7 +61,7 @@ export function AddGuestForm({ sessionId }: { sessionId: string }) {
               >
                 <path d="M12 5v14M5 12h14" />
               </svg>
-              <span>{isPending ? "..." : "Tambah"}</span>
+              <span>{isPending ? "..." : "Add"}</span>
             </button>
           </div>
         </div>
@@ -100,7 +100,7 @@ export function AddGuestForm({ sessionId }: { sessionId: string }) {
             className="empty-guest"
             style={{ marginTop: 8 }}
           >
-            Ketik nama guest dan klik Tambah. Mereka akan langsung muncul di
+            Type the guest name and tap Add. They’ll show up in
             session.
           </div>
         ) : (

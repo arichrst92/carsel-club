@@ -82,7 +82,7 @@ export async function generateBracketAction(
     .orderBy(asc(sessionParticipants.joinedAt));
   const playing = parts.filter((p) => p.isPlaying).map((p) => p.id);
   if (playing.length % 2 !== 0) {
-    return { error: "Jumlah pemain harus genap (pair-based teams)" };
+    return { error: "Number of players must be even (pair-based teams)" };
   }
   const teams: Team[] = [];
   for (let i = 0; i < playing.length; i += 2) {

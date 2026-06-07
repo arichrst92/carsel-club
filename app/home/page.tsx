@@ -284,7 +284,7 @@ export default async function HomePage() {
                 fontWeight: 600,
               }}
             >
-              No matches yet. Create a session Belum ada match. Buat session & mulai main! start playing!
+              No matches yet. Create a session and start playing!
             </div>
           ) : (
             <div className="activity-list">
@@ -306,9 +306,9 @@ export default async function HomePage() {
                     <div className="activity-title">{m.sessionTitle}</div>
                     <div className="activity-meta">
                       {m.outcome === "win"
-                        ? "Menang"
+                        ? "Win"
                         : m.outcome === "draw"
-                          ? "Seri"
+                          ? "Draw"
                           : "Loss"}{" "}
                       {m.myScore}-{m.oppScore}
                     </div>
@@ -403,7 +403,7 @@ function TierCard({
           className="tier-progress-meta"
           style={{ marginTop: "var(--s-3)" }}
         >
-          <span>👑 Tier tertinggi!</span>
+          <span>👑 Top tier reached!</span>
         </div>
       )}
     </section>

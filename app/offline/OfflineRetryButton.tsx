@@ -10,7 +10,7 @@ export function OfflineRetryButton() {
       className="btn-primary"
       style={{ minWidth: 160 }}
     >
-      Coba lagi
+      Try again
     </button>
   );
 }

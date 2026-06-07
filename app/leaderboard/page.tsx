@@ -142,7 +142,7 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
               marginBottom: "var(--s-3)",
             }}
           >
-            {periodLabel(period)} · {rows.length} pemain
+            {periodLabel(period)} · {rows.length} players
           </div>
 
           <div style={{ display: "flex", gap: "var(--s-2)", flexWrap: "wrap" }}>
@@ -290,11 +290,11 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
         {rows.length === 0 && (
           <div className="empty-state">
             <div className="empty-state-icon">🎾</div>
-            <div className="empty-state-title">Leaderboard masih kosong</div>
+            <div className="empty-state-title">Leaderboard is empty</div>
             <div className="empty-state-text">
               {period !== "all_time"
                 ? "No completed matches in this period."
-                : "Mulai main session pertama kamu untuk masuk leaderboard."}
+                : "Play your first session to get on the leaderboard."}
             </div>
           </div>
         )}

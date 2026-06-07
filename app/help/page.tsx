@@ -16,41 +16,41 @@ const FAQ_SECTIONS: { title: string; items: { q: string; a: string }[] }[] = [
     title: "Getting Started",
     items: [
       {
-        q: "Cara daftar Carsel Club?",
-        a: "Tap Login, masukkan nomor WhatsApp aktif, terima OTP 6 digit, verifikasi, isi profil singkat (nama + kota + bio), selesai.",
+        q: "How do I sign up for Carsel Club?",
+        a: "Tap Log in, enter your active WhatsApp number, receive the 6-digit OTP, verify, fill in a short profile (name + city + bio) — done.",
       },
       {
-        q: "Apa beda Member dan Guest?",
-        a: "Member punya akun + stats lifetime + tier yang naik seiring waktu. Guest cuma satu sesi—host bisa tambah tanpa nomor WA, tapi gak punya stats lifetime.",
+        q: "What's the difference between Member and Guest?",
+        a: "Members have an account + lifetime stats + a tier that grows over time. Guests are session-only — the host can add them without a WA number, but they have no lifetime stats.",
       },
       {
-        q: "Aku tidak terima OTP. Kenapa?",
-        a: "Pastikan nomor WA aktif. Tunggu 1-2 menit. Cek folder Archived/Spam di WA. Kalau belum masuk, tap 'Kirim ulang' (max 3 request per 10 menit) atau hubungi support.",
+        q: "I didn't receive the OTP. Why?",
+        a: "Make sure your WA number is active. Wait 1–2 minutes. Check the Archived/Spam folders in WA. If it still doesn't arrive, tap 'Resend' (max 3 requests per 10 minutes) or contact support.",
       },
     ],
   },
   {
-    title: "Hosting Session",
+    title: "Hosting a Session",
     items: [
       {
-        q: "Cara host session padel?",
-        a: "Tap tombol + di tengah bottom nav, isi 5 step wizard (info, format, type, jadwal, review), invite player, lalu Generate Match saat siap mulai.",
+        q: "How do I host a padel session?",
+        a: "Tap the + button in the middle of the bottom nav, fill out the 5-step wizard (info, format, type, schedule, review), invite players, then Generate Match when you're ready to start.",
       },
       {
-        q: "Apa beda Americano, Mexicano, Tournament?",
-        a: "Americano = partner rotate setiap round (semua main bareng semua). Mexicano = pairing by ranking di tiap round. Tournament = single-elimination bracket.",
+        q: "What's the difference between Americano, Mexicano, and Tournament?",
+        a: "Americano = partners rotate every round (everyone plays with everyone). Mexicano = pairings by ranking each round. Tournament = single-elimination bracket.",
       },
       {
-        q: "Apa itu Fix Partners?",
-        a: "Mode khusus Americano dimana team sama selama session—2 pemain selalu jadi partner. Untuk tournament atau session formal.",
+        q: "What is Fix Partners?",
+        a: "An Americano sub-mode where teams stay the same throughout the session — 2 players are always partners. Useful for tournaments or formal sessions.",
       },
       {
-        q: "Bisa edit session setelah create?",
-        a: "Ya. Tap session → menu Edit. Kamu bisa ubah info, tambah/kurang player, ganti format selama status masih upcoming. Setelah live, banyak field ter-lock.",
+        q: "Can I edit a session after creating it?",
+        a: "Yes. Tap the session → Edit menu. You can change info, add/remove players, switch format while the status is still upcoming. Once it's live, many fields lock.",
       },
       {
-        q: "Cara invite player non-member?",
-        a: "Saat Add Player, pilih tab Guest, isi nama tampilan (gak perlu nomor WA). Guest cuma muncul di session ini.",
+        q: "How do I invite a non-member player?",
+        a: "When adding a player, pick the Guest tab and enter a display name (no WA number needed). The guest only shows up in this session.",
       },
     ],
   },
@@ -58,20 +58,20 @@ const FAQ_SECTIONS: { title: string; items: { q: string; a: string }[] }[] = [
     title: "Match & Scoring",
     items: [
       {
-        q: "Siapa yang bisa input score?",
-        a: "Host atau co-host. Player biasa cuma bisa lihat. Score input pakai tombol +/− saat match Live.",
+        q: "Who can enter scores?",
+        a: "The host or a co-host. Regular players can only view. Scores are entered using the +/− buttons while the match is Live.",
       },
       {
-        q: "Salah input score, gimana?",
-        a: "Sebelum match End: edit langsung pakai +/−. Setelah End: tap match → Edit Score. Stats akan auto-recompute (revert delta + apply baru).",
+        q: "What if I entered the wrong score?",
+        a: "Before the match ends: edit directly with +/−. After it ends: tap the match → Edit Score. Stats auto-recompute (revert the delta + apply the new value).",
       },
       {
-        q: "Aku mau revert match dari completed ke live, bisa?",
-        a: "Bisa. Host buka match detail → Revert. Stats akan reverse otomatis sampai score di-update lagi & End.",
+        q: "Can I revert a match from completed back to live?",
+        a: "Yes. The host opens match detail → Revert. Stats reverse automatically until the score is updated and the match is ended again.",
       },
       {
-        q: "Berapa poin yang aku dapat per match?",
-        a: "Menang = 3 poin, Seri = 2 poin, Kalah = 1 poin. Akumulasi → naik tier otomatis.",
+        q: "How many points do I earn per match?",
+        a: "Win = 3 points, Draw = 2 points, Loss = 1 point. The total accumulates and you tier up automatically.",
       },
     ],
   },
@@ -79,20 +79,20 @@ const FAQ_SECTIONS: { title: string; items: { q: string; a: string }[] }[] = [
     title: "Tier & Achievements",
     items: [
       {
-        q: "Tier ladder lengkap?",
-        a: "Rookie (0) → Bronze (50pts/10 matches) → Silver (150/25) → Gold (300/50) → Platinum (600/100) → Master (1000/200). Tier naik otomatis saat threshold tercapai.",
+        q: "What's the full tier ladder?",
+        a: "Rookie (0) → Bronze (50 pts/10 matches) → Silver (150/25) → Gold (300/50) → Platinum (600/100) → Master (1000/200). Tier goes up automatically when the threshold is reached.",
       },
       {
-        q: "Kalau aku salah input score dan tier-down, gimana?",
-        a: "Tier mengikuti stats riil. Setelah recompute via revert/edit, tier akan adjust juga (bisa naik atau turun).",
+        q: "What if a wrong score causes me to tier down?",
+        a: "Tier follows real stats. After a recompute via revert/edit, the tier adjusts too (can go up or down).",
       },
       {
-        q: "Pencapaian apa saja yang ada?",
-        a: "Total 15+ badge: milestone match, win count, host count, streak, tier, perfect day, hot session. Lihat lengkap di Profile → Achievements.",
+        q: "What achievements are available?",
+        a: "Over 15 badges: match milestones, win counts, host counts, streaks, tiers, perfect day, hot session. See the full list under Profile → Achievements.",
       },
       {
-        q: "Apa itu streak?",
-        a: "Win streak adalah jumlah match menang berturut-turut. Reset saat kalah/seri. Best win streak ditracking forever.",
+        q: "What's a streak?",
+        a: "A win streak is the number of matches won in a row. It resets on a loss or draw. Your best win streak is tracked forever.",
       },
     ],
   },
@@ -100,16 +100,16 @@ const FAQ_SECTIONS: { title: string; items: { q: string; a: string }[] }[] = [
     title: "Notifications",
     items: [
       {
-        q: "Notif apa saja yang aku terima?",
-        a: "Session invite, session reminder H-1 jam, hasil match, friend request, tier up, dan achievement unlock. Atur per-tipe di Settings → Notifikasi.",
+        q: "What notifications do I receive?",
+        a: "Session invites, the H-1 hour session reminder, match results, friend requests, tier-ups, and achievement unlocks. Configure per type under Settings → Notifications.",
       },
       {
-        q: "Cara matikan notif WA?",
-        a: "Profile → Notifikasi → set channel WA jadi off per tipe yang gak mau dapat.",
+        q: "How do I turn off WA notifications?",
+        a: "Profile → Notifications → toggle the WA channel off for any type you don't want.",
       },
       {
-        q: "Bisa set quiet hours?",
-        a: "Bisa. Settings → Notifikasi → Quiet hours start/end. Push & WA tidak dikirim antara jam itu (in-app tetap masuk).",
+        q: "Can I set quiet hours?",
+        a: "Yes. Settings → Notifications → Quiet hours start/end. Push & WA aren't sent during those hours (in-app still arrives).",
       },
     ],
   },
@@ -117,20 +117,20 @@ const FAQ_SECTIONS: { title: string; items: { q: string; a: string }[] }[] = [
     title: "Privacy & Data",
     items: [
       {
-        q: "Siapa yang bisa lihat profil aku?",
-        a: "Default Public (siapa saja yang punya link). Bisa diset Friends (cuma friend) atau Private (cuma kamu) di Profile → Ubah Profil.",
+        q: "Who can see my profile?",
+        a: "Public by default (anyone with the link). You can switch to Friends (friends only) or Private (only you) under Profile → Edit Profile.",
       },
       {
-        q: "Cara matikan friend request dari orang asing?",
-        a: "Profile → Privacy → Friend request → set 'Mati' atau 'Hanya friend dari friend'.",
+        q: "How do I block friend requests from strangers?",
+        a: "Profile → Privacy → Friend requests → set 'Off' or 'Friends of friends only'.",
       },
       {
-        q: "Mau export semua data aku, bisa?",
-        a: "Bisa. Profile → Privacy → Data export → Download JSON. Berisi profile, session, match history, achievements.",
+        q: "Can I export all my data?",
+        a: "Yes. Profile → Privacy → Data export → Download JSON. Includes profile, sessions, match history, achievements.",
       },
       {
-        q: "Mau hapus akun, gimana?",
-        a: "Profile → Privacy → Hapus akun permanen → ketik 'HAPUS' untuk konfirmasi. Akun di-anonim secara permanen, stats historical tetap untuk integritas data sesi.",
+        q: "How do I delete my account?",
+        a: "Profile → Privacy → Permanently delete account → type 'DELETE' to confirm. The account is permanently anonymized; historical stats are kept to preserve session data integrity.",
       },
     ],
   },
@@ -146,9 +146,9 @@ export default function HelpPage() {
           marginTop: 0,
         }}
       >
-        Bantuan & Support
+        Help & Support
       </h1>
-      <p>Ada pertanyaan atau kendala? Hubungi tim Carsel Club via:</p>
+      <p>Have questions or issues? Reach the Carsel Club team via:</p>
       <ul>
         <li>
           WhatsApp:{" "}
@@ -206,20 +206,20 @@ export default function HelpPage() {
               href="/privacy-policy"
               style={{ color: "var(--primary-700)" }}
             >
-              Kebijakan Privasi
+              Privacy Policy
             </Link>
           </li>
           <li>
             <Link href="/tos" style={{ color: "var(--primary-700)" }}>
-              Syarat & Ketentuan
+              Terms & Conditions
             </Link>
           </li>
         </ul>
       </section>
 
       <p style={{ marginTop: 28, fontSize: 12, color: "var(--text-500)" }}>
-        Pertanyaan tidak terjawab? Tap WhatsApp di atas untuk chat support
-        langsung.
+        Didn't find your answer? Tap the WhatsApp link above to chat with
+        support directly.
       </p>
     </LegalShell>
   );

@@ -76,7 +76,7 @@ export function GenerateRoundButton({
               fontWeight: 600,
             }}
           >
-            Butuh minimal 4 pemain aktif (sekarang {activePlayerCount}).
+            Need at least 4 active players (currently {activePlayerCount}).
           </p>
         )}
       </div>
@@ -108,7 +108,7 @@ export function GenerateRoundButton({
             fontWeight: 600,
           }}
         >
-          Butuh minimal 4 pemain aktif (sekarang {activePlayerCount}).
+          Need at least 4 active players (currently {activePlayerCount}).
         </p>
       )}
     </div>

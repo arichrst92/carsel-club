@@ -79,8 +79,8 @@ export default async function NotificationsPage() {
             }}
           >
             {unreadCount > 0
-              ? `${unreadCount} belum dibaca`
-              : "Semua sudah dibaca"}
+              ? `${unreadCount} unread`
+              : "All caught up"}
           </div>
           <Link
             href="/profile/settings/notifications"
@@ -91,7 +91,7 @@ export default async function NotificationsPage() {
               textDecoration: "none",
             }}
           >
-            Pengaturan ⚙
+Settings ⚙
           </Link>
         </div>
 
@@ -195,8 +195,8 @@ function EmptyState() {
           maxWidth: 280,
         }}
       >
-        Notifikasi muncul saat kamu di-invite ke session, tier naik, atau match
-        selesai.
+        Notifications show up when you're invited to a session, tier up, or a
+        match ends.
       </div>
     </div>
   );

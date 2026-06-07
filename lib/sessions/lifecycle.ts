@@ -32,8 +32,8 @@ export const STATUS_ORDER: SessionStatus[] = [
 export const STATUS_LABEL: Record<SessionStatus, string> = {
   upcoming: "Upcoming",
   live: "Live",
-  completed: "Selesai",
-  cancelled: "Dibatalkan",
+  completed: "Completed",
+  cancelled: "Cancelled",
 };
 
 export const STATUS_EMOJI: Record<SessionStatus, string> = {
@@ -73,7 +73,7 @@ export function transitionForEnd(
 ): SessionStatus {
   if (!canTransition(current, "completed")) {
     throw new Error(
-      `Tidak bisa End dari status '${current}'. Sudah selesai/dibatalkan.`
+      `Cannot End from status '${current}'. Already completed/cancelled.`
     );
   }
   return "completed";
@@ -106,7 +106,7 @@ export function transitionForCancel(
 ): SessionStatus {
   if (!canTransition(current, "cancelled")) {
     throw new Error(
-      `Tidak bisa Cancel dari status '${current}'. Sudah selesai/dibatalkan.`
+      `Cannot Cancel from status '${current}'. Already completed/cancelled.`
     );
   }
   return "cancelled";

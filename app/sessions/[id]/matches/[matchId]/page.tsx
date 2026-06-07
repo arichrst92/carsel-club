@@ -118,7 +118,7 @@ export default async function MatchDetailPage({ params }: PageProps) {
             <MetaCard label="Court" value={`#${match.courtNumber}`} />
             <MetaCard label="Round" value={`#${round.roundNumber}`} />
             <MetaCard
-              label={isLive ? "Berjalan" : isCompleted ? "Durasi" : "Status"}
+              label={isLive ? "Running" : isCompleted ? "Duration" : "Status"}
               value={
                 match.startedAt ? (
                   <MatchTimer
@@ -231,7 +231,7 @@ export default async function MatchDetailPage({ params }: PageProps) {
         {/* Lineup — Team 1 */}
         <section>
           <div className="section-head">
-            <h3>Tim 1</h3>
+            <h3>Team 1</h3>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {team1.map((p) => (
@@ -249,7 +249,7 @@ export default async function MatchDetailPage({ params }: PageProps) {
         {/* Lineup — Team 2 */}
         <section>
           <div className="section-head">
-            <h3>Tim 2</h3>
+            <h3>Team 2</h3>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {team2.map((p) => (

@@ -41,9 +41,9 @@ export async function GET(_req: Request, { params }: Props) {
     session.status === "live"
       ? "🔴 LIVE"
       : session.status === "completed"
-        ? "✅ Selesai"
+        ? "✅ Completed"
         : session.status === "cancelled"
-          ? "❌ Dibatalkan"
+          ? "❌ Cancelled"
           : "📅 Upcoming";
 
   return new ImageResponse(
@@ -281,7 +281,7 @@ export async function GET(_req: Request, { params }: Props) {
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               <div style={{ fontSize: 18, opacity: 0.85, fontWeight: 700 }}>
-                Match Selesai
+                Matches Done
               </div>
               <div style={{ fontSize: 40, fontWeight: 800 }}>
                 {completedMatches}

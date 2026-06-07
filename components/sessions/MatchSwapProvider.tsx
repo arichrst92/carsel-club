@@ -199,7 +199,7 @@ export function MatchSwapProvider({
                   cursor: "pointer",
                 }}
               >
-                Batal
+                Cancel
               </button>
               <button
                 type="button"
@@ -208,7 +208,7 @@ export function MatchSwapProvider({
                 className="btn-primary-lg"
                 style={{ flex: 1 }}
               >
-                {isPending ? "Menukar..." : "Tukar"}
+                {isPending ? "Swapping..." : "Swap"}
               </button>
             </div>
           </div>

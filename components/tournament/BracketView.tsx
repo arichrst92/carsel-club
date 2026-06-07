@@ -166,7 +166,7 @@ export function BracketView({ data }: { data: BracketViewData }) {
                           {m.status === "live"
                             ? "● Live"
                             : m.status === "completed"
-                              ? "✓ Selesai"
+                              ? "✓ Done"
                               : "Pending"}
                         </div>
                       </Link>

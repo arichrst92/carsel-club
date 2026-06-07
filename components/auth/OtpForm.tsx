@@ -115,7 +115,7 @@ export function OtpForm({ phone }: { phone: string }) {
       if (result?.error) {
         setError(result.error);
       } else {
-        setResendInfo("OTP baru dikirim ke WhatsApp");
+        setResendInfo("New OTP sent to WhatsApp");
         setResendSecs(RESEND_SECS);
         setDigits(Array(OTP_LENGTH).fill(""));
         inputRefs.current[0]?.focus();
@@ -149,9 +149,9 @@ export function OtpForm({ phone }: { phone: string }) {
               <path d="M9 10h.01M13 10h.01M17 10h.01" />
             </svg>
           </div>
-          <h2 className="auth-step-title">Cek WhatsApp Kamu</h2>
+          <h2 className="auth-step-title">Check Your WhatsApp</h2>
           <p className="auth-step-sub">
-            Kami baru saja kirim 6-digit kode ke{" "}
+            We just sent a 6-digit code to{" "}
             <strong>{formatPhoneForDisplay(phone)}</strong>.
           </p>
 
@@ -230,15 +230,15 @@ export function OtpForm({ phone }: { phone: string }) {
           <div className="resend-row">
             {resendSecs > 0 ? (
               <p>
-                Belum dapat kode?{" "}
+                Didn't get the code?{" "}
                 <span className="timer">
-                  Kirim ulang dalam 0:
+                  Resend in 0:
                   {String(resendSecs).padStart(2, "0")}
                 </span>
               </p>
             ) : (
               <p>
-                Belum dapat kode?{" "}
+                Didn't get the code?{" "}
                 <a
                   href="#"
                   onClick={(e) => {
@@ -246,7 +246,7 @@ export function OtpForm({ phone }: { phone: string }) {
                     handleResend();
                   }}
                 >
-                  Kirim ulang OTP
+                  Resend OTP
                 </a>
               </p>
             )}
@@ -266,7 +266,7 @@ export function OtpForm({ phone }: { phone: string }) {
           disabled={!allFilled || isPending}
           className={`btn-primary-lg ${isPending ? "loading" : ""}`}
         >
-          <span>{isPending ? "Memverifikasi..." : "Verifikasi"}</span>
+          <span>{isPending ? "Verifying..." : "Verify"}</span>
           {!isPending && (
             <svg
               width="20"

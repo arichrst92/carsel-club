@@ -21,14 +21,14 @@ import {
 import type { NotificationType } from "@/lib/notifications/types";
 
 const TYPE_LABELS: Record<NotificationType, string> = {
-  session_invite: "Diundang ke session",
-  session_reminder: "Session reminder (H-1 hour)",
+  session_invite: "Invited to a session",
+  session_reminder: "Session reminder (1 hour before)",
   session_cancelled: "Session cancelled",
   friend_request: "Friend request",
-  friend_accepted: "Friend di-accept",
-  join_requested: "Join request masuk (host)",
-  join_approved: "Join request di-approve",
-  join_rejected: "Join request di-reject",
+  friend_accepted: "Friend request accepted",
+  join_requested: "Join request received (host)",
+  join_approved: "Join request approved",
+  join_rejected: "Join request rejected",
 };
 
 const TYPES: NotificationType[] = Object.keys(TYPE_LABELS) as NotificationType[];
@@ -62,10 +62,10 @@ export function NotificationPrefsForm(props: NotificationPrefsFormProps) {
           padding: "var(--s-4)",
         }}
       >
-        <h3 style={prefHeader}>Channels per tipe</h3>
+        <h3 style={prefHeader}>Channels by type</h3>
         <p style={prefDesc}>
-          In-app selalu masuk. Push & WhatsApp belum aktif (Sprint 27/28) —
-          preferensi disimpan untuk dipakai nanti.
+          In-app is always on. Push & WhatsApp aren't live yet (Sprint 27/28) —
+          preferences are saved for later.
         </p>
         <div
           style={{
@@ -104,7 +104,7 @@ export function NotificationPrefsForm(props: NotificationPrefsFormProps) {
       >
         <h3 style={prefHeader}>Quiet hours</h3>
         <p style={prefDesc}>
-          Push & WA tidak dikirim antara jam berikut (in-app tetap masuk).
+          Push & WA won't be sent during these hours (in-app still arrives).
         </p>
         <div
           style={{
@@ -115,12 +115,12 @@ export function NotificationPrefsForm(props: NotificationPrefsFormProps) {
         >
           <HourSelect
             name="quiet_start"
-            label="Mulai"
+            label="Start"
             value={props.initialQuietStart}
           />
           <HourSelect
             name="quiet_end"
-            label="Completed"
+            label="End"
             value={props.initialQuietEnd}
           />
         </div>
@@ -157,7 +157,7 @@ export function NotificationPrefsForm(props: NotificationPrefsFormProps) {
         className="btn-primary"
         style={{ marginTop: "var(--s-2)" }}
       >
-        {pending ? "Menyimpan..." : "Simpan preferensi"}
+        {pending ? "Saving..." : "Save preferences"}
       </button>
     </form>
   );

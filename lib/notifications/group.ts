@@ -13,7 +13,7 @@ export type DateBucket = "today" | "yesterday" | "this_week" | "older";
 
 export const BUCKET_LABELS: Record<DateBucket, string> = {
   today: "Hari ini",
-  yesterday: "Kemarin",
+  yesterday: "Yesterday",
   this_week: "Minggu ini",
   older: "Lebih lama",
 };

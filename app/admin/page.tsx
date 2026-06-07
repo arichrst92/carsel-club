@@ -109,7 +109,7 @@ export default async function AdminIndex() {
             >
               Last:{" "}
               {health.lastBackupAt
-                ? `${health.lastBackupAt.toISOString().slice(0, 16).replace("T", " ")} (${formatBackupAge(health.hoursSince)} lalu)`
+                ? `${health.lastBackupAt.toISOString().slice(0, 16).replace("T", " ")} (${formatBackupAge(health.hoursSince)} ago)`
                 : "—"}
             </div>
           </div>
@@ -141,20 +141,20 @@ export default async function AdminIndex() {
           <AdminLink
             href="/admin/users"
             emoji="🔍"
-            title="Cari user"
-            sub="Cari berdasar nama, nomor, kota"
+            title="Search users"
+            sub="Search by name, phone, city"
           />
           <AdminLink
             href="/admin/sessions"
             emoji="📅"
-            title="Cari session"
-            sub="Cari berdasar judul, venue"
+            title="Search sessions"
+            sub="Search by title, venue"
           />
           <AdminLink
             href="/monitor"
             emoji="📊"
             title="Event log monitor"
-            sub="Lihat app logs + events"
+            sub="View app logs + events"
           />
         </nav>
       </main>

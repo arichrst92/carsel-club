@@ -116,7 +116,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
           <Link
             href={`/sessions/${session.id}/edit`}
             className="subscreen-action"
-            aria-label="Ubah Sesi"
+            aria-label="Edit Session"
             title="Edit Session"
             style={{
               fontFamily: "var(--font-display)",
@@ -278,7 +278,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
                   marginBottom: 4,
                 }}
               >
-                🌍 Session ini Public
+                🌍 Public Session
               </div>
               <p
                 style={{
@@ -289,8 +289,8 @@ export default async function SessionDetailPage({ params }: PageProps) {
                   lineHeight: 1.4,
                 }}
               >
-                Kamu belum join session ini. Tap di bawah untuk langsung join
-                sebagai pemain.
+                You haven't joined this session yet. Tap below to join directly
+                as a player.
               </p>
               <JoinPublicSessionButton
               sessionId={session.id}
@@ -355,7 +355,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
                   href={`/sessions/${session.id}/participants`}
                   className="section-link"
                 >
-                  + Tambah
+                  + Add
                 </Link>
               )}
             </div>
@@ -430,7 +430,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
                       fontWeight: 600,
                     }}
                   >
-                    Member atau Guest · tanpa batas
+                    Member or Guest · no limit
                   </div>
                 </div>
               </Link>
@@ -586,9 +586,9 @@ export default async function SessionDetailPage({ params }: PageProps) {
                 No matches created yet
               </div>
               <div className="empty-state-text">
-                Klik &quot;Generate Match&quot; di bawah saat semua pemain
-                sudah datang. Kamu bisa buat extra match kapan saja saat session
-                berjalan.
+                Click &quot;Generate Match&quot; below once all players have
+                arrived. You can create extra matches anytime while the session
+                is running.
               </div>
             </div>
           ) : (
@@ -621,7 +621,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
                   }}
                 >
                   {rounds.length} round{rounds.length > 1 ? "s" : ""} ·{" "}
-                  {completedMatches}/{totalMatches} match selesai
+                  {completedMatches}/{totalMatches} matches completed
                 </div>
                 <svg
                   width="20"
@@ -643,7 +643,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
                   fontWeight: 600,
                 }}
               >
-                Tap untuk lihat detail match + scoring
+                Tap to view match details + scoring
               </div>
             </Link>
           )}
@@ -680,7 +680,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
                   <path d="M12 6v6l4 2" />
                 </svg>
               </div>
-              <h3>Status Session</h3>
+              <h3>Session Status</h3>
             </div>
 
             <SessionStatusTimeline current={session.status} />
@@ -743,7 +743,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
             >
               <path d="M9 11H4l3-3M9 13H4l3 3M14 11h5l-3-3M14 13h5l-3 3" />
             </svg>
-            <span>Lihat Match & Skor</span>
+            <span>View Matches & Scores</span>
           </Link>
         </div>
       )}

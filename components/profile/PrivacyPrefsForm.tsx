@@ -51,9 +51,9 @@ export function PrivacyPrefsForm(props: PrivacyPrefsFormProps) {
           padding: "var(--s-4)",
         }}
       >
-        <h3 style={h3}>Tampilan profil publik</h3>
+        <h3 style={h3}>Public profile display</h3>
         <p style={pSub}>
-          Yang ditampilkan saat orang lain buka profil kamu (kecuali visibility = Private).
+          What other people see when they open your profile (unless visibility = Private).
         </p>
         <div
           style={{
@@ -84,7 +84,7 @@ export function PrivacyPrefsForm(props: PrivacyPrefsFormProps) {
         }}
       >
         <h3 style={h3}>Friend request</h3>
-        <p style={pSub}>Siapa yang boleh kirim friend request ke kamu.</p>
+        <p style={pSub}>Who can send you a friend request.</p>
         <div
           style={{
             display: "flex",
@@ -118,7 +118,7 @@ export function PrivacyPrefsForm(props: PrivacyPrefsFormProps) {
       )}
 
       <button type="submit" disabled={pending} className="btn-primary">
-        {pending ? "Menyimpan..." : "Simpan privacy"}
+        {pending ? "Saving..." : "Save privacy"}
       </button>
     </form>
   );

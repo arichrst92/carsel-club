@@ -106,8 +106,8 @@ export default async function AdminUserDetailPage({
             textAlign: "center",
           }}
         >
-          Recompute rebuilds totals + streak + tier dari match history. Achievements
-          akan di-re-check untuk catch yang baru unlock.
+          Recompute rebuilds totals + streak + tier from match history. Achievements
+          are re-checked to catch any newly unlocked.
         </div>
       </main>
     </div>

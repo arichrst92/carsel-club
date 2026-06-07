@@ -104,7 +104,7 @@ export function GenerateMatchConfig({
 
   function handleSubmit() {
     if (!canGenerate) {
-      setError("Butuh minimal 4 pemain aktif");
+      setError("Need at least 4 active players");
       return;
     }
     setError(null);
@@ -323,7 +323,7 @@ export function GenerateMatchConfig({
                 fontWeight: 700,
               }}
             >
-              ⚠ Butuh minimal 4 pemain aktif untuk generate round
+              ⚠ Need at least 4 active players to generate a round
             </div>
           )}
         </section>

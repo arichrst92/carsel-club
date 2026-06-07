@@ -111,7 +111,7 @@ export default async function MonitorPage({
               color: "var(--text-900)",
             }}
           >
-            {totalShown.toLocaleString("id-ID")} entry
+            {totalShown.toLocaleString("en-US")} entries
           </div>
           <div
             style={{

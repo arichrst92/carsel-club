@@ -24,10 +24,10 @@ export const DEFAULT_DISPLAY_FLAGS: Required<DisplayFlags> = {
 };
 
 export const DISPLAY_FLAG_LABELS: Record<keyof DisplayFlags, string> = {
-  showCity: "Tampilkan kota di profil publik",
-  showStats: "Tampilkan stats (poin, match, win rate)",
-  showAchievements: "Tampilkan achievements unlocked",
-  showMatches: "Tampilkan recent matches",
+  showCity: "Show city on public profile",
+  showStats: "Show stats (points, matches, win rate)",
+  showAchievements: "Show unlocked achievements",
+  showMatches: "Show recent matches",
 };
 
 /**

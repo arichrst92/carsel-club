@@ -25,7 +25,7 @@ export type MatchAction = "start" | "end" | "revert" | "edit";
 export const MATCH_STATUS_LABEL: Record<MatchStatus, string> = {
   pending: "Pending",
   live: "LIVE",
-  completed: "Selesai",
+  completed: "Completed",
 };
 
 export const MATCH_STATUS_EMOJI: Record<MatchStatus, string> = {

@@ -5,101 +5,101 @@
 import { LegalShell } from "@/components/legal/LegalShell";
 
 export const metadata = {
-  title: "Syarat & Ketentuan",
+  title: "Terms & Conditions",
 };
 
-const LAST_UPDATED = "6 Juni 2026";
+const LAST_UPDATED = "June 6, 2026";
 
 export default function TosPage() {
   return (
-    <LegalShell title="Syarat & Ketentuan">
+    <LegalShell title="Terms & Conditions">
       <h1 style={{ fontFamily: "var(--font-display)", fontSize: 22, marginTop: 0 }}>
-        Syarat & Ketentuan
+        Terms & Conditions
       </h1>
       <p style={{ fontSize: 12, color: "var(--text-500)" }}>
-        Terakhir diperbarui: {LAST_UPDATED}
+        Last updated: {LAST_UPDATED}
       </p>
 
-      <h2 style={h2}>1. Penerimaan</h2>
+      <h2 style={h2}>1. Acceptance</h2>
       <p>
-        Dengan mendaftar dan menggunakan Carsel Club, kamu setuju terikat oleh
-        syarat ini. Jika tidak setuju, jangan gunakan aplikasi.
+        By signing up and using Carsel Club, you agree to be bound by these
+        terms. If you don't agree, don't use the app.
       </p>
 
-      <h2 style={h2}>2. Akun & Keamanan</h2>
+      <h2 style={h2}>2. Account & Security</h2>
       <ul>
-        <li>Satu akun per nomor WhatsApp. Akun tidak dapat dipindahtangankan.</li>
-        <li>Kamu bertanggung jawab atas semua aktivitas yang terjadi di akunmu.</li>
-        <li>Jangan share OTP atau session link ke pihak yang tidak dikenal.</li>
+        <li>One account per WhatsApp number. Accounts are not transferable.</li>
+        <li>You are responsible for all activity that happens under your account.</li>
+        <li>Don't share your OTP or session link with people you don't know.</li>
       </ul>
 
-      <h2 style={h2}>3. Perilaku yang Dilarang</h2>
+      <h2 style={h2}>3. Prohibited Behavior</h2>
       <ul>
-        <li>Spam, harassment, atau konten yang menyinggung pengguna lain.</li>
+        <li>Spam, harassment, or content that offends other users.</li>
         <li>
-          Manipulasi stats (fake match, kolusi score, multi-akun untuk inflate
-          tier).
+          Stat manipulation (fake matches, score collusion, multiple accounts to
+          inflate tier).
         </li>
         <li>
-          Upload konten yang melanggar hak cipta atau bersifat ilegal (porn,
-          violence, dll).
+          Uploading content that violates copyright or is illegal (pornography,
+          violence, etc.).
         </li>
         <li>
-          Reverse-engineering, scraping massal, atau membuat klon untuk
-          kepentingan komersial tanpa izin.
+          Reverse-engineering, mass scraping, or building a clone for
+          commercial purposes without permission.
         </li>
       </ul>
 
-      <h2 style={h2}>4. Konten yang Kamu Upload</h2>
+      <h2 style={h2}>4. Content You Upload</h2>
       <p>
-        Kamu memberikan Carsel Club lisensi non-eksklusif untuk menyimpan,
-        memproses, dan menampilkan foto profil/cover/session photo yang kamu
-        upload, semata-mata untuk operasional aplikasi.
+        You grant Carsel Club a non-exclusive license to store, process, and
+        display profile/cover/session photos you upload, solely for app
+        operations.
       </p>
 
       <h2 style={h2}>5. Stats & Match Integrity</h2>
       <p>
-        Host & co-host bertanggung jawab atas akurasi score. Carsel Club berhak
-        meninjau ulang dan menyesuaikan stats jika ada bukti manipulasi.
-        Recompute admin (lihat dashboard) akan rebuild stats dari source data
-        kalau diperlukan.
+        Hosts and co-hosts are responsible for score accuracy. Carsel Club
+        reserves the right to review and adjust stats if there is evidence of
+        manipulation. Admin recompute (see the admin dashboard) can rebuild
+        stats from source data when needed.
       </p>
 
-      <h2 style={h2}>6. Pengakhiran</h2>
+      <h2 style={h2}>6. Termination</h2>
       <p>
-        Kami berhak menonaktifkan akun yang melanggar syarat ini tanpa
-        pemberitahuan. Kamu dapat menutup akun kapan saja via support.
+        We reserve the right to disable any account that violates these terms
+        without notice. You can close your account any time via support.
       </p>
 
       <h2 style={h2}>7. Disclaimer</h2>
       <p>
-        Carsel Club disediakan "as-is". Kami tidak menjamin layanan 100% bebas
-        downtime atau bebas bug. Stats, leaderboard, dan ranking bersifat
-        informatif, bukan pengganti turnamen resmi PB Padel.
+        Carsel Club is provided "as-is". We don't guarantee the service is
+        100% downtime-free or bug-free. Stats, leaderboards, and rankings are
+        informational and not a substitute for official PB Padel tournaments.
       </p>
 
-      <h2 style={h2}>8. Batas Tanggung Jawab</h2>
+      <h2 style={h2}>8. Limitation of Liability</h2>
       <p>
-        Tanggung jawab Carsel Club terbatas pada biaya yang kamu bayar untuk
-        layanan (saat ini gratis). Kami tidak bertanggung jawab atas kerugian
-        tidak langsung dari penggunaan aplikasi.
+        Carsel Club's liability is limited to the amount you have paid for the
+        service (currently free). We are not responsible for indirect damages
+        arising from use of the app.
       </p>
 
-      <h2 style={h2}>9. Perubahan</h2>
+      <h2 style={h2}>9. Changes</h2>
       <p>
-        Syarat dapat berubah; perubahan material akan diberitahukan via
-        notifikasi in-app minimal 14 hari sebelumnya. Tetap menggunakan
-        aplikasi setelah update = menerima syarat baru.
+        These terms may change; material changes will be announced via in-app
+        notification at least 14 days in advance. Continuing to use the app
+        after an update means you accept the new terms.
       </p>
 
-      <h2 style={h2}>10. Hukum yang Berlaku</h2>
+      <h2 style={h2}>10. Governing Law</h2>
       <p>
-        Syarat ini diatur oleh hukum Republik Indonesia. Sengketa diselesaikan
-        melalui musyawarah; jika gagal, melalui Badan Arbitrase Nasional
-        Indonesia (BANI) di Jakarta.
+        These terms are governed by the laws of the Republic of Indonesia.
+        Disputes are resolved through good-faith discussion; if unresolved,
+        through the Indonesian National Arbitration Board (BANI) in Jakarta.
       </p>
 
-      <h2 style={h2}>11. Kontak</h2>
+      <h2 style={h2}>11. Contact</h2>
       <p>
         <a href="mailto:support@carsel.club" style={{ color: "var(--primary-700)" }}>
           support@carsel.club

@@ -13,7 +13,7 @@ export function StartSessionButton({ sessionId }: { sessionId: string }) {
   function handleClick() {
     if (
       !confirm(
-        "Mulai sesi sekarang? Status berubah ke LIVE. Cocok kalau pemain sudah datang & siap main."
+        "Start the session now? Status switches to LIVE. Good when players have arrived & are ready."
       )
     )
       return;

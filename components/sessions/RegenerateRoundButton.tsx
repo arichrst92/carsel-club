@@ -37,7 +37,7 @@ export function RegenerateRoundButton({ roundSetId, roundNumber }: Props) {
         type="button"
         onClick={handleClick}
         disabled={isPending}
-        title="Hapus matches + generate ulang"
+        title="Delete matches + regenerate"
         style={{
           padding: "6px 12px",
           background: "transparent",

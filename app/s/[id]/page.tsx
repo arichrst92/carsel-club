@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: PageProps) {
   const ogImage = `/api/og/session/${id}`;
   const description = data.session.venueName
     ? `Live padel session · ${data.session.venueName}`
-    : "Live padel session di Carsel Club";
+    : "Live padel session on Carsel Club";
 
   return {
     title: `LIVE — ${data.session.title} · Carsel Club`,
@@ -49,8 +49,8 @@ export async function generateMetadata({ params }: PageProps) {
 const STATUS_LABEL: Record<string, { label: string; color: string }> = {
   upcoming: { label: "📅 Upcoming", color: "#FACC15" },
   live: { label: "🔴 LIVE", color: "#EF4444" },
-  completed: { label: "✅ Selesai", color: "#10B981" },
-  cancelled: { label: "❌ Dibatalkan", color: "#94A3B8" },
+  completed: { label: "✅ Completed", color: "#10B981" },
+  cancelled: { label: "❌ Cancelled", color: "#94A3B8" },
 };
 
 export default async function PublicLiveView({ params }: PageProps) {
@@ -139,7 +139,7 @@ export default async function PublicLiveView({ params }: PageProps) {
             boxShadow: "var(--shadow-sm)",
           }}
         >
-          Buka di App →
+          Open in App →
         </Link>
       </header>
 
@@ -203,7 +203,7 @@ export default async function PublicLiveView({ params }: PageProps) {
                   textTransform: "uppercase",
                 }}
               >
-                Auto-refresh tiap 5 detik
+                Auto-refresh every 5 seconds
               </span>
             )}
           </div>
@@ -264,7 +264,7 @@ export default async function PublicLiveView({ params }: PageProps) {
                   <path d="M12 6v6l4 2" />
                 </svg>
                 <span>
-                  Round {currentRound.roundNumber} dari {totalRounds}
+                  Round {currentRound.roundNumber} of {totalRounds}
                 </span>
               </div>
             )}
@@ -305,7 +305,7 @@ export default async function PublicLiveView({ params }: PageProps) {
                   <path d="M4 21a8 8 0 0 1 16 0" />
                 </svg>
                 <span>
-                  Hosted by {session.hostName} · {participants.length} pemain
+                  Hosted by {session.hostName} · {participants.length} players
                 </span>
               </div>
             )}
@@ -351,7 +351,7 @@ export default async function PublicLiveView({ params }: PageProps) {
         {leaderboard.length > 0 && (
           <section>
             <div className="section-head">
-              <h3>🏆 Top {Math.min(5, leaderboard.length)} Pemimpin</h3>
+              <h3>🏆 Top {Math.min(5, leaderboard.length)} Leaders</h3>
               <span
                 style={{
                   color: "var(--text-500)",
@@ -389,10 +389,10 @@ export default async function PublicLiveView({ params }: PageProps) {
         {!currentRound && (
           <div className="empty-state">
             <div className="empty-state-icon">⏳</div>
-            <div className="empty-state-title">Match belum dimulai</div>
+            <div className="empty-state-title">Matches haven't started yet</div>
             <div className="empty-state-text">
-              Host belum generate round pertama. Refresh page saat match
-              dimulai.
+              The host hasn't generated the first round yet. Refresh the page
+              when matches start.
             </div>
           </div>
         )}
@@ -420,7 +420,7 @@ export default async function PublicLiveView({ params }: PageProps) {
                 marginBottom: 4,
               }}
             >
-              Mau ikut main?
+              Want to play?
             </div>
             <div
               style={{
@@ -430,7 +430,7 @@ export default async function PublicLiveView({ params }: PageProps) {
                 marginBottom: "var(--s-3)",
               }}
             >
-              Join as guest tanpa daftar — nama kamu langsung masuk lineup.
+              Join as a guest without signing up — your name goes straight into the lineup.
             </div>
             <Link
               href={`/s/${session.id}/guest`}
@@ -482,7 +482,7 @@ export default async function PublicLiveView({ params }: PageProps) {
               marginBottom: "var(--s-3)",
             }}
           >
-            Padel community Indonesia
+            Padel community
           </div>
           <Link
             href="/"
@@ -499,7 +499,7 @@ export default async function PublicLiveView({ params }: PageProps) {
               textDecoration: "none",
             }}
           >
-            Daftar Member
+            Sign Up
           </Link>
         </section>
       </main>
@@ -760,7 +760,7 @@ function PublicLeaderboardRow({
             marginTop: 2,
           }}
         >
-          {wins}W · {draws}D · {losses}L · {matches} match
+          {wins}W · {draws}D · {losses}L · {matches} matches
         </div>
       </div>
       <div

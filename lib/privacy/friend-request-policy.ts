@@ -39,9 +39,9 @@ export const FRIEND_REQUEST_POLICY_LABELS: Record<
   FriendRequestPolicy,
   string
 > = {
-  anyone: "Siapa saja",
-  friends_of_friends: "Hanya friend dari friend",
-  off: "Mati",
+  anyone: "Anyone",
+  friends_of_friends: "Friends of friends only",
+  off: "Off",
 };
 
 export function denialMessage(reason: "off" | "no_mutual_friends"): string {

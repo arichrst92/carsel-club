@@ -63,7 +63,7 @@ export default async function FindSessionPage({ searchParams }: PageProps) {
               marginBottom: 2,
             }}
           >
-            Cari Sesi Publik
+            Find Public Sessions
           </div>
           <div style={{ fontSize: 12, opacity: 0.85, fontWeight: 600 }}>
             {allSessions.length} active sessions in Indonesia
@@ -80,14 +80,14 @@ export default async function FindSessionPage({ searchParams }: PageProps) {
           }}
         >
           <FilterPill
-            label={cityFilter ? `📍 ${cityFilter}` : "🇮🇩 Semua kota"}
+            label={cityFilter ? `📍 ${cityFilter}` : "🇮🇩 All cities"}
             active={!!cityFilter}
             href="/find"
             altLabel="Reset"
           />
           {user.city && (
             <FilterPill
-              label={`📍 ${user.city} (kotamu)`}
+              label={`📍 ${user.city} (your city)`}
               active={cityFilter === user.city}
               href={`/find?city=${encodeURIComponent(user.city)}`}
             />
@@ -98,7 +98,7 @@ export default async function FindSessionPage({ searchParams }: PageProps) {
         <section>
           <div className="section-head">
             <h3>
-              {cityFilter ? `Di ${cityFilter}` : "Semua Kota"} ({sessions.length})
+              {cityFilter ? `In ${cityFilter}` : "All Cities"} ({sessions.length})
             </h3>
           </div>
 
@@ -129,7 +129,7 @@ export default async function FindSessionPage({ searchParams }: PageProps) {
                   boxShadow: "var(--shadow-sm)",
                 }}
               >
-                + Create Session Publik
+                + Create Public Session
               </Link>
             </div>
           ) : (
@@ -213,7 +213,7 @@ function PublicSessionCard({
       <div className="session-banner">
         <div className="session-banner-text">
           <div className="session-banner-tag">
-            🌍 {session.status === "live" ? "BERLANGSUNG" : "Publik"}
+            🌍 {session.status === "live" ? "LIVE" : "Public"}
           </div>
           <div className="session-banner-title">{session.title}</div>
         </div>
@@ -276,7 +276,7 @@ function PublicSessionCard({
             </svg>
             <span>
               Host: {session.hostName ?? "—"} · {session.participantCount}{" "}
-              pemain
+              players
             </span>
           </div>
         </div>
@@ -315,7 +315,7 @@ function PublicSessionCard({
                 : "var(--primary-700)",
             }}
           >
-            {session.isAlreadyMember ? "✓ Sudah Gabung" : "Lihat detail →"}
+            {session.isAlreadyMember ? "✓ Joined" : "See details →"}
           </span>
         </div>
       </div>

@@ -2,7 +2,7 @@ import Image from "next/image";
 import { PhoneForm } from "@/components/auth/PhoneForm";
 
 export const metadata = {
-  title: "Masuk",
+  title: "Sign In",
 };
 
 export default function LoginPage() {
@@ -30,8 +30,8 @@ export default function LoginPage() {
           <span className="highlight">all-in-one</span> tool.
         </h1>
         <p className="auth-hero-sub">
-          Atur session, scoring, leaderboard, dan share match — semua di satu
-          tempat. Buat circle padelmu makin seru.
+          Organize sessions, scoring, leaderboards, and share matches — all in
+          one place. Make your padel circle more fun.
         </p>
 
         {/* Decorative floating cards */}
@@ -62,8 +62,8 @@ export default function LoginPage() {
 
       {/* AUTH CARD (slides up over hero) */}
       <section className="auth-card">
-        <div className="auth-card-title">Mulai Bermain</div>
-        <div className="auth-card-sub">Free untuk circle padelmu sendiri</div>
+        <div className="auth-card-title">Get Started</div>
+        <div className="auth-card-sub">Free for your padel circle</div>
 
         <PhoneForm />
 
@@ -100,16 +100,16 @@ export default function LoginPage() {
               lineHeight: 1.4,
             }}
           >
-            Verifikasi cepat via WhatsApp OTP. Kami akan kirim 6-digit kode ke
-            nomor WA kamu.
+            Quick verification via WhatsApp OTP. We'll send a 6-digit code to
+            your WA number.
           </div>
         </div>
 
         <div className="auth-tos">
-          Dengan lanjut, kamu setuju dengan
+          By continuing, you agree to our
           <br />
-          <a href="/tos">Syarat & Ketentuan</a> &{" "}
-          <a href="/privacy-policy">Kebijakan Privasi</a>
+          <a href="/tos">Terms & Conditions</a> &{" "}
+          <a href="/privacy-policy">Privacy Policy</a>
         </div>
       </section>
     </div>

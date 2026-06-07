@@ -40,7 +40,7 @@ export function EditProfileForm({
     setError(null);
 
     if (displayName.trim().length < 2 || displayName.trim().length > 30) {
-      setError("Nama harus 2-30 karakter");
+      setError("Name must be 2-30 characters");
       return;
     }
 
@@ -66,17 +66,17 @@ export function EditProfileForm({
         <section className="form-section">
           <div className="form-group">
             <label className="form-label">
-              Nama Display <span className="req">*</span>
+              Display Name <span className="req">*</span>
             </label>
             <input
               type="text"
               className="form-input"
-              placeholder="Contoh: Ari Christian"
+              placeholder="e.g. Ari Christian"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               maxLength={30}
             />
-            <p className="form-help">2-30 karakter. Visible ke pemain lain.</p>
+            <p className="form-help">2-30 characters. Visible to other players.</p>
           </div>
         </section>
 
@@ -158,14 +158,14 @@ export function EditProfileForm({
                 marginBottom: 8,
               }}
             >
-              {customCity ? "✓ Custom city aktif" : "+ Kota lain (custom)"}
+              {customCity ? "✓ Custom city active" : "+ Other city (custom)"}
             </button>
 
             {customCity && (
               <input
                 type="text"
                 className="form-input"
-                placeholder="Ketik nama kota kamu"
+                placeholder="Type your city name"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 maxLength={50}
@@ -181,9 +181,9 @@ export function EditProfileForm({
             <div className="segmented" style={{ flexWrap: "wrap" }}>
               {(
                 [
-                  { v: "public", label: "🌍 Public", sub: "Siapa pun" },
-                  { v: "friends", label: "👥 Friends", sub: "Friend saja" },
-                  { v: "private", label: "🔒 Private", sub: "Hanya kamu" },
+                  { v: "public", label: "🌍 Public", sub: "Anyone" },
+                  { v: "friends", label: "👥 Friends", sub: "Friends only" },
+                  { v: "private", label: "🔒 Private", sub: "Only you" },
                 ] as const
               ).map((opt) => (
                 <button
@@ -200,7 +200,7 @@ export function EditProfileForm({
               ))}
             </div>
             <p className="form-help">
-              Atur siapa yang bisa lihat profile kamu di /u/[id].
+              Control who can view your profile at /u/[id].
             </p>
           </div>
         </section>
@@ -234,7 +234,7 @@ export function EditProfileForm({
           disabled={isPending || displayName.trim().length < 2}
           className={`btn-primary-lg ${isPending ? "loading" : ""}`}
         >
-          <span>{isPending ? "Menyimpan..." : "Save Changes"}</span>
+          <span>{isPending ? "Saving..." : "Save Changes"}</span>
           {!isPending && (
             <svg
               width="20"

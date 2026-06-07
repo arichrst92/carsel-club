@@ -53,7 +53,7 @@ export function GroupPhotoGallery({ sessionId, photos, canManage }: Props) {
   }
 
   function handleRemove(photoId: string) {
-    if (!confirm("Hapus foto ini?")) return;
+    if (!confirm("Delete this photo?")) return;
     setError(null);
     startTransition(async () => {
       const result = await removeGroupPhotoAction(photoId);
@@ -181,7 +181,7 @@ function PhotoThumb({
             onRemove();
           }}
           disabled={disabled}
-          aria-label="Hapus foto"
+          aria-label="Delete photo"
           style={{
             position: "absolute",
             top: 4,
@@ -410,7 +410,7 @@ function Lightbox({
             onPrev();
           }}
           disabled={!hasPrev}
-          aria-label="Sebelumnya"
+          aria-label="Previous"
           style={{
             background: hasPrev ? "rgba(255,255,255,0.18)" : "transparent",
             color: "#fff",

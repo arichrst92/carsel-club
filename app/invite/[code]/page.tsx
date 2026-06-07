@@ -126,7 +126,7 @@ export default async function InviteLandingPage({ params }: PageProps) {
               marginBottom: 6,
             }}
           >
-            Kamu diundang oleh
+            You're invited by
             <br />
             {referrer.displayName}
           </div>
@@ -140,7 +140,7 @@ export default async function InviteLandingPage({ params }: PageProps) {
               lineHeight: 1.5,
             }}
           >
-            Join Carsel Club — Indonesia padel community
+            Join Carsel Club — the padel community
           </div>
         </section>
 
@@ -208,7 +208,7 @@ export default async function InviteLandingPage({ params }: PageProps) {
                 marginTop: 4,
               }}
             >
-              {referrer.totalPoints} pts · {referrer.totalMatches} match
+              {referrer.totalPoints} pts · {referrer.totalMatches} matches
             </div>
           </div>
         </section>
@@ -222,8 +222,8 @@ export default async function InviteLandingPage({ params }: PageProps) {
             marginBottom: "var(--s-5)",
           }}
         >
-          <Feature icon="🎯" title="Atur Session Padel" sub="Multi-court, auto match generator" />
-          <Feature icon="🏆" title="Live Score + Leaderboard" sub="Tier system, ranking realtime" />
+          <Feature icon="🎯" title="Organize Padel Sessions" sub="Multi-court, auto match generator" />
+          <Feature icon="🏆" title="Live Score + Leaderboard" sub="Tier system, real-time ranking" />
           <Feature icon="📱" title="Share Match Result" sub="WhatsApp invite + image card" />
         </section>
 
@@ -234,7 +234,7 @@ export default async function InviteLandingPage({ params }: PageProps) {
             className="btn-primary-lg"
             style={{ width: "100%" }}
           >
-            <span>🎾 Daftar & Lihat Profil</span>
+            <span>🎾 Sign Up & See Profile</span>
             <svg
               width="20"
               height="20"
@@ -259,7 +259,7 @@ export default async function InviteLandingPage({ params }: PageProps) {
             fontWeight: 600,
           }}
         >
-          Verifikasi cepat via WhatsApp · Gratis untuk circle padel kamu
+          Quick verification via WhatsApp · Free for your padel circle
         </p>
 
         <Link
@@ -273,7 +273,7 @@ export default async function InviteLandingPage({ params }: PageProps) {
             textDecoration: "underline",
           }}
         >
-          Sudah punya akun? Login
+          Already have an account? Log in
         </Link>
       </main>
     </div>

@@ -126,7 +126,7 @@ export function MatchPlayerCard({
           )}
           <span>·</span>
           <span>
-            {player.side === "team1" ? "Tim 1" : "Tim 2"} · P{player.slot}
+            {player.side === "team1" ? "Team 1" : "Team 2"} · P{player.slot}
           </span>
         </div>
       </div>

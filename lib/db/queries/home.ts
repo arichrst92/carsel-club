@@ -164,7 +164,7 @@ export async function getRecentMatches(userId: string, limit = 3) {
         .where(inArray(sessionParticipants.id, allPartIds))
     : [];
   const nameMap = new Map(
-    partRows.map((p) => [p.id, p.userDisplayName ?? p.guestName ?? "Pemain"])
+    partRows.map((p) => [p.id, p.userDisplayName ?? p.guestName ?? "Player"])
   );
 
   return rows.map((m) => {

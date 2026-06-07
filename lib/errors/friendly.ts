@@ -44,14 +44,14 @@ export function parseFriendlyError(input: unknown): FriendlyError {
   if (matchesAny(lower, NETWORK_HINTS)) {
     return {
       title: "Tidak ada koneksi",
-      body: "Cek WiFi/data kamu lalu coba lagi.",
+      body: "Check your WiFi/data and try again.",
       retryable: true,
       category: "network",
     };
   }
   if (matchesAny(lower, AUTH_HINTS)) {
     return {
-      title: "Sesi habis",
+      title: "Session expired",
       body: "Silakan login ulang untuk lanjut.",
       retryable: false,
       category: "auth",

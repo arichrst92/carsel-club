@@ -108,7 +108,7 @@ function StreakCard({ streak }: { streak: number }) {
               fontWeight: 800,
             }}
           >
-            {streak} {streak === 1 ? "menang" : "menang berturut"}
+            {streak === 1 ? "1 win streak" : `${streak} wins in a row`}
           </div>
         </div>
       </div>

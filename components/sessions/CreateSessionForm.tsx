@@ -78,11 +78,11 @@ export function CreateSessionForm() {
   }
 
   function validateStep(s: number): string | null {
-    if (s === 1 && !data.name.trim()) return "Nama sesi required";
+    if (s === 1 && !data.name.trim()) return "Session name is required";
     if (s === 2) {
-      if (!data.venueName.trim()) return "Venue required";
-      if (!data.date) return "Tanggal required";
-      if (!data.timeStart) return "Jam mulai required";
+      if (!data.venueName.trim()) return "Venue is required";
+      if (!data.date) return "Date is required";
+      if (!data.timeStart) return "Start time is required";
     }
     return null;
   }
@@ -112,11 +112,11 @@ export function CreateSessionForm() {
     // Final validation
     const scheduledAt = new Date(`${data.date}T${data.timeStart}`);
     if (isNaN(scheduledAt.getTime())) {
-      setError("Tanggal & jam tidak valid");
+      setError("Invalid date & time");
       return;
     }
     if (scheduledAt.getTime() < Date.now() - 60_000) {
-      setError("Tanggal & waktu harus di masa depan");
+      setError("Date & time must be in the future");
       return;
     }
 
@@ -124,7 +124,7 @@ export function CreateSessionForm() {
     if (data.timeEnd) {
       scheduledEndAt = new Date(`${data.date}T${data.timeEnd}`);
       if (scheduledEndAt.getTime() <= scheduledAt.getTime()) {
-        setError("Jam berakhir harus setelah jam mulai");
+        setError("End time must be after start time");
         return;
       }
     }
@@ -497,14 +497,14 @@ function Step2Location({
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                 <circle cx="12" cy="10" r="3" />
               </svg>
-              <span>Link akan dibagikan ke pemain saat invite via WhatsApp.</span>
+              <span>Link will be shared with players when inviting via WhatsApp.</span>
             </div>
           )}
         </div>
 
         <div className="form-group">
           <label className="form-label">
-            Tanggal <span className="req">*</span>
+            Date <span className="req">*</span>
           </label>
           <input
             type="date"
@@ -630,7 +630,7 @@ function Step3Players({
               <path d="M21 3v5h-5" />
             </svg>
           </div>
-          <h3>Jumlah Round</h3>
+          <h3>Number of Rounds</h3>
         </div>
 
         <div className="form-group">
@@ -641,7 +641,7 @@ function Step3Players({
               onClick={() => setField("roundMode", "auto")}
             >
               <span>Auto</span>
-              <span className="seg-sub">Hitung otomatis</span>
+              <span className="seg-sub">Auto-calculate</span>
             </button>
             <button
               type="button"
@@ -649,7 +649,7 @@ function Step3Players({
               onClick={() => setField("roundMode", "manual")}
             >
               <span>Manual</span>
-              <span className="seg-sub">Set sendiri</span>
+              <span className="seg-sub">Set manually</span>
             </button>
           </div>
           {data.roundMode === "manual" && (
@@ -777,8 +777,8 @@ function Step4Visibility({
           </div>
           <p className="form-help">
             {data.visibility === "public"
-              ? "Session muncul di Find Session untuk pemain padel — anyone bisa join langsung."
-              : "Only players who get the WA link yang bisa join."}
+              ? "Session shows up in Find Session for padel players — anyone can join directly."
+              : "Only players who get the WA link can join."}
           </p>
         </div>
       </section>
@@ -834,8 +834,8 @@ function Step4Visibility({
             fontWeight: 600,
           }}
         >
-          ℹ️ Co-Host bisa di-assign nanti dari halaman detail session setelah
-          add pemain.
+          ℹ️ Co-Host can be assigned later from the session detail page after
+          adding players.
         </div>
       </section>
     </>
@@ -856,20 +856,20 @@ function Step5Review({
   const dateLabel = useMemo(() => {
     if (!data.date) return "—";
     const dt = new Date(`${data.date}T${data.timeStart || "00:00"}`);
-    const days = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const months = [
       "Jan",
       "Feb",
       "Mar",
       "Apr",
-      "Mei",
+      "May",
       "Jun",
       "Jul",
-      "Agu",
+      "Aug",
       "Sep",
-      "Okt",
+      "Oct",
       "Nov",
-      "Des",
+      "Dec",
     ];
     return `${days[dt.getDay()]}, ${dt.getDate()} ${months[dt.getMonth()]} ${dt.getFullYear()}`;
   }, [data.date, data.timeStart]);

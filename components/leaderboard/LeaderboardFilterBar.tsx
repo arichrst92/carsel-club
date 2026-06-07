@@ -82,8 +82,8 @@ export function LeaderboardFilterBar(props: LeaderboardFilterBarProps) {
           onChange={(v) => setParam("period", v === "all_time" ? null : v)}
           options={[
             { value: "all_time", label: "All-time" },
-            { value: "monthly", label: "30 hari" },
-            { value: "weekly", label: "7 hari" },
+            { value: "monthly", label: "30 days" },
+            { value: "weekly", label: "7 days" },
           ]}
         />
         {props.scope === "regional" && (
@@ -92,7 +92,7 @@ export function LeaderboardFilterBar(props: LeaderboardFilterBarProps) {
             value={props.city ?? ""}
             onChange={(v) => setParam("city", v || null)}
             options={[
-              { value: "", label: "Semua kota" },
+              { value: "", label: "All cities" },
               ...props.cities.map((c) => ({ value: c, label: c })),
             ]}
           />

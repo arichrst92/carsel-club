@@ -34,12 +34,12 @@ export function computePlayerStats(
 }
 
 /**
- * UI helper: label outcome bahasa Indonesia.
+ * UI helper: outcome labels (English).
  */
 export const OUTCOME_LABEL: Record<Outcome, string> = {
-  win: "Menang",
-  loss: "Kalah",
-  draw: "Seri",
+  win: "Win",
+  loss: "Loss",
+  draw: "Draw",
 };
 
 export const OUTCOME_EMOJI: Record<Outcome, string> = {

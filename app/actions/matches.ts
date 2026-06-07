@@ -90,7 +90,7 @@ export async function generateRoundAction(
 
   if (activeParticipants.length < 4) {
     return {
-      error: `Butuh minimal 4 pemain aktif (sekarang ${activeParticipants.length}). Tambah pemain atau toggle 'ikut main'.`,
+      error: `Need at least 4 active players (currently ${activeParticipants.length}). Add players or toggle 'I will play'.`,
     };
   }
 
@@ -141,7 +141,7 @@ export async function generateRoundAction(
       if (pairs.length < 2) {
         return {
           error:
-            "Butuh minimal 4 pemain aktif dan pair valid untuk Fix Partners round",
+            "Need at least 4 active players and valid pairs for a Fix Partners round",
         };
       }
 
@@ -308,7 +308,7 @@ export async function regenerateRoundAction(
   );
 
   if (activePool.length < 4) {
-    return { error: "Butuh minimal 4 pemain untuk regenerate" };
+    return { error: "Need at least 4 players to regenerate" };
   }
 
   // Load session untuk numCourts
@@ -440,13 +440,13 @@ export async function swapPlayersAction(
   if (!rowA) return { error: "Match A tidak ditemukan" };
 
   if (!(await isSessionStaff(rowA.sessionId, me.id))) {
-    return { error: "Hanya host/co-host yang bisa swap pemain" };
+    return { error: "Only the host/co-host can swap players" };
   }
 
   // Status check: hanya pending
   if (rowA.status !== "pending") {
     return {
-      error: "Hanya match status 'pending' yang bisa di-swap pemainnya",
+      error: "Only matches with status 'pending' can have players swapped",
     };
   }
 
@@ -606,7 +606,7 @@ export async function updateMatchScoreAction(
 
   // Strict: pending matches harus di-Start dulu (Sprint 4 enforcement).
   if (!canAdjustScore(loaded.status)) {
-    return { error: "Mulai match dulu (klik Start Game)." };
+    return { error: "Start the match first (tap Start Game)." };
   }
 
   try {

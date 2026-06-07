@@ -95,9 +95,9 @@ export async function deleteAccountAction(
   if (!me) redirect("/login");
 
   const confirmation = String(formData.get("confirmation") ?? "").trim();
-  if (confirmation !== "HAPUS") {
+  if (confirmation !== "DELETE") {
     return {
-      error: "Ketik HAPUS persis untuk konfirmasi penghapusan akun.",
+      error: "Type DELETE exactly to confirm account deletion.",
     };
   }
 

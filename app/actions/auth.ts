@@ -103,7 +103,7 @@ export async function verifyOtpAction(
 
   const phone = normalizePhone(rawPhone);
   if (!isValidIndonesianPhone(phone)) {
-    return { error: "Nomor tidak valid. Mulai ulang." };
+    return { error: "Invalid number. Please start over." };
   }
   if (!/^\d{6}$/.test(code)) {
     return { error: "Kode OTP harus 6 digit angka" };

@@ -179,7 +179,7 @@ export function AddMemberSearch({ sessionId }: { sessionId: string }) {
                 flexShrink: 0,
               }}
             >
-              {isPending ? "..." : "+ Tambah"}
+              {isPending ? "..." : "+ Add"}
             </button>
           </div>
         </div>

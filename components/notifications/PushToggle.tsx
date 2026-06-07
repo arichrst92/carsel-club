@@ -219,12 +219,12 @@ function StatusButton({
   if (status === "unsupported") {
     return (
       <span style={badgeStyle("muted")}>
-        Tidak didukung
+        Not supported
       </span>
     );
   }
   if (status === "denied") {
-    return <span style={badgeStyle("muted")}>Permission diblokir</span>;
+    return <span style={badgeStyle("muted")}>Permission blocked</span>;
   }
   if (status === "on") {
     return (
@@ -234,7 +234,7 @@ function StatusButton({
         disabled={busy}
         style={btnStyle("danger")}
       >
-        {busy ? "..." : "Matikan"}
+        {busy ? "..." : "Disable"}
       </button>
     );
   }
@@ -245,7 +245,7 @@ function StatusButton({
       disabled={busy}
       style={btnStyle("primary")}
     >
-      {busy ? "..." : "Aktifkan"}
+      {busy ? "..." : "Enable"}
     </button>
   );
 }
@@ -253,19 +253,19 @@ function StatusButton({
 function statusDescription(s: Status): string {
   switch (s) {
     case "loading":
-      return "Cek status…";
+      return "Checking status…";
     case "unsupported":
-      return "Browser ini belum dukung Web Push (Safari iOS: install sebagai PWA)";
+      return "This browser doesn't support Web Push yet (iOS Safari: install as PWA)";
     case "denied":
-      return "Permission diblokir di browser. Reset di address bar > Site settings.";
+      return "Permission blocked in the browser. Reset via address bar > Site settings.";
     case "on":
-      return "Aktif — kamu akan dapat notifikasi browser";
+      return "On — you'll get browser notifications";
     case "off":
-      return "Mati — aktifkan untuk dapat ping real-time";
+      return "Off — enable to receive real-time pings";
     case "subscribing":
-      return "Mengaktifkan…";
+      return "Enabling…";
     case "unsubscribing":
-      return "Mematikan…";
+      return "Disabling…";
   }
 }
 

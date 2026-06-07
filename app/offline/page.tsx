@@ -46,8 +46,8 @@ export default function OfflinePage() {
           lineHeight: 1.5,
         }}
       >
-        Carsel Club butuh internet untuk fetch session + leaderboard. Cek
-        koneksi kamu dan reload.
+        Carsel Club needs an internet connection to fetch sessions and the
+        leaderboard. Check your connection and reload.
       </div>
       <OfflineRetryButton />
     </div>

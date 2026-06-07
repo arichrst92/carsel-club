@@ -75,7 +75,7 @@ export function suggestRoundCount(
     suggested: clamp(suggested),
     min: ABSOLUTE_MIN,
     max: ABSOLUTE_MAX,
-    reason: `${label}: ${n} pemain → ${suggested} round`,
+    reason: `${label}: ${n} players → ${suggested} rounds`,
   };
 }
 

@@ -57,7 +57,7 @@ export default async function AdminSessions({
       >
         <form method="get" action="/admin/sessions">
           <label htmlFor="q" className="sr-only">
-            Cari session
+            Search sessions
           </label>
           <input
             id="q"

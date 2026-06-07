@@ -235,7 +235,7 @@ export function SessionShareActions({
           </svg>
         </div>
         <div className="qa-title">Papan Peringkat</div>
-        <div className="qa-sub">Peringkat pemain sesi ini</div>
+        <div className="qa-sub">Player ranking for this session</div>
       </Link>
       <button
         type="button"

@@ -62,14 +62,14 @@ function formatJoinDate(d: Date | string): string {
     "Feb",
     "Mar",
     "Apr",
-    "Mei",
+    "May",
     "Jun",
     "Jul",
-    "Agu",
+    "Aug",
     "Sep",
-    "Okt",
+    "Oct",
     "Nov",
-    "Des",
+    "Dec",
   ];
   return `Joined ${months[date.getMonth()]} ${date.getFullYear()}`;
 }
@@ -536,9 +536,9 @@ export default async function ProfilePage() {
           {recent.length === 0 ? (
             <div className="empty-state">
               <div className="empty-state-icon">🎾</div>
-              <div className="empty-state-title">Belum ada match selesai</div>
+              <div className="empty-state-title">No completed matches yet</div>
               <div className="empty-state-text">
-                Match yang sudah completed akan muncul di sini.
+                Completed matches will show up here.
               </div>
             </div>
           ) : (
@@ -561,9 +561,9 @@ export default async function ProfilePage() {
                     <div className="activity-title">{m.sessionTitle}</div>
                     <div className="activity-meta">
                       {m.outcome === "win"
-                        ? "Menang"
+                        ? "Win"
                         : m.outcome === "draw"
-                          ? "Seri"
+                          ? "Draw"
                           : "Loss"}{" "}
                       {m.myScore}-{m.oppScore}
                     </div>
@@ -651,8 +651,8 @@ export default async function ProfilePage() {
             >
               <SettingsRow
                 icon="🔔"
-                title="Notifikasi"
-                sub="Channel, quiet hours, push, WA"
+                title="Notifications"
+                sub="Channels, quiet hours, push, WA"
               />
             </Link>
             <Link
@@ -676,7 +676,7 @@ export default async function ProfilePage() {
               <SettingsRow
                 icon="🔒"
                 title="Privacy Policy"
-                sub="Cara kami pakai data kamu"
+                sub="How we use your data"
               />
             </Link>
             <Link href="/tos" style={{ textDecoration: "none" }}>
@@ -689,7 +689,7 @@ export default async function ProfilePage() {
             <SettingsRow
               icon="🌐"
               title="Language"
-              sub="Indonesia"
+              sub="English"
               disabled
             />
             <form action={logoutAction}>

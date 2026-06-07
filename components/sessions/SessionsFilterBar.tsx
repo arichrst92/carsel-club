@@ -13,7 +13,7 @@ const TAB_OPTIONS: Array<{ value: SessionTab; label: string; emoji: string }> = 
 ];
 
 const FORMAT_OPTIONS: Array<{ value: FormatFilter; label: string }> = [
-  { value: "all", label: "Semua" },
+  { value: "all", label: "All" },
   { value: "americano", label: "Americano" },
   { value: "mexicano", label: "Mexicano" },
 ];
@@ -69,7 +69,7 @@ export function SessionsFilterBar({
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search name session / venue..."
+          placeholder="Search session name / venue..."
           className="form-input"
           style={{ flex: 1, fontSize: 13 }}
         />
@@ -90,7 +90,7 @@ export function SessionsFilterBar({
               opacity: isPending ? 0.6 : 1,
             }}
           >
-            Cari
+            Search
           </button>
         )}
         {currentQuery && (

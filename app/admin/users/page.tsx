@@ -50,14 +50,14 @@ export default async function AdminUsers({
       >
         <form method="get" action="/admin/users">
           <label htmlFor="q" className="sr-only">
-            Cari user
+            Search users
           </label>
           <input
             id="q"
             name="q"
             type="search"
             defaultValue={q}
-            placeholder="Search name / nomor WA / kota…"
+            placeholder="Search name / WA number / city…"
             style={{
               width: "100%",
               padding: "var(--s-3) var(--s-4)",
@@ -152,7 +152,7 @@ export default async function AdminUsers({
                     fontWeight: 700,
                   }}
                 >
-                  {u.totalMatches} match
+                  {u.totalMatches} matches
                   <div style={{ fontWeight: 800, color: "var(--text-900)" }}>
                     {u.totalPoints} pts
                   </div>

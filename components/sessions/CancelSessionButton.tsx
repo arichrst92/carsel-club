@@ -14,7 +14,7 @@ export function CancelSessionButton({ sessionId }: { sessionId: string }) {
   function handleClick() {
     if (
       !confirm(
-        "Batalkan sesi ini? Statistik yang sudah masuk tidak akan ter-reset."
+        "Cancel this session? Stats already recorded will not be reset."
       )
     )
       return;
