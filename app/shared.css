@@ -867,12 +867,19 @@ h4 { font-size: 15px; line-height: 1.4; }
   min-width: 0;
 }
 .form-row > .form-group { min-width: 0; }
-.form-row input[type="date"],
-.form-row input[type="time"] {
+/* Sprint 52: apply WebKit appearance reset globally, not just inside .form-row —
+   standalone date/time inputs (e.g. the Date field in Create Session Step 2) need
+   the same min-width:0 + appearance:none to prevent iOS Safari intrinsic width overflow. */
+input[type="date"].form-input,
+input[type="time"].form-input,
+input[type="datetime-local"].form-input {
   width: 100%;
   min-width: 0;
+  max-width: 100%;
   -webkit-appearance: none;
+  -moz-appearance: none;
   appearance: none;
+  box-sizing: border-box;
 }
 .input-with-icon {
   position: relative;
