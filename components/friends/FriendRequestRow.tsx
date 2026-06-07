@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -31,7 +32,7 @@ export function FriendRequestRowItem({ row, direction }: Props) {
   }
 
   function handleReject() {
-    if (!confirm(`Reject request dari ${row.displayName}?`)) return;
+    if (!confirm(`Reject request from ${row.displayName}?`)) return;
     setError(null);
     startTransition(async () => {
       const result = await rejectFriendRequestAction(row.id);
@@ -41,7 +42,7 @@ export function FriendRequestRowItem({ row, direction }: Props) {
   }
 
   function handleCancel() {
-    if (!confirm(`Cancel request ke ${row.displayName}?`)) return;
+    if (!confirm(`Cancel request to ${row.displayName}?`)) return;
     setError(null);
     startTransition(async () => {
       const result = await cancelOutgoingRequestAction(row.id);
@@ -64,7 +65,9 @@ export function FriendRequestRowItem({ row, direction }: Props) {
           borderRadius: "var(--r-md)",
         }}
       >
-        <div
+        <Link
+          href={`/u/${row.otherUserId}`}
+          aria-label={`Profile ${row.displayName}`}
           style={{
             width: 44,
             height: 44,
@@ -79,11 +82,20 @@ export function FriendRequestRowItem({ row, direction }: Props) {
             fontWeight: 800,
             fontSize: 16,
             flexShrink: 0,
+            textDecoration: "none",
           }}
         >
           {!row.avatarUrl && initial}
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
+        </Link>
+        <Link
+          href={`/u/${row.otherUserId}`}
+          style={{
+            flex: 1,
+            minWidth: 0,
+            textDecoration: "none",
+            color: "inherit",
+          }}
+        >
           <div
             style={{
               fontFamily: "var(--font-display)",
@@ -117,7 +129,7 @@ export function FriendRequestRowItem({ row, direction }: Props) {
               &ldquo;{row.message}&rdquo;
             </div>
           )}
-        </div>
+        </Link>
         <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
           {direction === "incoming" ? (
             <>

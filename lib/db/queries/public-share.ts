@@ -105,6 +105,7 @@ export type PublicMatchPlayer = {
   side: "team1" | "team2";
   slot: 1 | 2;
   name: string;
+  userId: string | null;
   isMember: boolean;
   avatarUrl: string | null;
   tierName: string | null;
@@ -180,6 +181,7 @@ export async function getPublicMatchView(matchId: string) {
       side,
       slot,
       name: p?.pGuestName ?? p?.uDisplayName ?? "?",
+      userId: p?.pUserId ?? null,
       isMember: !!p?.pUserId,
       avatarUrl: p?.uAvatarUrl ?? null,
       tierName: p?.tName ?? null,

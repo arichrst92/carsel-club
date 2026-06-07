@@ -43,7 +43,7 @@ export function DiscoverRow({ row }: { row: DiscoverSuggestion }) {
           flexShrink: 0,
           textDecoration: "none",
         }}
-        aria-label={`Profil ${row.displayName}`}
+        aria-label={`Profile ${row.displayName}`}
       >
         {!row.avatarUrl &&
           (row.displayName.trim()[0] ?? "?").toUpperCase()}
@@ -88,7 +88,7 @@ export function DiscoverRow({ row }: { row: DiscoverSuggestion }) {
             `${row.mutualFriendCount} mutual${row.mutualFriendCount > 1 ? "s" : ""}`}
           {row.mutualFriendCount > 0 && row.coPlayerSessionCount > 0 && " · "}
           {row.coPlayerSessionCount > 0 &&
-            `${row.coPlayerSessionCount} session bareng`}
+            `${row.coPlayerSessionCount} sessions together`}
         </div>
       </div>
       <button

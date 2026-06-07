@@ -390,6 +390,7 @@ function PublicPlayerRow({
     side: "team1" | "team2";
     slot: 1 | 2;
     name: string;
+    userId: string | null;
     isMember: boolean;
     avatarUrl: string | null;
     tierName: string | null;
@@ -408,18 +409,29 @@ function PublicPlayerRow({
       ? Math.round((player.totalWins / player.totalMatches) * 100)
       : null;
 
+  const containerStyle: React.CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    padding: "var(--s-3)",
+    background: "var(--bg)",
+    border: "1px solid var(--border-light)",
+    borderRadius: "var(--r-md)",
+    textDecoration: "none",
+    color: "inherit",
+  };
+
+  const Wrapper = ({ children }: { children: React.ReactNode }) =>
+    player.userId ? (
+      <Link href={`/u/${player.userId}`} style={containerStyle}>
+        {children}
+      </Link>
+    ) : (
+      <div style={containerStyle}>{children}</div>
+    );
+
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-        padding: "var(--s-3)",
-        background: "var(--bg)",
-        border: "1px solid var(--border-light)",
-        borderRadius: "var(--r-md)",
-      }}
-    >
+    <Wrapper>
       <div
         style={{
           width: 40,
@@ -520,6 +532,6 @@ function PublicPlayerRow({
           </div>
         </div>
       )}
-    </div>
+    </Wrapper>
   );
 }

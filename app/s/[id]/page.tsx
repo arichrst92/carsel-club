@@ -67,6 +67,7 @@ export default async function PublicLiveView({ params }: PageProps) {
       string,
       {
         name: string;
+        userId: string | null;
         isMember: boolean;
         avatarUrl: string | null;
         tierName: string | null;
@@ -82,6 +83,7 @@ export default async function PublicLiveView({ params }: PageProps) {
         : 0;
     acc[p.id] = {
       name: p.guestName ?? p.userDisplayName ?? "?",
+      userId: p.userId ?? null,
       isMember: p.userId !== null,
       avatarUrl: p.userAvatarUrl ?? null,
       tierName: p.tierName ?? null,
@@ -374,6 +376,7 @@ export default async function PublicLiveView({ params }: PageProps) {
                   key={p.id}
                   rank={idx + 1}
                   name={lookup[p.id]?.name ?? "?"}
+                  userId={lookup[p.id]?.userId ?? null}
                   points={p.sessionPoints}
                   wins={p.sessionWins}
                   losses={p.sessionLosses}
@@ -519,6 +522,7 @@ type LiveLookup = Record<
   string,
   {
     name: string;
+    userId: string | null;
     isMember: boolean;
     avatarUrl: string | null;
     tierName: string | null;
@@ -644,9 +648,10 @@ function CourtPlayer({
   const winRate = entry?.winRate ?? 0;
   const hasStats = (entry?.totalMatches ?? 0) >= 5; // min 5 match utk credibility
   const avatarUrl = entry?.avatarUrl ?? null;
+  const userId = entry?.userId ?? null;
 
-  return (
-    <div className={`court-player ${team}`} style={{ position: "relative" }}>
+  const inner = (
+    <>
       <div
         className="cp-avatar"
         style={
@@ -693,6 +698,20 @@ function CourtPlayer({
           {hasStats && <span style={{ opacity: 0.7 }}>· {winRate}% WR</span>}
         </div>
       )}
+    </>
+  );
+
+  return userId ? (
+    <Link
+      href={`/u/${userId}`}
+      className={`court-player ${team}`}
+      style={{ position: "relative", textDecoration: "none", color: "inherit" }}
+    >
+      {inner}
+    </Link>
+  ) : (
+    <div className={`court-player ${team}`} style={{ position: "relative" }}>
+      {inner}
     </div>
   );
 }
@@ -700,6 +719,7 @@ function CourtPlayer({
 function PublicLeaderboardRow({
   rank,
   name,
+  userId,
   points,
   wins,
   losses,
@@ -708,6 +728,7 @@ function PublicLeaderboardRow({
 }: {
   rank: number;
   name: string;
+  userId: string | null;
   points: number;
   wins: number;
   losses: number;
@@ -715,18 +736,27 @@ function PublicLeaderboardRow({
   matches: number;
 }) {
   const MEDAL: Record<number, string> = { 1: "🥇", 2: "🥈", 3: "🥉" };
+  const containerStyle: React.CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    gap: "var(--s-3)",
+    padding: "var(--s-3)",
+    background: "var(--bg)",
+    border: "1px solid var(--border-light)",
+    borderRadius: "var(--r-lg)",
+    textDecoration: "none",
+    color: "inherit",
+  };
+  const Wrapper = ({ children }: { children: React.ReactNode }) =>
+    userId ? (
+      <Link href={`/u/${userId}`} style={containerStyle}>
+        {children}
+      </Link>
+    ) : (
+      <div style={containerStyle}>{children}</div>
+    );
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "var(--s-3)",
-        padding: "var(--s-3)",
-        background: "var(--bg)",
-        border: "1px solid var(--border-light)",
-        borderRadius: "var(--r-lg)",
-      }}
-    >
+    <Wrapper>
       <div
         style={{
           fontFamily: "var(--font-display)",
@@ -784,6 +814,6 @@ function PublicLeaderboardRow({
           pts
         </span>
       </div>
-    </div>
+    </Wrapper>
   );
 }

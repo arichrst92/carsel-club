@@ -12,6 +12,7 @@
  * - CSS: app/globals.css .padel-court + related
  */
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import {
   endMatchAction,
@@ -337,8 +338,8 @@ function CourtPlayer({
   side: "team-1" | "team-2";
 }) {
   const initial = (player.name.trim()[0] ?? "?").toUpperCase();
-  return (
-    <div className={`court-player ${side}`}>
+  const inner = (
+    <>
       <div
         className="cp-avatar"
         style={
@@ -356,7 +357,19 @@ function CourtPlayer({
       <div className="cp-tier">
         {TIER_SHORT[player.tierName ?? ""] ?? (player.tierName ?? "RKE")}
       </div>
-    </div>
+    </>
+  );
+
+  return player.userId ? (
+    <Link
+      href={`/u/${player.userId}`}
+      className={`court-player ${side}`}
+      style={{ textDecoration: "none", color: "inherit" }}
+    >
+      {inner}
+    </Link>
+  ) : (
+    <div className={`court-player ${side}`}>{inner}</div>
   );
 }
 

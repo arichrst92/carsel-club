@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { removeFriendAction } from "@/app/actions/friends";
 import { Toast } from "@/components/ui/Toast";
@@ -30,7 +31,7 @@ export function FriendRow(props: Props) {
   const tier = props.tierName ?? "Rookie";
 
   function handleRemove() {
-    if (!confirm(`Remove ${props.displayName} dari friends?`)) return;
+    if (!confirm(`Remove ${props.displayName} from friends?`)) return;
     setError(null);
     startTransition(async () => {
       const result = await removeFriendAction(props.friendId);
@@ -42,20 +43,35 @@ export function FriendRow(props: Props) {
     <>
     <Toast message={error} onDismiss={() => setError(null)} />
     <div className="player-list-item">
-      <div
+      <Link
+        href={`/u/${props.friendId}`}
         className="player-avatar-lg member-1"
+        aria-label={`Profile ${props.displayName}`}
         style={
           props.avatarUrl
             ? {
                 background: `url(${props.avatarUrl}) center/cover no-repeat`,
                 color: "transparent",
+                textDecoration: "none",
               }
-            : { background: "linear-gradient(135deg, #06B6D4, #0EA5E9)" }
+            : {
+                background: "linear-gradient(135deg, #06B6D4, #0EA5E9)",
+                textDecoration: "none",
+              }
         }
       >
         {!props.avatarUrl && initial}
-      </div>
-      <div className="player-info">
+      </Link>
+      <Link
+        href={`/u/${props.friendId}`}
+        className="player-info"
+        style={{
+          textDecoration: "none",
+          color: "inherit",
+          flex: 1,
+          minWidth: 0,
+        }}
+      >
         <div className="player-name">
           <span>{props.displayName}</span>
         </div>
@@ -73,9 +89,9 @@ export function FriendRow(props: Props) {
             marginTop: 2,
           }}
         >
-          {props.totalPoints} pts · {props.totalMatches} match
+          {props.totalPoints} pts · {props.totalMatches} matches
         </div>
-      </div>
+      </Link>
       <button
         type="button"
         onClick={handleRemove}

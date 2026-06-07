@@ -398,7 +398,8 @@ function PodiumSlot({
         ? `${Math.round(player.winRate)}% WR`
         : `${player.totalMatches} match`;
   return (
-    <div
+    <Link
+      href={`/u/${player.id}`}
       style={{
         background: isFirst
           ? "linear-gradient(135deg, #FEF3C7, #FED7AA)"
@@ -409,6 +410,9 @@ function PodiumSlot({
         textAlign: "center",
         boxShadow: isFirst ? "var(--shadow-md)" : "var(--shadow-card)",
         transform: isFirst ? "translateY(-12px)" : "none",
+        textDecoration: "none",
+        color: "inherit",
+        display: "block",
       }}
     >
       <div style={{ fontSize: isFirst ? 28 : 22, marginBottom: 4 }}>
@@ -456,7 +460,7 @@ function PodiumSlot({
       >
         {primaryValue}
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -470,7 +474,11 @@ function LbItem({
   sort: LeaderboardSort;
 }) {
   return (
-    <div className={`lb-item ${isMe ? "is-me" : ""}`}>
+    <Link
+      href={`/u/${row.id}`}
+      className={`lb-item ${isMe ? "is-me" : ""}`}
+      style={{ textDecoration: "none", color: "inherit" }}
+    >
       <div className="lb-rank">#{row.rank}</div>
       <div className={`lb-avatar ${avatarClass(row.id)}`}>
         {(row.displayName.trim()[0] ?? "?").toUpperCase()}
@@ -520,7 +528,7 @@ function LbItem({
           <div className="lb-stat-label">Match</div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 

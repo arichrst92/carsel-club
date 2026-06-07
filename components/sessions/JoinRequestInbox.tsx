@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -30,14 +31,14 @@ export function JoinRequestInbox({ requests }: Props) {
       setBusyId(null);
       if (result?.error) setError(result.error);
       else {
-        setSuccess(result?.success ?? "Di-approve");
+        setSuccess(result?.success ?? "Approved");
         router.refresh();
       }
     });
   }
 
   function handleReject(id: string) {
-    if (!confirm("Reject request ini?")) return;
+    if (!confirm("Reject this request?")) return;
     setError(null);
     setBusyId(id);
     startTransition(async () => {
@@ -45,7 +46,7 @@ export function JoinRequestInbox({ requests }: Props) {
       setBusyId(null);
       if (result?.error) setError(result.error);
       else {
-        setSuccess(result?.success ?? "Di-reject");
+        setSuccess(result?.success ?? "Rejected");
         router.refresh();
       }
     });
@@ -96,7 +97,9 @@ export function JoinRequestInbox({ requests }: Props) {
                   borderRadius: "var(--r-md)",
                 }}
               >
-                <div
+                <Link
+                  href={`/u/${r.userId}`}
+                  aria-label={`Profile ${r.displayName}`}
                   style={{
                     width: 44,
                     height: 44,
@@ -111,11 +114,20 @@ export function JoinRequestInbox({ requests }: Props) {
                     fontWeight: 800,
                     fontSize: 16,
                     flexShrink: 0,
+                    textDecoration: "none",
                   }}
                 >
                   {!r.avatarUrl && initial}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
+                </Link>
+                <Link
+                  href={`/u/${r.userId}`}
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    textDecoration: "none",
+                    color: "inherit",
+                  }}
+                >
                   <div
                     style={{
                       fontFamily: "var(--font-display)",
@@ -134,7 +146,7 @@ export function JoinRequestInbox({ requests }: Props) {
                     }}
                   >
                     {r.tierName ?? "—"} · {r.totalPoints} pts ·{" "}
-                    {r.totalMatches} match
+                    {r.totalMatches} matches
                     {r.city && ` · 📍 ${r.city}`}
                   </div>
                   {r.message && (
@@ -150,7 +162,7 @@ export function JoinRequestInbox({ requests }: Props) {
                       &ldquo;{r.message}&rdquo;
                     </div>
                   )}
-                </div>
+                </Link>
                 <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
                   <button
                     type="button"

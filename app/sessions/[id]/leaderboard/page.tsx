@@ -352,18 +352,21 @@ function LbItem({
 }) {
   const initial = (row.displayName.trim()[0] ?? "?").toUpperCase();
   const tierName = row.tierName ?? "Rookie";
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "var(--s-3)",
-        padding: "var(--s-3) var(--s-4)",
-        background: isMe ? "var(--primary-50)" : "var(--bg-card)",
-        border: `1px solid ${isMe ? "var(--primary)" : "var(--border)"}`,
-        borderRadius: "var(--r-lg)",
-      }}
-    >
+
+  const containerStyle: React.CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    gap: "var(--s-3)",
+    padding: "var(--s-3) var(--s-4)",
+    background: isMe ? "var(--primary-50)" : "var(--bg-card)",
+    border: `1px solid ${isMe ? "var(--primary)" : "var(--border)"}`,
+    borderRadius: "var(--r-lg)",
+    textDecoration: "none",
+    color: "inherit",
+  };
+
+  const inner = (
+    <>
       <div
         style={{
           width: 36,
@@ -479,7 +482,15 @@ function LbItem({
           primary={sort === "match"}
         />
       </div>
-    </div>
+    </>
+  );
+
+  return row.userId ? (
+    <Link href={`/u/${row.userId}`} style={containerStyle}>
+      {inner}
+    </Link>
+  ) : (
+    <div style={containerStyle}>{inner}</div>
   );
 }
 
