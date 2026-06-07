@@ -203,7 +203,7 @@ export default async function SessionLeaderboardPage({
             target="point"
             emoji="🏆"
             label="Point"
-            sub="Total poin"
+            sub="Total points"
           />
           <SortTab
             sessionId={id}
@@ -211,7 +211,7 @@ export default async function SessionLeaderboardPage({
             target="winrate"
             emoji="📈"
             label="Win Rate"
-            sub="% menang"
+            sub="% wins"
           />
           <SortTab
             sessionId={id}
@@ -219,7 +219,7 @@ export default async function SessionLeaderboardPage({
             target="match"
             emoji="🎯"
             label="Match"
-            sub="Total main"
+            sub="Played"
           />
         </section>
 

@@ -64,7 +64,7 @@ export default async function AdminSessions({
             name="q"
             type="search"
             defaultValue={q}
-            placeholder="Cari title / venue…"
+            placeholder="Search title / venue…"
             style={{
               width: "100%",
               padding: "var(--s-3) var(--s-4)",

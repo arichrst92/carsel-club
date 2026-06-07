@@ -46,7 +46,7 @@ export function AdvancedStats(props: AdvancedStatsProps) {
         <ListCard
           title="Partner terbaik"
           subtitle="Highest win rate (min 3 match)"
-          empty="Belum cukup data partner"
+          empty="Not enough partner data"
           rows={props.bestPartners}
           metricLabel={(r) =>
             `${Math.round(r.winRate * 100)}% (${r.won}W / ${r.played})`

@@ -57,7 +57,7 @@ export default async function AdminUsers({
             name="q"
             type="search"
             defaultValue={q}
-            placeholder="Cari nama / nomor WA / kota…"
+            placeholder="Search name / nomor WA / kota…"
             style={{
               width: "100%",
               padding: "var(--s-3) var(--s-4)",

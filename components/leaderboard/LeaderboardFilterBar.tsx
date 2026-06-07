@@ -77,11 +77,11 @@ export function LeaderboardFilterBar(props: LeaderboardFilterBarProps) {
         }}
       >
         <SmallSelect
-          label="Periode"
+          label="Period"
           value={props.period}
           onChange={(v) => setParam("period", v === "all_time" ? null : v)}
           options={[
-            { value: "all_time", label: "Sepanjang masa" },
+            { value: "all_time", label: "All-time" },
             { value: "monthly", label: "30 hari" },
             { value: "weekly", label: "7 hari" },
           ]}

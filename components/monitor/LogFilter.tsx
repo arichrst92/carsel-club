@@ -63,7 +63,7 @@ export function LogFilter() {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Cari di name/context…"
+          placeholder="Search di name/context…"
           className="form-input"
           style={{ flex: 1 }}
         />

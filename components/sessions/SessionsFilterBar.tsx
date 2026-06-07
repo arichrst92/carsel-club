@@ -69,7 +69,7 @@ export function SessionsFilterBar({
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Cari nama session / venue..."
+          placeholder="Search name session / venue..."
           className="form-input"
           style={{ flex: 1, fontSize: 13 }}
         />

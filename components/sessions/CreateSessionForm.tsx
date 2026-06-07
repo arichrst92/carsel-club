@@ -157,7 +157,7 @@ export function CreateSessionForm() {
         <section className="wizard-progress">
           <div className="wizard-progress-meta">
             <span className="wizard-step-label">
-              Langkah {step} dari {TOTAL_STEPS}
+              Step {step} dari {TOTAL_STEPS}
             </span>
             <span
               className="wizard-step-label"
@@ -235,7 +235,7 @@ export function CreateSessionForm() {
           </button>
         ) : (
           <Link href="/sessions" className="btn-secondary-lg">
-            <span>Batal</span>
+            <span>Cancel</span>
           </Link>
         )}
         <button
@@ -314,7 +314,7 @@ function Step1Info({
             maxLength={60}
           />
           <p className="form-help">
-            Beri nama yang mudah diingat untuk sesi kamu.
+            Give your session a memorable name.
           </p>
         </div>
 
@@ -608,7 +608,7 @@ function Step3Players({
             }}
           >
             No maximum player limit. Add players via WhatsApp invite
-            — kapan saja sebelum/saat session.
+            — anytime before/during the session.
           </div>
         </div>
       </section>
@@ -713,7 +713,7 @@ function Step3Players({
             }}
           >
             Match has no point/time limit. Host or co-host decides
-            kapan match berakhir saat scoring.
+            when matches end during scoring.
           </div>
         </div>
       </section>
@@ -778,7 +778,7 @@ function Step4Visibility({
           <p className="form-help">
             {data.visibility === "public"
               ? "Session muncul di Find Session untuk pemain padel — anyone bisa join langsung."
-              : "Hanya pemain yang dapat link WA yang bisa join."}
+              : "Only players who get the WA link yang bisa join."}
           </p>
         </div>
       </section>
@@ -809,7 +809,7 @@ function Step4Visibility({
           <div className="toggle-info">
             <div className="form-label">I will play</div>
             <p className="form-help">
-              Disable kalau kamu hanya jadi organizer/wasit.
+              Disable if youre just organizer/referee.
             </p>
           </div>
           <button
@@ -889,7 +889,7 @@ function Step5Review({
           marginTop: -12,
         }}
       >
-        Cek detail sebelum create. Tap edit kalau mau ubah.
+        Review details before creating. Tap edit to modify.
       </p>
 
       <div className="review-card">
@@ -962,7 +962,7 @@ function Step5Review({
                   : `${data.roundCount} round (manual)`}
               </span>
               <span style={{ color: "var(--text-500)" }}>
-                Tanpa batas pemain · match end manual
+                No player limit · match end manual
               </span>
             </div>
           </div>
@@ -981,7 +981,7 @@ function Step5Review({
             <div className="review-value">
               {data.visibility === "public"
                 ? "🌍 Public — discoverable"
-                : "🔒 Privat — undangan saja"}
+                : "🔒 Privat — invite only"}
             </div>
             <div className="review-value-list" style={{ marginTop: 4 }}>
               <span>
@@ -1037,7 +1037,7 @@ function Step5Review({
               marginBottom: 2,
             }}
           >
-            Setelah dibuat:
+            After creation:
           </div>
           <div
             style={{
@@ -1047,7 +1047,7 @@ function Step5Review({
               lineHeight: 1.5,
             }}
           >
-            Session akan masuk ke &quot;My Sessions&quot;. Kamu bisa undang
+            Session will appear in &quot;My Sessions&quot;. Kamu bisa undang
             pemain via WhatsApp link & atur match di dalam session.
           </div>
         </div>

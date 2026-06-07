@@ -373,7 +373,7 @@ function TierCard({
       <div className="tier-badge-row">
         <div className="tier-icon">{tierEmoji}</div>
         <div className="tier-info">
-          <div className="tier-label">Tier Saat Ini</div>
+          <div className="tier-label">Current Tier</div>
           <div className="tier-name">{tierName}</div>
         </div>
         <div>

@@ -628,14 +628,14 @@ export default async function ProfilePage() {
               <SettingsRow
                 icon="✏️"
                 title="Edit Profile"
-                sub="Nama, kota"
+                sub="Name, city"
               />
             </Link>
             <Link href="/friends" style={{ textDecoration: "none" }}>
               <SettingsRow
                 icon="👥"
                 title="Friends"
-                sub="Following + followers + teman padel"
+                sub="Following + followers + padel friends"
               />
             </Link>
             <Link href="/achievements" style={{ textDecoration: "none" }}>
@@ -669,7 +669,7 @@ export default async function ProfilePage() {
               <SettingsRow
                 icon="❓"
                 title="Help"
-                sub="FAQ, kontak support"
+                sub="FAQ, contact support"
               />
             </Link>
             <Link href="/privacy-policy" style={{ textDecoration: "none" }}>
