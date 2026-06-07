@@ -27,21 +27,21 @@ export const metadata: Metadata = {
     template: "%s · Carsel Club",
   },
   description:
-    "Host & main padel bareng dengan mudah. Komunitas padel Indonesia — buat session, generate match, share live ke siapa pun.",
+    "Host & play padel easily. Indonesia padel community — create sessions, generate matches, share live with anyone.",
   applicationName: "Carsel Club",
   authors: [{ name: "Carsel Club" }],
-  keywords: ["padel", "indonesia", "komunitas padel", "match", "americano", "mexicano"],
+  keywords: ["padel", "indonesia", "padel community", "match", "americano", "mexicano"],
   openGraph: {
     type: "website",
-    locale: "id_ID",
+    locale: "en_US",
     siteName: "Carsel Club",
     title: "Carsel Club — Padel Community Indonesia",
-    description: "Host & main padel bareng dengan mudah.",
+    description: "Host & play padel easily.",
   },
   twitter: {
     card: "summary_large_image",
     title: "Carsel Club",
-    description: "Host & main padel bareng dengan mudah.",
+    description: "Host & play padel easily.",
   },
   icons: {
     icon: [
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
       { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
       { url: "/favicon.ico" },
     ],
-    apple: "/icon-192.png",
+    apple: "/apple-touch-icon.png",
     shortcut: "/icon-192.png",
   },
   appleWebApp: {
@@ -63,7 +63,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#F97316",
+  // Sprint 51: theme color align dgn brand teal + match manifest
+  themeColor: "#14B8A6",
 };
 
 export default function RootLayout({
@@ -73,7 +74,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="id"
+      lang="en"
       className={`${quicksand.variable} ${nunito.variable} h-full antialiased`}
     >
       <body className="min-h-full">

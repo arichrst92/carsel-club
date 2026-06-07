@@ -9,10 +9,10 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/home",
     scope: "/",
     display: "standalone",
-    background_color: "#FFFBF5",
-    theme_color: "#F97316",
+    background_color: "#FFFFFF",
+    theme_color: "#14B8A6",
     orientation: "portrait",
-    lang: "id",
+    lang: "en",
     icons: [
       {
         src: "/icon-192.png",
@@ -31,6 +31,12 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",
+      },
+      // Sprint 51: iOS apple-touch-icon (Safari home screen)
+      {
+        src: "/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png",
       },
     ],
     categories: ["sports", "social", "lifestyle"],
