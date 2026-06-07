@@ -50,7 +50,7 @@ export function StartSessionButton({ sessionId }: { sessionId: string }) {
         >
           <path d="M5 3l14 9-14 9V3z" />
         </svg>
-        <span>{isPending ? "Memulai…" : "Mulai Sesi"}</span>
+        <span>{isPending ? "Starting..." : "Start Session"}</span>
       </button>
     </>
   );

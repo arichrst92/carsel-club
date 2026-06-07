@@ -248,8 +248,8 @@ export function CreateSessionForm() {
             {step === TOTAL_STEPS
               ? isPending
                 ? "Creating..."
-                : "Buat Sesi"
-              : "Lanjut"}
+                : "Create Session"
+              : "Next"}
           </span>
           {step !== TOTAL_STEPS && (
             <svg
@@ -298,7 +298,7 @@ function Step1Info({
 }) {
   return (
     <>
-      <h2 className="wizard-step-title">Info Sesi</h2>
+      <h2 className="wizard-step-title">Session Info</h2>
 
       <section className="form-section">
         <div className="form-group">
@@ -326,21 +326,21 @@ function Step1Info({
               onSelect={() => setField("format", "americano")}
               emoji="🔄"
               title="Americano"
-              sub="Pasangan dirotasi tiap ronde — semua main dgn semua."
+              sub="Partners rotate each round — everyone plays with everyone."
             />
             <FormatCard
               active={data.format === "mexicano"}
               onSelect={() => setField("format", "mexicano")}
               emoji="📊"
               title="Mexicano"
-              sub="Pairing berdasar ranking — tiap ronde adu pemain rangking serupa."
+              sub="Pairing by ranking — each round matches similarly-ranked players."
             />
             <FormatCard
               active={data.format === "tournament"}
               onSelect={() => setField("format", "tournament")}
               emoji="🏆"
               title="Tournament"
-              sub="Sistem gugur — pemenang lanjut, kalah tersingkir."
+              sub="Single elimination — winners advance, losers eliminated."
             />
           </div>
         </div>
@@ -408,7 +408,7 @@ function Step2Location({
 }) {
   return (
     <>
-      <h2 className="wizard-step-title">Lokasi & Waktu</h2>
+      <h2 className="wizard-step-title">Location & Time</h2>
 
       <section className="form-section">
         <div className="form-section-head">
@@ -427,7 +427,7 @@ function Step2Location({
               <circle cx="12" cy="10" r="3" />
             </svg>
           </div>
-          <h3>Venue & Jadwal</h3>
+          <h3>Venue & Schedule</h3>
         </div>
         <div className="form-group">
           <label className="form-label">
@@ -459,7 +459,7 @@ function Step2Location({
         </div>
 
         <div className="form-group">
-          <label className="form-label">Google Maps Link (Opsional)</label>
+          <label className="form-label">Google Maps Link (Optional)</label>
           <div className="input-with-icon">
             <svg
               width="18"
@@ -918,7 +918,7 @@ function Step5Review({
 
         <div className="review-section">
           <div className="review-info">
-            <div className="review-label">Lokasi & Waktu</div>
+            <div className="review-label">Location & Time</div>
             <div className="review-value">{data.venueName || "—"}</div>
             <div className="review-value-list" style={{ marginTop: 4 }}>
               <span>

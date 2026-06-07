@@ -7,7 +7,7 @@ import {
 import { AddParticipantsTabs } from "@/components/sessions/AddParticipantsTabs";
 
 export const metadata = {
-  title: "Tambah Pemain",
+  title: "Add Players",
 };
 
 type PageProps = {

@@ -170,7 +170,7 @@ export function InstallPromptBanner() {
         <button
           type="button"
           onClick={dismiss}
-          aria-label="Tutup"
+          aria-label="Close"
           style={{
             background: "transparent",
             border: "none",

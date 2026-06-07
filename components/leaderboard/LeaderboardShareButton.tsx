@@ -30,17 +30,17 @@ export function LeaderboardShareButton(props: {
         : "Indonesia";
     const periodLabel =
       props.period === "weekly"
-        ? "minggu ini"
+        ? "this week"
         : props.period === "monthly"
-          ? "bulan ini"
-          : "sepanjang waktu";
+          ? "this month"
+          : "all-time";
     const title = `Top 10 ${scopeLabel} — Carsel Club`;
     // Sprint 50: body text WITHOUT URL — URL via param tunggal navigator.share
     // supaya tidak duplikat saat WhatsApp gabungkan text + url.
     const bodyText =
-      `🏆 *Top 10 Pemain Padel ${scopeLabel}*\n` +
-      `Papan peringkat ${periodLabel} di Carsel Club ⚡\n\n` +
-      `Cek siapa yang lagi di puncak — komunitas padel Indonesia!`;
+      `🏆 *Top 10 Padel Players ${scopeLabel}*\n` +
+      `Leaderboard ${periodLabel} di Carsel Club ⚡\n\n` +
+      `See who is on top — Indonesia padel community!`;
 
     if (typeof navigator !== "undefined" && navigator.share) {
       try {

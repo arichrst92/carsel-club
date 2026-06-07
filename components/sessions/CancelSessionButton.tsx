@@ -28,7 +28,7 @@ export function CancelSessionButton({ sessionId }: { sessionId: string }) {
       }
       // Sprint 50: refresh client-side supaya status badge + tombol
       // update tanpa user reload manual.
-      setSuccess("Sesi dibatalkan.");
+      setSuccess("Session cancelled.");
       router.refresh();
     });
   }
@@ -60,7 +60,7 @@ export function CancelSessionButton({ sessionId }: { sessionId: string }) {
           <circle cx="12" cy="12" r="10" />
           <path d="M15 9l-6 6M9 9l6 6" />
         </svg>
-        <span>{isPending ? "Membatalkan…" : "Batalkan Sesi"}</span>
+        <span>{isPending ? "Cancelling..." : "Cancel Session"}</span>
       </button>
     </>
   );

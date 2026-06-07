@@ -97,7 +97,7 @@ const FAQ_SECTIONS: { title: string; items: { q: string; a: string }[] }[] = [
     ],
   },
   {
-    title: "Notifikasi",
+    title: "Notifications",
     items: [
       {
         q: "Notif apa saja yang aku terima?",
@@ -114,7 +114,7 @@ const FAQ_SECTIONS: { title: string; items: { q: string; a: string }[] }[] = [
     ],
   },
   {
-    title: "Privasi & Data",
+    title: "Privacy & Data",
     items: [
       {
         q: "Siapa yang bisa lihat profil aku?",

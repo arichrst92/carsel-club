@@ -30,7 +30,7 @@ function buildText({
   const team1 = team1Names.filter(Boolean).join(" & ");
   const team2 = team2Names.filter(Boolean).join(" & ");
 
-  let text = `🎾 *Hasil Pertandingan · ${sessionTitle}*\n\n`;
+  let text = `🎾 *Match Result · ${sessionTitle}*\n\n`;
 
   if (team1Score > team2Score) {
     text += `🏆 *${team1}* menang ${team1Score} - ${team2Score} vs ${team2}\n`;
@@ -69,7 +69,7 @@ export function ShareMatchButton({
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
-          title: `${sessionTitle} — Hasil Pertandingan`,
+          title: `${sessionTitle} — Match Result`,
           text: bodyText, // tanpa URL
           url,
         });

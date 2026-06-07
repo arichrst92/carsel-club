@@ -95,7 +95,7 @@ export function AddMemberSearch({ sessionId }: { sessionId: string }) {
                 fontSize: 13,
               }}
             >
-              {isPending ? "Mencari..." : "Cari Member"}
+              {isPending ? "Searching..." : "Cari Member"}
             </button>
           </div>
         </div>

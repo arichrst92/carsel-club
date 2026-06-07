@@ -26,7 +26,7 @@ const STATUS_STYLES: Record<
   { label: string; color: string; bg: string }
 > = {
   pending: {
-    label: "Menunggu",
+    label: "Pending",
     color: "var(--text-500)",
     bg: "var(--bg-soft)",
   },
@@ -36,7 +36,7 @@ const STATUS_STYLES: Record<
     bg: "var(--accent-50)",
   },
   completed: {
-    label: "Selesai",
+    label: "Completed",
     color: "var(--primary-700)",
     bg: "var(--primary-50)",
   },
@@ -323,7 +323,7 @@ export function MatchCard({
           >
             <path d="M5 3l14 9-14 9V3z" />
           </svg>
-          <span>{isPending ? "Memulai…" : "Mulai Match"}</span>
+          <span>{isPending ? "Starting..." : "Start Match"}</span>
         </button>
       )}
 
@@ -340,7 +340,7 @@ export function MatchCard({
             width: "100%",
           }}
         >
-          {isPending ? "Menyimpan…" : "Akhiri Match"}
+          {isPending ? "Saving..." : "End Match"}
         </button>
       )}
 
@@ -419,7 +419,7 @@ export function MatchCard({
               fontSize: 12,
             }}
           >
-            {isPending ? "..." : "Simpan"}
+            {isPending ? "..." : "Save"}
           </button>
         </div>
       )}

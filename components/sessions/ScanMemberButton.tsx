@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Tombol "Pindai QR Pemain" di halaman Tambah Pemain sesi.
+ * Tombol "Scan Player QR" di halaman Tambah Pemain sesi.
  *
  * Flow:
  * 1. Host buka modal scan
@@ -96,7 +96,7 @@ export function ScanMemberButton({ sessionId }: Props) {
 
       {open && (
         <QRScanModal
-          title="Pindai QR Pemain"
+          title="Scan Player QR"
           subtitle="Arahkan kamera ke QR Code di halaman Profil pemain. Pemain otomatis ditambahkan ke sesi."
           onScan={handleScan}
           onClose={() => setOpen(false)}

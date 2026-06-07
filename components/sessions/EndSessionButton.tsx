@@ -70,7 +70,7 @@ export function EndSessionButton({
           <path d="M9 12l2 2 4-4" />
           <circle cx="12" cy="12" r="10" />
         </svg>
-        <span>{isPending ? "Menyelesaikan…" : "Selesaikan Sesi"}</span>
+        <span>{isPending ? "Ending..." : "End Session"}</span>
       </button>
     </>
   );

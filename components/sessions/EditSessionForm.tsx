@@ -151,7 +151,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
                 <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
               </svg>
             </div>
-            <h3>Info Sesi</h3>
+            <h3>Session Info</h3>
           </div>
           <div className="form-group">
             <label className="form-label">
@@ -180,7 +180,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Google Maps Link (Opsional)</label>
+            <label className="form-label">Google Maps Link (Optional)</label>
             <input
               type="url"
               className="form-input"
@@ -226,7 +226,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Deskripsi (Opsional)</label>
+            <label className="form-label">Deskripsi (Optional)</label>
             <textarea
               className="form-input"
               value={description}
@@ -255,10 +255,10 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
             </div>
-            <h3>Akses & Visibilitas</h3>
+            <h3>Access & Visibility</h3>
           </div>
           <div className="form-group">
-            <label className="form-label">Visibilitas</label>
+            <label className="form-label">Visibility</label>
             <div className="segmented">
               <button
                 type="button"
@@ -374,7 +374,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Max Rounds (Opsional)</label>
+            <label className="form-label">Max Rounds (Optional)</label>
             <input
               type="number"
               className="form-input"
@@ -396,7 +396,7 @@ export function EditSessionForm({ sessionId, hasRounds, initial }: Props) {
           className="btn-primary-lg"
           style={{ width: "100%" }}
         >
-          {isPending ? "Menyimpan..." : "Simpan Perubahan"}
+          {isPending ? "Menyimpan..." : "Save Changes"}
         </button>
       </div>
     </>

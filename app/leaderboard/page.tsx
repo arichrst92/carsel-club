@@ -235,7 +235,7 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
             period={period}
             city={city}
             emoji="🏆"
-            label="Poin"
+            label="Point"
             sub="Total poin"
           />
           <SortTab
@@ -245,7 +245,7 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
             period={period}
             city={city}
             emoji="📈"
-            label="Tingkat Menang"
+            label="Win Rate"
             sub="% menang"
           />
           <SortTab

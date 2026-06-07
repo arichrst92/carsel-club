@@ -6,7 +6,7 @@ import { BottomNav } from "@/components/nav/BottomNav";
 import { formatDate, formatTimeRange } from "@/lib/utils";
 
 export const metadata = {
-  title: "Cari Sesi",
+  title: "Find Session",
 };
 
 type PageProps = {
@@ -33,7 +33,7 @@ export default async function FindSessionPage({ searchParams }: PageProps) {
       <header className="app-header">
         <div className="logo">
           <AppLogoMark />
-          <span className="logo-text">Cari Sesi</span>
+          <span className="logo-text">Find Session</span>
         </div>
       </header>
 
@@ -66,7 +66,7 @@ export default async function FindSessionPage({ searchParams }: PageProps) {
             Cari Sesi Publik
           </div>
           <div style={{ fontSize: 12, opacity: 0.85, fontWeight: 600 }}>
-            {allSessions.length} sesi aktif di Indonesia
+            {allSessions.length} active sessions in Indonesia
           </div>
         </section>
 
@@ -106,12 +106,12 @@ export default async function FindSessionPage({ searchParams }: PageProps) {
             <div className="empty-state">
               <div className="empty-state-icon">🔍</div>
               <div className="empty-state-title">
-                Belum ada sesi publik aktif
+                No active public sessions
               </div>
               <div className="empty-state-text">
                 {cityFilter
-                  ? "Coba reset filter atau buat sesi sendiri di kotamu."
-                  : "Jadi yang pertama — buat sesi publik untuk komunitas padel!"}
+                  ? "Try resetting the filter or create your own session in your city."
+                  : "Be the first — create a public session for the padel community!"}
               </div>
               <Link
                 href="/sessions/new"

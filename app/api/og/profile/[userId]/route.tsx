@@ -198,7 +198,7 @@ export async function GET(_req: Request, { params }: Props) {
           }}
         >
           <StatTile label="Total Points" value={profile.totalPoints} />
-          <StatTile label="Tingkat Menang" value={`${wr}%`} />
+          <StatTile label="Win Rate" value={`${wr}%`} />
           <StatTile label="Matches" value={profile.totalMatches} />
         </div>
 

@@ -190,9 +190,9 @@ export function OnboardingForm({
           <span>
             {step === TOTAL_STEPS
               ? isPending
-                ? "Menyimpan…"
+                ? "Saving..."
                 : "Mulai Main"
-              : "Lanjut"}
+              : "Next"}
           </span>
           {!isPending && (
             <svg

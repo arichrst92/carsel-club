@@ -93,7 +93,7 @@ export default async function SessionsPage({
       <header className="app-header">
         <div className="logo">
           <AppLogoMark />
-          <span className="logo-text">Sesi Saya</span>
+          <span className="logo-text">My Sessions</span>
         </div>
         <div className="header-actions">
           <Link

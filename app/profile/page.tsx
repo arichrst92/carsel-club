@@ -34,7 +34,7 @@ import {
 } from "@/components/profile/AdvancedStats";
 
 export const metadata = {
-  title: "Profil",
+  title: "Profile",
 };
 
 const TIER_EMOJI: Record<string, string> = {
@@ -71,7 +71,7 @@ function formatJoinDate(d: Date | string): string {
     "Nov",
     "Des",
   ];
-  return `Bergabung ${months[date.getMonth()]} ${date.getFullYear()}`;
+  return `Joined ${months[date.getMonth()]} ${date.getFullYear()}`;
 }
 
 export default async function ProfilePage() {
@@ -143,7 +143,7 @@ export default async function ProfilePage() {
       <header className="app-header">
         <div className="logo">
           <AppLogoMark />
-          <span className="logo-text">Profil</span>
+          <span className="logo-text">Profile</span>
         </div>
         <div className="header-actions">
           <form action={logoutAction}>
@@ -151,7 +151,7 @@ export default async function ProfilePage() {
               type="submit"
               className="icon-btn"
               aria-label="Logout"
-              title="Keluar"
+              title="Logout"
             >
               <svg
                 width="22"
@@ -298,7 +298,7 @@ export default async function ProfilePage() {
             }}
           >
             <QuickStat value={profile.totalPoints.toLocaleString()} label="Points" />
-            <QuickStat value={`${wr}%`} label="Tingkat Menang" />
+            <QuickStat value={`${wr}%`} label="Win Rate" />
             <QuickStat value={profile.totalMatches.toString()} label="Match" />
           </div>
         </section>
@@ -306,7 +306,7 @@ export default async function ProfilePage() {
         {/* TIER JOURNEY */}
         <section>
           <div className="section-head">
-            <h3>Perjalanan Tier</h3>
+            <h3>Tier Journey</h3>
           </div>
           <div
             style={{
@@ -365,7 +365,7 @@ export default async function ProfilePage() {
                     {ptsToNext > 0 && `${ptsToNext} pts`}
                     {ptsToNext > 0 && matchesToNext > 0 && " · "}
                     {matchesToNext > 0 && `${matchesToNext} match`}
-                    {ptsToNext === 0 && matchesToNext === 0 && "Siap!"}
+                    {ptsToNext === 0 && matchesToNext === 0 && "Ready!"}
                   </div>
                 </div>
               ) : (
@@ -480,25 +480,25 @@ export default async function ProfilePage() {
             <StatCard
               variant="teal"
               value={profile.totalMatches}
-              label="Total Main"
+              label="Match Played"
               icon="🎯"
             />
             <StatCard
               variant="coral"
               value={`${wr}%`}
-              label="Tingkat Menang"
+              label="Win Rate"
               icon="📈"
             />
             <StatCard
               variant="yellow"
               value={profile.totalWins}
-              label="Total Menang"
+              label="Total Wins"
               icon="🏆"
             />
             <StatCard
               variant="teal"
               value={profile.hostedCount}
-              label="Sesi Di-host"
+              label="Sessions Hosted"
               icon="👑"
             />
           </div>
@@ -528,7 +528,7 @@ export default async function ProfilePage() {
         {/* RECENT MATCHES */}
         <section>
           <div className="section-head">
-            <h3>Pertandingan Terbaru</h3>
+            <h3>Recent Matches</h3>
             <Link href="/profile/matches" className="section-link">
               View All
             </Link>
@@ -610,7 +610,7 @@ export default async function ProfilePage() {
         {/* SETTINGS */}
         <section>
           <div className="section-head">
-            <h3>Pengaturan</h3>
+            <h3>Settings</h3>
           </div>
           <div
             style={{
@@ -627,21 +627,21 @@ export default async function ProfilePage() {
             <Link href="/profile/edit" style={{ textDecoration: "none" }}>
               <SettingsRow
                 icon="✏️"
-                title="Ubah Profil"
+                title="Edit Profile"
                 sub="Nama, kota"
               />
             </Link>
             <Link href="/friends" style={{ textDecoration: "none" }}>
               <SettingsRow
                 icon="👥"
-                title="Teman"
+                title="Friends"
                 sub="Following + followers + teman padel"
               />
             </Link>
             <Link href="/achievements" style={{ textDecoration: "none" }}>
               <SettingsRow
                 icon="🏆"
-                title="Pencapaian"
+                title="Achievements"
                 sub="Badge & milestones"
               />
             </Link>
@@ -661,7 +661,7 @@ export default async function ProfilePage() {
             >
               <SettingsRow
                 icon="🔐"
-                title="Privasi"
+                title="Privacy"
                 sub="Display + friend req + data export"
               />
             </Link>
@@ -768,7 +768,7 @@ function ProfileAchievements({
     <section>
       <div className="section-head">
         <h3>
-          Pencapaian{" "}
+          Achievements{" "}
           <span
             style={{
               color: "var(--text-500)",

@@ -278,7 +278,7 @@ export async function acceptFriendRequestAction(
   });
 
   revalidatePath("/friends");
-  return { success: "Pertemanan diterima!" };
+  return { success: "Friend accepted!" };
 }
 
 export async function rejectFriendRequestAction(
@@ -317,7 +317,7 @@ export async function rejectFriendRequestAction(
   });
 
   revalidatePath("/friends");
-  return { success: "Permintaan ditolak" };
+  return { success: "Request rejected" };
 }
 
 export async function cancelOutgoingRequestAction(

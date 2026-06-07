@@ -141,7 +141,7 @@ export default async function HomePage() {
         {/* QUICK ACTIONS */}
         <section>
           <div className="section-head">
-            <h3>Aksi Cepat</h3>
+            <h3>Quick Actions</h3>
           </div>
           <div className="quick-actions">
             <Link href="/sessions/new" className="qa-btn primary">
@@ -178,7 +178,7 @@ export default async function HomePage() {
                   <path d="M21 21l-4.35-4.35" />
                 </svg>
               </div>
-              <div className="qa-title">Cari Sesi</div>
+              <div className="qa-title">Find Session</div>
               <div className="qa-sub">Sesi publik di kotamu</div>
             </Link>
           </div>
@@ -188,7 +188,7 @@ export default async function HomePage() {
         {nextSession && (
           <section>
             <div className="section-head">
-              <h3>Sesi Berikutnya</h3>
+              <h3>Next Session</h3>
               <Link href="/sessions" className="section-link">
                 Lihat Semua
               </Link>
@@ -269,7 +269,7 @@ export default async function HomePage() {
         {/* RECENT ACTIVITY */}
         <section>
           <div className="section-head">
-            <h3>Pertandingan Terbaru</h3>
+            <h3>Recent Matches</h3>
           </div>
           {recent.length === 0 ? (
             <div

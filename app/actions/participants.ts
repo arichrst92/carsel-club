@@ -147,7 +147,7 @@ export async function addMemberAction(
 
   revalidatePath(`/sessions/${sessionId}`);
   revalidatePath(`/sessions/${sessionId}/participants`);
-  return { success: "Pemain ditambahkan" };
+  return { success: "Member added" };
 }
 
 // ============================================================

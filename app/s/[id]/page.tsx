@@ -327,9 +327,9 @@ export default async function PublicLiveView({ params }: PageProps) {
                 }}
               >
                 {currentRound.status === "completed"
-                  ? "Selesai"
+                  ? "Completed"
                   : currentRound.status === "in_progress"
-                    ? "Berlangsung"
+                    ? "Live"
                     : "Pending"}
               </span>
             </div>
@@ -575,7 +575,7 @@ function CourtMatchCard({
             )}
             <span>
               Court {match.courtNumber} ·{" "}
-              {isCompleted ? "Selesai" : isLive ? "LIVE" : "Pending"}
+              {isCompleted ? "Completed" : isLive ? "LIVE" : "Pending"}
             </span>
           </span>
         </div>

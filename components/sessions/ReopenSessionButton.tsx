@@ -74,7 +74,7 @@ export function ReopenSessionButton({
         </svg>
         <span>
           {isPending
-            ? "Membuka ulang…"
+            ? "Reopening..."
             : `Buka Ulang Sesi${hasRounds ? " (Live)" : ""}`}
         </span>
       </button>

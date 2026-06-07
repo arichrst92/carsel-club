@@ -24,7 +24,7 @@ import {
 } from "@/lib/match/history-filter";
 
 export const metadata = {
-  title: "Papan Peringkat Sesi",
+  title: "Session Leaderboard",
 };
 
 export const dynamic = "force-dynamic";
@@ -134,7 +134,7 @@ export default async function SessionLeaderboardPage({
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
         </Link>
-        <h2 className="subscreen-title">Papan Peringkat Sesi</h2>
+        <h2 className="subscreen-title">Session Leaderboard</h2>
         <div style={{ width: 40 }} />
       </header>
 
@@ -183,7 +183,7 @@ export default async function SessionLeaderboardPage({
             }}
           >
             <HeroStat label="Pemain" value={hero.playerCount} />
-            <HeroStat label="Match Selesai" value={hero.completedMatches} />
+            <HeroStat label="Match Done" value={hero.completedMatches} />
             <HeroStat label="Total Pts" value={hero.totalPoints} />
           </div>
         </section>
@@ -202,7 +202,7 @@ export default async function SessionLeaderboardPage({
             current={sort}
             target="point"
             emoji="🏆"
-            label="Poin"
+            label="Point"
             sub="Total poin"
           />
           <SortTab
@@ -210,7 +210,7 @@ export default async function SessionLeaderboardPage({
             current={sort}
             target="winrate"
             emoji="📈"
-            label="Tingkat Menang"
+            label="Win Rate"
             sub="% menang"
           />
           <SortTab

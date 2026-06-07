@@ -176,7 +176,7 @@ export function AvatarUploader({ currentAvatarUrl, initial }: Props) {
               disabled={isPending}
               style={{ display: "none" }}
             />
-            {isPending ? "Mengunggah..." : preview ? "Ganti foto" : "Pilih foto"}
+            {isPending ? "Uploading..." : preview ? "Ganti foto" : "Pilih foto"}
           </label>
 
           {preview && !isPending && (

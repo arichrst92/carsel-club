@@ -24,7 +24,7 @@ import {
 } from "@/lib/match/history-filter";
 
 export const metadata = {
-  title: "Riwayat Pertandingan",
+  title: "Match History",
 };
 
 export const dynamic = "force-dynamic";
@@ -119,7 +119,7 @@ export default async function MatchHistoryPage({
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
         </Link>
-        <h2 className="subscreen-title">Riwayat Pertandingan</h2>
+        <h2 className="subscreen-title">Match History</h2>
         <div style={{ width: 40 }} />
       </header>
 
@@ -127,7 +127,7 @@ export default async function MatchHistoryPage({
         {/* INSIGHTS — featured 30-day win rate */}
         <section>
           <div className="section-head">
-            <h3>Wawasan</h3>
+            <h3>Insights</h3>
             <span
               style={{
                 color: "var(--text-500)",

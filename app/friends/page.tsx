@@ -11,7 +11,7 @@ import { FriendRequestRowItem } from "@/components/friends/FriendRequestRow";
 import { DiscoverRow } from "@/components/friends/DiscoverRow";
 import { AddFriendActions } from "@/components/friends/AddFriendActions";
 
-export const metadata = { title: "Teman" };
+export const metadata = { title: "Friends" };
 
 type SearchParams = { tab?: string };
 type FriendTab = "friends" | "incoming" | "outgoing" | "discover";
@@ -56,7 +56,7 @@ export default async function FriendsPage({
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
         </Link>
-        <h2 className="subscreen-title">Teman</h2>
+        <h2 className="subscreen-title">Friends</h2>
         <div style={{ width: 40 }} />
       </header>
 
@@ -74,26 +74,26 @@ export default async function FriendsPage({
         >
           <TabLink
             href="/friends?tab=friends"
-            label="Teman"
+            label="Friends"
             count={friends.length}
             active={tab === "friends"}
           />
           <TabLink
             href="/friends?tab=incoming"
-            label="Masuk"
+            label="Incoming"
             count={incoming.length}
             active={tab === "incoming"}
             highlight={incoming.length > 0}
           />
           <TabLink
             href="/friends?tab=outgoing"
-            label="Keluar"
+            label="Outgoing"
             count={outgoing.length}
             active={tab === "outgoing"}
           />
           <TabLink
             href="/friends?tab=discover"
-            label="Jelajah"
+            label="Discover"
             count={null}
             active={tab === "discover"}
           />

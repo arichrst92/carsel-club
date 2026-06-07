@@ -19,7 +19,7 @@ import { NotificationItem } from "@/components/notifications/NotificationItem";
 import { MarkAllReadButton } from "@/components/notifications/MarkAllReadButton";
 
 export const metadata = {
-  title: "Notifikasi",
+  title: "Notifications",
 };
 
 export const dynamic = "force-dynamic";

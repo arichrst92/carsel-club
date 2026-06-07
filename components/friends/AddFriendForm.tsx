@@ -101,7 +101,7 @@ export function AddFriendForm() {
               fontSize: 13,
             }}
           >
-            {isPending ? "Mencari..." : "Cari User"}
+            {isPending ? "Searching..." : "Cari User"}
           </button>
         </div>
       </form>

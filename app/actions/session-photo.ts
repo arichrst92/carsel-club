@@ -97,7 +97,7 @@ export async function updateCoverPhotoAction(
   revalidatePath("/home");
   revalidatePath("/find");
   revalidatePath(`/s/${sessionId}`);
-  return { success: "Cover berhasil diubah!", coverPhotoUrl: savedUrl };
+  return { success: "Cover updated!", coverPhotoUrl: savedUrl };
 }
 
 export async function removeCoverPhotoAction(
@@ -131,7 +131,7 @@ export async function removeCoverPhotoAction(
   revalidatePath("/home");
   revalidatePath("/find");
   revalidatePath(`/s/${sessionId}`);
-  return { success: "Cover dihapus." };
+  return { success: "Cover removed." };
 }
 
 // ============================================================
@@ -225,7 +225,7 @@ export async function addGroupPhotoAction(
 
   revalidatePath(`/sessions/${sessionId}`);
   revalidatePath(`/s/${sessionId}`);
-  return { success: "Foto ditambahkan", url: savedUrl };
+  return { success: "Photo added", url: savedUrl };
 }
 
 export async function removeGroupPhotoAction(
@@ -268,5 +268,5 @@ export async function removeGroupPhotoAction(
 
   revalidatePath(`/sessions/${photo.sessionId}`);
   revalidatePath(`/s/${photo.sessionId}`);
-  return { success: "Foto dihapus." };
+  return { success: "Photo removed." };
 }

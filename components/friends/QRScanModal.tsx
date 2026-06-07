@@ -21,7 +21,7 @@ import jsQR from "jsqr";
 type Props = {
   onScan: (userId: string) => void | Promise<void>;
   onClose: () => void;
-  /** Judul header — default "Pindai QR Teman". */
+  /** Judul header — default "Scan Friend QR". */
   title?: string;
   /** Subtitle deskriptif — default petunjuk standar. */
   subtitle?: string;
@@ -30,7 +30,7 @@ type Props = {
 export function QRScanModal({
   onScan,
   onClose,
-  title = "Pindai QR Teman",
+  title = "Scan Friend QR",
   subtitle = "Arahkan kamera ke QR Code di halaman Profil teman kamu.",
 }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -191,7 +191,7 @@ export function QRScanModal({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Tutup"
+            aria-label="Close"
             style={{
               background: "var(--bg-soft)",
               border: "none",

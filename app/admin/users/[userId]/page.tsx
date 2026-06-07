@@ -72,7 +72,7 @@ export default async function AdminUserDetailPage({
             label="Created"
             value={u.createdAt.toISOString().slice(0, 10)}
           />
-          <Field label="Admin?" value={u.isAdmin ? "Ya" : "Tidak"} />
+          <Field label="Admin?" value={u.isAdmin ? "Yes" : "No"} />
         </section>
 
         <section
@@ -92,7 +92,7 @@ export default async function AdminUserDetailPage({
           <Stat label="Losses" value={u.totalLosses} />
           <Stat label="Draws" value={u.totalDraws} />
           <Stat label="Tier ID" value={u.currentTierId ?? 1} />
-          <Stat label="Streak Menang" value={u.currentWinStreak} />
+          <Stat label="Streak" value={u.currentWinStreak} />
           <Stat label="Best Streak" value={u.bestWinStreak} />
         </section>
 

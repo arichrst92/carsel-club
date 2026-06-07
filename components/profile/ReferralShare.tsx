@@ -21,11 +21,11 @@ export function ReferralShare({ userId, displayName }: Props) {
   // Sprint 50: body text TANPA URL utk navigator.share — supaya tidak
   // duplikat saat WhatsApp gabungkan text + url. Fallback wa.me yang
   // butuh URL inline akan tambah di akhir di handleShare.
-  const bodyText = `🎾 Yuk gabung Carsel Club — komunitas padel Indonesia.
+  const bodyText = `🎾 Join Carsel Club — komunitas padel Indonesia.
 
-Atur sesi padel, skor realtime, leaderboard, dan share hasil — semua di satu app.
+Manage padel sessions, realtime scoring, leaderboard, and share results — all in one app.
 
-Diundang oleh ${displayName}.`;
+Invited by ${displayName}.`;
 
   async function handleShare() {
     if (typeof navigator !== "undefined" && navigator.share) {
@@ -41,7 +41,7 @@ Diundang oleh ${displayName}.`;
       }
     }
     // Fallback wa.me — URL inline di akhir
-    const waText = `${bodyText}\n\nDaftar via link:\n${inviteUrl}`;
+    const waText = `${bodyText}\n\nSign up via link:\n${inviteUrl}`;
     const waUrl = `https://wa.me/?text=${encodeURIComponent(waText)}`;
     window.open(waUrl, "_blank", "noopener,noreferrer");
   }

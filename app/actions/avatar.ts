@@ -95,7 +95,7 @@ export async function updateAvatarAction(
   revalidatePath("/profile/edit");
   revalidatePath("/home");
   revalidatePath("/leaderboard");
-  return { success: "Foto profil berhasil diubah!", avatarUrl: savedUrl };
+  return { success: "Avatar updated!", avatarUrl: savedUrl };
 }
 
 export async function removeAvatarAction(): Promise<AvatarActionState> {
@@ -124,5 +124,5 @@ export async function removeAvatarAction(): Promise<AvatarActionState> {
   revalidatePath("/profile/edit");
   revalidatePath("/home");
   revalidatePath("/leaderboard");
-  return { success: "Foto profil dihapus." };
+  return { success: "Avatar removed." };
 }

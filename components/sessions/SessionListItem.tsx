@@ -21,10 +21,10 @@ type Props = {
 };
 
 const STATUS_PILL: Record<string, { label: string; cls: string }> = {
-  upcoming: { label: "Mendatang", cls: "upcoming" },
+  upcoming: { label: "Upcoming", cls: "upcoming" },
   live: { label: "🔴 LIVE", cls: "live" },
-  completed: { label: "Selesai", cls: "past" },
-  cancelled: { label: "Dibatalkan", cls: "past" },
+  completed: { label: "Completed", cls: "past" },
+  cancelled: { label: "Cancelled", cls: "past" },
 };
 
 const MONTH_ID = [

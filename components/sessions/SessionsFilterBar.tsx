@@ -7,9 +7,9 @@ export type SessionTab = "upcoming" | "live" | "past";
 export type FormatFilter = "all" | "americano" | "mexicano" | "tournament";
 
 const TAB_OPTIONS: Array<{ value: SessionTab; label: string; emoji: string }> = [
-  { value: "upcoming", label: "Mendatang", emoji: "📅" },
+  { value: "upcoming", label: "Upcoming", emoji: "📅" },
   { value: "live", label: "Live", emoji: "🔴" },
-  { value: "past", label: "Lalu", emoji: "✅" },
+  { value: "past", label: "Past", emoji: "✅" },
 ];
 
 const FORMAT_OPTIONS: Array<{ value: FormatFilter; label: string }> = [

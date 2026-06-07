@@ -13,7 +13,7 @@ import { NotificationPrefsForm } from "@/components/notifications/NotificationPr
 import { PushToggle } from "@/components/notifications/PushToggle";
 
 export const metadata = {
-  title: "Preferensi Notifikasi",
+  title: "Notification preferences",
 };
 
 export const dynamic = "force-dynamic";

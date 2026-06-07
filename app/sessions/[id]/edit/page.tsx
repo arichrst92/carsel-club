@@ -14,7 +14,7 @@ import { sessions, matchRoundSets } from "@/lib/db/schema";
 import { isSessionStaff } from "@/lib/db/queries/sessions";
 import { EditSessionForm } from "@/components/sessions/EditSessionForm";
 
-export const metadata = { title: "Ubah Sesi" };
+export const metadata = { title: "Edit Session" };
 
 type PageProps = { params: Promise<{ id: string }> };
 

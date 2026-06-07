@@ -74,7 +74,7 @@ export async function markAllNotificationsReadAction(): Promise<ActionState> {
 
   revalidatePath("/notifications");
   revalidatePath("/home");
-  return { success: "Semua ditandai dibaca" };
+  return { success: "All marked as read" };
 }
 
 // ============================================================

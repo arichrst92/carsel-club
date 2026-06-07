@@ -78,7 +78,7 @@ export async function updatePrivacyPrefsAction(
 
   revalidatePath("/profile/settings/privacy");
   revalidatePath("/profile");
-  return { success: "Privasi disimpan" };
+  return { success: "Privacy saved" };
 }
 
 /**

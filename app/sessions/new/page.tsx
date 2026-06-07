@@ -3,7 +3,7 @@ import { requireUser } from "@/lib/auth/get-current-user";
 import { CreateSessionForm } from "@/components/sessions/CreateSessionForm";
 
 export const metadata = {
-  title: "Buat Sesi",
+  title: "Create Session",
 };
 
 export default async function NewSessionPage() {

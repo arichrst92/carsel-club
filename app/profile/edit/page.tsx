@@ -4,7 +4,7 @@ import { EditProfileForm } from "@/components/profile/EditProfileForm";
 import { AvatarUploader } from "@/components/profile/AvatarUploader";
 
 export const metadata = {
-  title: "Ubah Profil",
+  title: "Edit Profile",
 };
 
 export default async function EditProfilePage() {

@@ -39,7 +39,7 @@ export function GroupPhotoGallery({ sessionId, photos, canManage }: Props) {
       if (result?.error) {
         setError(result.error);
       } else {
-        setSuccess(result?.success ?? "Foto ditambahkan");
+        setSuccess(result?.success ?? "Photo added");
         router.refresh();
       }
     });
@@ -60,7 +60,7 @@ export function GroupPhotoGallery({ sessionId, photos, canManage }: Props) {
       if (result?.error) {
         setError(result.error);
       } else {
-        setSuccess(result?.success ?? "Foto dihapus.");
+        setSuccess(result?.success ?? "Photo removed.");
         router.refresh();
       }
     });
@@ -248,7 +248,7 @@ function UploadButton({
           color: "var(--text-900)",
         }}
       >
-        {isPending ? "Mengunggah..." : "Upload foto group"}
+        {isPending ? "Uploading..." : "Upload foto group"}
       </div>
       <div
         style={{

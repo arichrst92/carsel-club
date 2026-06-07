@@ -13,7 +13,7 @@ import { listEarnedAchievements } from "@/lib/db/queries/achievements";
 import { formatDate } from "@/lib/utils";
 
 export const metadata = {
-  title: "Pencapaian",
+  title: "Achievements",
 };
 
 export default async function AchievementsPage() {

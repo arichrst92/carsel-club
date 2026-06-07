@@ -234,7 +234,7 @@ export function EditProfileForm({
           disabled={isPending || displayName.trim().length < 2}
           className={`btn-primary-lg ${isPending ? "loading" : ""}`}
         >
-          <span>{isPending ? "Menyimpan..." : "Simpan Perubahan"}</span>
+          <span>{isPending ? "Menyimpan..." : "Save Changes"}</span>
           {!isPending && (
             <svg
               width="20"

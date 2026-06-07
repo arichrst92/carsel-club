@@ -45,10 +45,10 @@ const STATUS_LABEL: Record<
   "upcoming" | "live" | "completed" | "cancelled",
   { label: string; icon: string }
 > = {
-  upcoming: { label: "Mendatang", icon: "📅" },
-  live: { label: "Berlangsung", icon: "🔴" },
-  completed: { label: "Selesai", icon: "✅" },
-  cancelled: { label: "Dibatalkan", icon: "❌" },
+  upcoming: { label: "Upcoming", icon: "📅" },
+  live: { label: "Live", icon: "🔴" },
+  completed: { label: "Completed", icon: "✅" },
+  cancelled: { label: "Cancelled", icon: "❌" },
 };
 
 export default async function SessionDetailPage({ params }: PageProps) {
@@ -111,13 +111,13 @@ export default async function SessionDetailPage({ params }: PageProps) {
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
         </Link>
-        <h2 className="subscreen-title">Detail Sesi</h2>
+        <h2 className="subscreen-title">Session Detail</h2>
         {staff && !isTerminal ? (
           <Link
             href={`/sessions/${session.id}/edit`}
             className="subscreen-action"
             aria-label="Ubah Sesi"
-            title="Ubah Sesi"
+            title="Edit Session"
             style={{
               fontFamily: "var(--font-display)",
               fontWeight: 700,
@@ -441,7 +441,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
         {/* MATCH SETTINGS RECAP */}
         <section>
           <div className="section-head">
-            <h3>Pengaturan Match</h3>
+            <h3>Match Settings</h3>
           </div>
           <div className="info-row-list">
             <div className="info-row">
@@ -680,7 +680,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
                   <path d="M12 6v6l4 2" />
                 </svg>
               </div>
-              <h3>Status Sesi</h3>
+              <h3>Status Session</h3>
             </div>
 
             <SessionStatusTimeline current={session.status} />

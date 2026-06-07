@@ -183,7 +183,7 @@ export function FileUpload({
           color: "var(--text-900)",
         }}
       >
-        {busy ? "Mengunggah..." : label}
+        {busy ? "Uploading..." : label}
       </div>
       <div
         style={{

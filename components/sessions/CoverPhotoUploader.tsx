@@ -45,7 +45,7 @@ export function CoverPhotoUploader({ sessionId, currentCoverUrl }: Props) {
         setPreview(currentCoverUrl);
       } else if (result?.coverPhotoUrl) {
         setPreview(result.coverPhotoUrl);
-        setSuccess(result.success ?? "Cover berhasil diubah!");
+        setSuccess(result.success ?? "Cover updated!");
         router.refresh();
       }
     });
@@ -66,7 +66,7 @@ export function CoverPhotoUploader({ sessionId, currentCoverUrl }: Props) {
         setError(result.error);
       } else {
         setPreview(null);
-        setSuccess(result?.success ?? "Cover dihapus.");
+        setSuccess(result?.success ?? "Cover removed.");
         router.refresh();
       }
     });
@@ -137,7 +137,7 @@ export function CoverPhotoUploader({ sessionId, currentCoverUrl }: Props) {
                 disabled={isPending}
                 style={{ display: "none" }}
               />
-              {isPending ? "Mengunggah..." : "Ganti"}
+              {isPending ? "Uploading..." : "Replace"}
             </label>
             <button
               type="button"
@@ -195,7 +195,7 @@ export function CoverPhotoUploader({ sessionId, currentCoverUrl }: Props) {
               color: "var(--text-900)",
             }}
           >
-            {isPending ? "Mengunggah..." : "Tambah cover photo"}
+            {isPending ? "Uploading..." : "Tambah cover photo"}
           </div>
           <div
             style={{

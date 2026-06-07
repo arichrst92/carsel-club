@@ -22,9 +22,9 @@ import type { NotificationType } from "@/lib/notifications/types";
 
 const TYPE_LABELS: Record<NotificationType, string> = {
   session_invite: "Diundang ke session",
-  session_reminder: "Pengingat sesi (H-1 jam)",
-  session_cancelled: "Sesi dibatalkan",
-  friend_request: "Permintaan pertemanan",
+  session_reminder: "Session reminder (H-1 hour)",
+  session_cancelled: "Session cancelled",
+  friend_request: "Friend request",
   friend_accepted: "Friend di-accept",
   join_requested: "Join request masuk (host)",
   join_approved: "Join request di-approve",
@@ -120,7 +120,7 @@ export function NotificationPrefsForm(props: NotificationPrefsFormProps) {
           />
           <HourSelect
             name="quiet_end"
-            label="Selesai"
+            label="Completed"
             value={props.initialQuietEnd}
           />
         </div>
