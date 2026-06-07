@@ -95,6 +95,7 @@ export default async function SessionMatchesPage({ params }: PageProps) {
           participants={participants}
           staff={staff}
           isTerminal={isTerminal}
+          fixPartners={session.fixPartners}
         />
       </main>
     </div>

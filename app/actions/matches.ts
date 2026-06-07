@@ -579,6 +579,204 @@ export async function swapPlayersAction(
 }
 
 // ============================================================
+// Sprint 53: setMatchPlayerAction — replace one player in a pending match
+//
+// Why a separate action from swapPlayersAction:
+// - swapPlayersAction targets two SLOTS (matchA/slotA ↔ matchB/slotB) — both
+//   sides must be currently scheduled players. It cannot reach a sit-out.
+// - setMatchPlayerAction targets one slot + one PARTICIPANT ID. The new
+//   participant can be anyone in the session who isn't already in the same
+//   match. We handle two scenarios:
+//     a) new participant is currently SIT-OUT this round → simple replace,
+//        old player just becomes sit-out.
+//     b) new participant is currently playing in ANOTHER match this round →
+//        we swap them (old player takes the other slot, new player comes in).
+//   Both scenarios are atomic in one transaction.
+//
+// Guards:
+// - Caller must be host/co-host (isSessionStaff)
+// - Target match must be pending (not live/completed)
+// - Other match (if applicable) must also be pending
+// - Same round only — cross-round replace would break Berger scheduling
+// - Fix Partners sessions: BLOCKED. Pair_key invariant must be preserved by
+//   editing pairs via /sessions/[id]/pairs. Returning a friendly error here.
+// ============================================================
+
+const MATCH_SLOTS: MatchSlotKey[] = [
+  "team1P1Id",
+  "team1P2Id",
+  "team2P1Id",
+  "team2P2Id",
+];
+
+export async function setMatchPlayerAction(
+  matchId: string,
+  slot: MatchSlotKey,
+  newParticipantId: string
+): Promise<{ error?: string } | null> {
+  const me = await getCurrentUser();
+  if (!me) redirect("/login");
+
+  // Load target match + session + round info
+  const [target] = await db
+    .select({
+      id: matches.id,
+      status: matches.status,
+      matchRoundSetId: matches.matchRoundSetId,
+      sessionId: matchRoundSets.sessionId,
+      fixPartners: sessions.fixPartners,
+      team1P1Id: matches.team1P1Id,
+      team1P2Id: matches.team1P2Id,
+      team2P1Id: matches.team2P1Id,
+      team2P2Id: matches.team2P2Id,
+    })
+    .from(matches)
+    .innerJoin(matchRoundSets, eq(matches.matchRoundSetId, matchRoundSets.id))
+    .innerJoin(sessions, eq(sessions.id, matchRoundSets.sessionId))
+    .where(eq(matches.id, matchId))
+    .limit(1);
+
+  if (!target) return { error: "Match not found" };
+
+  if (!(await isSessionStaff(target.sessionId, me.id))) {
+    return { error: "Only host/co-host can change match players" };
+  }
+
+  if (target.status !== "pending") {
+    return {
+      error: "Only matches that haven't started can have players changed",
+    };
+  }
+
+  if (target.fixPartners) {
+    return {
+      error:
+        "Fix Partners session — edit pairs via Manage Pairs instead of swapping individual players",
+    };
+  }
+
+  const oldParticipantId = target[slot];
+  if (!oldParticipantId) {
+    return { error: "Slot is empty" };
+  }
+  if (oldParticipantId === newParticipantId) {
+    // No-op, succeed quietly
+    return null;
+  }
+
+  // Validate that newParticipantId belongs to the same session and is active
+  const [newP] = await db
+    .select({
+      id: sessionParticipants.id,
+      sessionId: sessionParticipants.sessionId,
+      isPlaying: sessionParticipants.isPlaying,
+    })
+    .from(sessionParticipants)
+    .where(eq(sessionParticipants.id, newParticipantId))
+    .limit(1);
+
+  if (!newP) return { error: "Player not found" };
+  if (newP.sessionId !== target.sessionId) {
+    return { error: "Player belongs to a different session" };
+  }
+  if (!newP.isPlaying) {
+    return { error: "Player is marked as not playing this session" };
+  }
+
+  // Disallow if the candidate is already in this match (would create duplicate)
+  if (
+    target.team1P1Id === newParticipantId ||
+    target.team1P2Id === newParticipantId ||
+    target.team2P1Id === newParticipantId ||
+    target.team2P2Id === newParticipantId
+  ) {
+    return { error: "Player is already in this match" };
+  }
+
+  // Look for another match in the same round that holds newParticipantId
+  // (slot-level lookup, only pending matches are candidates)
+  const sameRoundMatches = await db
+    .select({
+      id: matches.id,
+      status: matches.status,
+      team1P1Id: matches.team1P1Id,
+      team1P2Id: matches.team1P2Id,
+      team2P1Id: matches.team2P1Id,
+      team2P2Id: matches.team2P2Id,
+    })
+    .from(matches)
+    .where(
+      and(
+        eq(matches.matchRoundSetId, target.matchRoundSetId),
+        ne(matches.id, target.id)
+      )
+    );
+
+  let otherMatchSwap: {
+    matchId: string;
+    slot: MatchSlotKey;
+  } | null = null;
+
+  for (const m of sameRoundMatches) {
+    const slotsRow = {
+      team1P1Id: m.team1P1Id,
+      team1P2Id: m.team1P2Id,
+      team2P1Id: m.team2P1Id,
+      team2P2Id: m.team2P2Id,
+    };
+    const foundSlot = MATCH_SLOTS.find(
+      (s) => slotsRow[s] === newParticipantId
+    );
+    if (foundSlot) {
+      if (m.status !== "pending") {
+        return {
+          error:
+            "Player is already in a live/completed match this round and cannot be moved",
+        };
+      }
+      otherMatchSwap = { matchId: m.id, slot: foundSlot };
+      break;
+    }
+  }
+
+  // Apply atomically
+  try {
+    await db.transaction(async (tx) => {
+      // Put newParticipantId into the target slot
+      await tx
+        .update(matches)
+        .set({ [slot]: newParticipantId })
+        .where(eq(matches.id, matchId));
+
+      // If newParticipant was occupying another slot, put oldParticipant there
+      // (swap). Otherwise oldParticipant just becomes sit-out for this round.
+      if (otherMatchSwap) {
+        await tx
+          .update(matches)
+          .set({ [otherMatchSwap.slot]: oldParticipantId })
+          .where(eq(matches.id, otherMatchSwap.matchId));
+      }
+    });
+  } catch (e) {
+    console.error("[setMatchPlayerAction] tx error:", e);
+    return { error: "Failed to update player. Try again." };
+  }
+
+  event("match_player_set", {
+    sessionId: target.sessionId,
+    matchId,
+    slot,
+    oldParticipantId,
+    newParticipantId,
+    swappedWithOtherMatch: otherMatchSwap !== null,
+  });
+
+  revalidatePath(`/sessions/${target.sessionId}`);
+  revalidatePath(`/sessions/${target.sessionId}/matches`);
+  return null;
+}
+
+// ============================================================
 // Score validation + authorization helper
 // ============================================================
 

@@ -18,6 +18,8 @@ type Props = {
   participants: Participant[];
   staff: boolean;
   isTerminal: boolean;
+  /** Sprint 53: disable per-player replace UX in Fix Partners sessions */
+  fixPartners?: boolean;
 };
 
 export async function MatchesSection({
@@ -26,6 +28,7 @@ export async function MatchesSection({
   participants,
   staff,
   isTerminal,
+  fixPartners = false,
 }: Props) {
   const rounds = await getRoundsWithMatches(sessionId);
   const nextRoundNumber = (rounds.at(-1)?.roundNumber ?? 0) + 1;
@@ -147,16 +150,76 @@ export async function MatchesSection({
                 gap: "var(--s-3)",
               }}
             >
-              {round.matches.map((m) => (
-                <MatchCard
-                  key={m.id}
-                  match={m}
-                  lookup={lookup}
-                  canManage={staff && !isTerminal}
-                  sessionId={sessionId}
-                  sessionTitle={sessionTitle}
-                />
-              ))}
+              {round.matches.map((m) => {
+                // Sprint 53: per-match replace-player context. Other-match
+                // players this round become "swap" candidates; benched
+                // active participants become "replace" (sit-out) candidates.
+                // Only useful when match is pending and Fix Partners is off.
+                const enableReplace =
+                  staff && !isTerminal && !fixPartners && m.status === "pending";
+                let replaceContext:
+                  | {
+                      candidates: {
+                        participantId: string;
+                        name: string;
+                        currentMatchId: string | null;
+                        currentMatchLabel: string | null;
+                      }[];
+                    }
+                  | undefined;
+                if (enableReplace) {
+                  // Build matchId → label map ("Court N") for this round so
+                  // candidates show which match they're currently playing in.
+                  const matchLabelByMatchId = new Map<string, string>();
+                  round.matches.forEach((rm) =>
+                    matchLabelByMatchId.set(rm.id, `Court ${rm.courtNumber}`)
+                  );
+                  // participantId → matchId (current placement this round)
+                  const participantPlacement = new Map<string, string>();
+                  for (const rm of round.matches) {
+                    for (const pid of [
+                      rm.team1P1Id,
+                      rm.team1P2Id,
+                      rm.team2P1Id,
+                      rm.team2P2Id,
+                    ]) {
+                      if (pid) participantPlacement.set(pid, rm.id);
+                    }
+                  }
+                  const inThisMatch = new Set([
+                    m.team1P1Id,
+                    m.team1P2Id,
+                    m.team2P1Id,
+                    m.team2P2Id,
+                  ]);
+                  const candidates = participants
+                    .filter((p) => p.isPlaying && !inThisMatch.has(p.id))
+                    .map((p) => {
+                      const placementMatchId =
+                        participantPlacement.get(p.id) ?? null;
+                      return {
+                        participantId: p.id,
+                        name: lookup[p.id]?.name ?? "Player",
+                        currentMatchId: placementMatchId,
+                        currentMatchLabel: placementMatchId
+                          ? (matchLabelByMatchId.get(placementMatchId) ?? null)
+                          : null,
+                      };
+                    });
+                  replaceContext = { candidates };
+                }
+                return (
+                  <MatchCard
+                    key={m.id}
+                    match={m}
+                    lookup={lookup}
+                    canManage={staff && !isTerminal}
+                    sessionId={sessionId}
+                    sessionTitle={sessionTitle}
+                    replaceContext={replaceContext}
+                  />
+                );
+              })}
             </div>
 
             {sitOuts.length > 0 && (

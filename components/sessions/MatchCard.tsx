@@ -13,8 +13,20 @@ import {
 import { ShareMatchButton } from "./ShareMatchButton";
 import { MatchTimer } from "./MatchTimer";
 import { useMatchSwap } from "./MatchSwapProvider";
+import { ReplacePlayerModal } from "./ReplacePlayerModal";
 import { Toast } from "@/components/ui/Toast";
 import type { MatchSlotKey } from "@/lib/match/swap";
+
+// Sprint 53: candidate list for replace-player UX
+type ReplaceCandidate = {
+  participantId: string;
+  name: string;
+  currentMatchId: string | null;
+  currentMatchLabel: string | null;
+};
+export type ReplaceContext = {
+  candidates: ReplaceCandidate[];
+};
 
 type ParticipantLookup = Record<
   string,
@@ -48,18 +60,22 @@ export function MatchCard({
   canManage,
   sessionId,
   sessionTitle,
+  replaceContext,
 }: {
   match: Match;
   lookup: ParticipantLookup;
   canManage: boolean;
   sessionId: string;
   sessionTitle: string;
+  replaceContext?: ReplaceContext;
 }) {
   const [t1, setT1] = useState(match.team1Score);
   const [t2, setT2] = useState(match.team2Score);
   const [editing, setEditing] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  // Sprint 53: which slot is currently being replaced (modal open)
+  const [replaceSlot, setReplaceSlot] = useState<MatchSlotKey | null>(null);
 
   const isPending_ = match.status === "pending";
   const isLive = match.status === "live";
@@ -256,6 +272,11 @@ export function MatchCard({
         match={match}
         slotKeys={["team1P1Id", "team1P2Id"]}
         playerNames={team1Names}
+        onEditSlot={
+          canManage && match.status === "pending" && replaceContext
+            ? setReplaceSlot
+            : undefined
+        }
       />
 
       <div
@@ -295,6 +316,11 @@ export function MatchCard({
         match={match}
         slotKeys={["team2P1Id", "team2P2Id"]}
         playerNames={team2Names}
+        onEditSlot={
+          canManage && match.status === "pending" && replaceContext
+            ? setReplaceSlot
+            : undefined
+        }
       />
 
       {/* Actions */}
@@ -436,6 +462,17 @@ export function MatchCard({
         />
       )}
     </div>
+
+    {/* Sprint 53: replace-player modal */}
+    {replaceSlot && replaceContext && (
+      <ReplacePlayerModal
+        matchId={match.id}
+        slot={replaceSlot}
+        currentPlayerName={lookup[match[replaceSlot]]?.name ?? "?"}
+        candidates={replaceContext.candidates}
+        onClose={() => setReplaceSlot(null)}
+      />
+    )}
     </>
   );
 }
@@ -453,6 +490,7 @@ function TeamRow({
   match,
   slotKeys,
   playerNames,
+  onEditSlot,
 }: {
   names: string[];
   score: number;
@@ -466,6 +504,8 @@ function TeamRow({
   match: Match;
   slotKeys: [MatchSlotKey, MatchSlotKey];
   playerNames: [string, string];
+  /** Sprint 53: when set, render an Edit chip on each player */
+  onEditSlot?: (slot: MatchSlotKey) => void;
 }) {
   const swap = useMatchSwap();
   // Sprint 15: swap-mode tap targets pada nama pemain (kalau match pending)
@@ -484,8 +524,10 @@ function TeamRow({
       swap?.selected?.matchId === match.id && swap?.selected?.slot === slot;
 
     if (!swapEnabled) {
-      return (
-        <div
+      // Sprint 53: when caller provides onEditSlot, render the Edit chip
+      // next to the name. Clicking opens the replace-player modal.
+      const nameNode = (
+        <span
           style={{
             fontSize: idx === 0 ? 14 : 12,
             fontWeight: idx === 0 ? 700 : 600,
@@ -499,9 +541,71 @@ function TeamRow({
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
+            flex: 1,
+            minWidth: 0,
           }}
         >
           {name}
+        </span>
+      );
+      if (!onEditSlot) {
+        return (
+          <div
+            style={{
+              fontSize: idx === 0 ? 14 : 12,
+              fontWeight: idx === 0 ? 700 : 600,
+              color:
+                idx === 0
+                  ? won
+                    ? "var(--text-900)"
+                    : "var(--text-700)"
+                  : "var(--text-500)",
+              lineHeight: 1.3,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {name}
+          </div>
+        );
+      }
+      return (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            minWidth: 0,
+          }}
+        >
+          {nameNode}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEditSlot(slot);
+            }}
+            aria-label={`Replace ${name}`}
+            title={`Replace ${name}`}
+            style={{
+              flexShrink: 0,
+              padding: "2px 8px",
+              fontSize: 10,
+              fontFamily: "var(--font-display)",
+              fontWeight: 800,
+              letterSpacing: 0.3,
+              textTransform: "uppercase",
+              color: "var(--primary-700)",
+              background: "var(--primary-50)",
+              border: "1px solid var(--primary-200)",
+              borderRadius: "var(--r-full)",
+              cursor: "pointer",
+              lineHeight: 1.4,
+            }}
+          >
+            Edit
+          </button>
         </div>
       );
     }
